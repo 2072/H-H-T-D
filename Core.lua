@@ -86,8 +86,8 @@ local options = {
             type = 'toggle',
             name = 'debug',
             desc = 'Enables / disables debugging',
-	    set = function(info, value) hhtd.db.global.debug = value; hhtd:Print("Debugging status is", value); return value; end,
-            get = function(info) return hhtd.db.global.debug end,
+	    set = function(info, value) hhtd.db.global.Debug = value; hhtd:Print("Debugging status is", value); return value; end,
+            get = function(info) return hhtd.db.global.Debug end,
 	    order = 1000,
         },
     },
@@ -143,7 +143,7 @@ end
 
 -- }}} ]=]
 
-
+local LastDetectedGUID = "";
 function hhtd:TestUnit(EventName)
 
     local Unit="";
@@ -168,12 +168,17 @@ function hhtd:TestUnit(EventName)
 	return;
     end
 
+    local TheUG = UnitGUID(Unit);
+
     if UnitIsUnit("mouseover", "target") then
-	self:Debug("mouseover is target");
+	--self:Debug("mouseover is target");
 	return;
+    elseif LastDetectedGUID == TheUG then
+	PlaySoundFile("Sound\\Doodad\\BellTollTribal.wav");
+	self:Print("c|FF00FF22You got it!|r");
+	
     end
 
-    local TheUG = UnitGUID(Unit);
 
     if not TheUG then
 	self:Debug("No unit GUID");
@@ -191,11 +196,12 @@ function hhtd:TestUnit(EventName)
     if HHTD_C.HealingClasses[TheUnitClass] then
 
 	if hhtd.EnemyHealers[TheUG] then
-	    if GetTime() - hhtd.EnemyHealers[TheUG] > hhtd.db.global.HFT then
-		self:Debug((UnitName(Unit)), " did not heal for more than 180s, removed.");
+	    if (GetTime() - hhtd.EnemyHealers[TheUG]) > hhtd.db.global.HFT then
+		self:Debug((UnitName(Unit)), " did not heal for more than", hhtd.db.global.HFT, ", removed.");
 		hhtd.EnemyHealers[TheUG] = nil;
 	    else
 		self:Print("|cFFFF0000", (UnitName(Unit)), "a", TheUnitClass_loc, "is a healer!", "|r");
+		LastDetectedGUID = TheUG;
 		PlaySoundFile("Sound\\interface\\AlarmClockWarning3.wav");
 	    end
 	    
@@ -212,12 +218,12 @@ local Time = 0;
 function hhtd:CleanHealers()
 
     Time = GetTime();
-    if Time - LastCleaned < 60 then return end
+    if (Time - LastCleaned) < 60 then return end
 
     self:Debug("cleaning...");
 
     for GUID, LastHeal in pairs(hhtd.EnemyHealers) do
-	if Time - LastHeal > hhtd.db.global.HFT then
+	if (Time - LastHeal) > hhtd.db.global.HFT then
 	    hhtd.EnemyHealers[GUID] = nil;
 	    self:Debug(GUID, "removed");
 	end
