@@ -191,7 +191,7 @@ function hhtd:TestUnit(EventName)
     if HHTD_C.HealingClasses[TheUnitClass] then
 
 	if hhtd.EnemyHealers[TheUG] then
-	    if GetTime() - hhtd.EnemyHealers[TheUG] > 180 then
+	    if GetTime() - hhtd.EnemyHealers[TheUG] > hhtd.db.global.HFT then
 		self:Debug((UnitName(Unit)), " did not heal for more than 180s, removed.");
 		hhtd.EnemyHealers[TheUG] = nil;
 	    else
@@ -202,6 +202,29 @@ function hhtd:TestUnit(EventName)
 	end
 
     end
+
+    hhtd:CleanHealers();
+
+end
+
+local LastCleaned = 0;
+local Time = 0;
+function hhtd:CleanHealers()
+
+    Time = GetTime();
+    if Time - LastCleaned < 60 then return end
+
+    self:Debug("cleaning...");
+
+    for GUID, LastHeal in pairs(hhtd.EnemyHealers) do
+	if Time - LastHeal > hhtd.db.global.HFT then
+	    hhtd.EnemyHealers[GUID] = nil;
+	    self:Debug(GUID, "removed");
+	end
+    end
+
+    LastCleaned = Time;
+
 end
 
 -- TODO add auto clean old healers
