@@ -8,7 +8,7 @@ Version 0.1
 --]=]
 
 -- [=[ Add-on basics and variable declarations {{{
-hhtd = LibStub("AceAddon-3.0"):NewAddon("HealersHaveToDie", "AceConsole-3.0", "AceEvent-3.0");
+hhtd = LibStub("AceAddon-3.0"):NewAddon("Healers Have To Die", "AceConsole-3.0", "AceEvent-3.0");
 
 local hhtd = hhtd;
 
@@ -40,7 +40,7 @@ local PlaySoundFile	= _G.PlaySoundFile;
 
 -- [=[ options and defaults {{{
 local options = {
-    name = "HealersHaveToDie",
+    name = "Healers Have To Die",
     handler = hhtd,
     type = 'group',
     args = {
@@ -109,8 +109,8 @@ function hhtd:OnInitialize()
 
   --options.args.profiles = LibStub("AceDBOptions-3.0"):GetOptionsTable(self.db);
 
-  LibStub("AceConfig-3.0"):RegisterOptionsTable("HealersHaveToDie", options, {"HealersHaveToDie", "hhtd"});
-  LibStub("AceConfigDialog-3.0"):AddToBlizOptions("HealersHaveToDie");
+  LibStub("AceConfig-3.0"):RegisterOptionsTable("Healers Have To Die", options, {"HealersHaveToDie", "hhtd"});
+  LibStub("AceConfigDialog-3.0"):AddToBlizOptions("Healers Have To Die");
 
   -- register slash command handler
   --self:RegisterChatCommand("hhtd", "CLIhandler");
@@ -125,20 +125,20 @@ end
 
 local PlayerFaction = "";
 function hhtd:OnEnable()
-    self:Print("HealersHaveToDie enabled! Type /hhtd for a list of options");
+    self:Print("enabled! Type /hhtd for a list of options");
 
     PlayerFaction = UnitFactionGroup("player");
 
 end
 
 function hhtd:OnDisable()
-    self:Print("HealersHaveToDie has been disabled!\nType /hhtd enable to re-enable it.");
+    self:Print("hhtd has been disabled!\nType /hhtd enable to re-enable it.");
 end
 
 function hhtd:Debug(...)
     if not self.db.global.Debug then return end;
 
-    self:Print("Debug:", ...);
+    self:Print("|cFFFF2222Debug:|r", ...);
 end
 
 -- }}} ]=]
@@ -164,7 +164,12 @@ function hhtd:TestUnit(EventName)
     local UnitFaction = UnitFactionGroup(Unit);
 
     if UnitFaction == PlayerFaction then
-	--self:Print("friendly");
+	--self:Debug("friendly");
+	return;
+    end
+
+    if UnitIsUnit("mouseover", "target") then
+	self:Debug("mouseover is target");
 	return;
     end
 
@@ -199,7 +204,7 @@ function hhtd:TestUnit(EventName)
     end
 end
 
-
+-- TODO add auto clean old healers
 
 do
     local bit	    = _G.bit;

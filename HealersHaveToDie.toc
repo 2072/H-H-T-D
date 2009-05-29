@@ -1,6 +1,6 @@
 ## Interface: 30100
 
-## Title: My Addon's Title
+## Title: Healers Have To Die
 ## Notes: A simple Add-on that beeps when you hover an enemy healer with you mouse pointer
 ## Author: Archarodim
 ## Version: 0.1
