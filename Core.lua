@@ -77,6 +77,19 @@ local options = {
 	    get = function(info) return hhtd.db.global.HFT; end,
 	    order = 30,
 	},
+	Header1000 = {
+	    type = 'header',
+	    name = '',
+	    order = 999,
+	},
+	debug = {
+            type = 'toggle',
+            name = 'debug',
+            desc = 'Enables / disables debugging',
+	    set = function(info, value) hhtd.db.global.debug = value; hhtd:Print("Debugging status is", value); return value; end,
+            get = function(info) return hhtd.db.global.debug end,
+	    order = 1000,
+        },
     },
 }
 
@@ -84,6 +97,7 @@ local defaults = {
   global = {
       HFT = 60,
       Enabled = true,
+      Debug = false,
   }
 };
 -- }}} ]=]
@@ -109,12 +123,22 @@ function hhtd:OnInitialize()
 
 end
 
+local PlayerFaction = "";
 function hhtd:OnEnable()
     self:Print("HealersHaveToDie enabled! Type /hhtd for a list of options");
+
+    PlayerFaction = UnitFactionGroup("player");
+
 end
 
 function hhtd:OnDisable()
     self:Print("HealersHaveToDie has been disabled!\nType /hhtd enable to re-enable it.");
+end
+
+function hhtd:Debug(...)
+    if not self.db.global.Debug then return end;
+
+    self:Print("Debug:", ...);
 end
 
 -- }}} ]=]
@@ -133,29 +157,28 @@ function hhtd:TestUnit(EventName)
 	return;
     end
 
-
-    local UnitFaction = UnitFactionGroup(Unit);
-
-    if UnitFaction ~= "Horde" then
-	--self:Print("No unit faction");
+    if not UnitIsPlayer(Unit) then
 	return;
     end
 
-    if not UnitIsPlayer(Unit) then
+    local UnitFaction = UnitFactionGroup(Unit);
+
+    if UnitFaction == PlayerFaction then
+	--self:Print("friendly");
 	return;
     end
 
     local TheUG = UnitGUID(Unit);
 
     if not TheUG then
-	self:Print("No unit GUID");
+	self:Debug("No unit GUID");
 	return;
     end
 
     local TheUnitClass_loc, TheUnitClass =UnitClass(Unit);
 
     if not TheUnitClass then
-	self:Print("No unit Class");
+	self:Debug("No unit Class");
 	return;
     end
 
@@ -164,7 +187,7 @@ function hhtd:TestUnit(EventName)
 
 	if hhtd.EnemyHealers[TheUG] then
 	    if GetTime() - hhtd.EnemyHealers[TheUG] > 180 then
-		self:Print((UnitName(Unit)), " did not heal for more than 180s, removed.");
+		self:Debug((UnitName(Unit)), " did not heal for more than 180s, removed.");
 		hhtd.EnemyHealers[TheUG] = nil;
 	    else
 		self:Print("|cFFFF0000", (UnitName(Unit)), "a", TheUnitClass_loc, "is a healer!", "|r");
