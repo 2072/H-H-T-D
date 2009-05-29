@@ -7,15 +7,14 @@ Version 0.1
 
 --]=]
 
+-- [=[ Add-on basics and variable declarations {{{
+hhtd = LibStub("AceAddon-3.0"):NewAddon("HealersHaveToDie", "AceConsole-3.0", "AceEvent-3.0");
 
--- TODO: add an option to disable it and to set the expire timer
+local hhtd = hhtd;
 
+--hhtd.BC	= LibStub("LibBabble-Class-3.0"):GetLookupTable();
 
-
-hhtd	= LibStub("AceAddon-3.0"):NewAddon("hhtd", "AceConsole-3.0", "AceEvent-3.0");
-hhtd.BC	= LibStub("LibBabble-Class-3.0"):GetLookupTable();
---hhtd.TQ = LibStub:GetLibrary("LibTalentQuery-1.0");
-
+-- Constants values holder
 local HHTD_C = {};
 
 HHTD_C.HealingClasses = {
@@ -27,38 +26,98 @@ HHTD_C.HealingClasses = {
 
 hhtd.EnemyHealers = {};
 
---hhtd.IsInspecting = false;
 
+-- upvalues
+local UnitFactionGroup	= _G.UnitFactionGroup;
+local UnitIsPlayer	= _G.UnitIsPlayer;
+local UnitGUID		= _G.UnitGUID;
+local UnitClass		= _G.UnitClass;
+local UnitFactionGroup	= _G.UnitFactionGroup;
+local GetTime		= _G.GetTime;
+local PlaySoundFile	= _G.PlaySoundFile;
+
+-- }}} ]=]
+
+-- [=[ options and defaults {{{
+local options = {
+    name = "HealersHaveToDie",
+    handler = hhtd,
+    type = 'group',
+    args = {
+        on = {
+            type = 'toggle',
+            name = 'on',
+            desc = 'Enables HHTD',
+	    set = function(info) hhtd.db.global.Enabled = hhtd:Enable(); return hhtd.db.global.Enabled; end,
+            get = function(info) return hhtd:IsEnabled(); end,
+	    order = 10,
+        },
+	off = {
+            type = 'toggle',
+            name = 'off',
+            desc = 'Disables HHTD',
+	    set = function(info) hhtd.db.global.Enabled = not hhtd:Disable(); return not hhtd.db.global.Enabled; end,
+            get = function(info) return not hhtd:IsEnabled(); end,
+	    order = 20,
+        },
+	Header1 = {
+	    type = 'header',
+	    name = '',
+	    order = 25,
+	},
+	HFT = {
+	    type = "range",
+	    name = "Healer Forget Timer",
+	    desc = "Set the Healer Forget Timer (the time in seconds an enemy will remain considered has a healer)",
+	    min = 10,
+	    max = 60 * 10,
+	    step = 1,
+	    bigStep = 5,
+	    set = function(info, value) hhtd.db.global.HFT = value; return value; end,
+	    get = function(info) return hhtd.db.global.HFT; end,
+	    order = 30,
+	},
+    },
+}
+
+local defaults = {
+  global = {
+      HFT = 60,
+      Enabled = true,
+  }
+};
+-- }}} ]=]
+
+-- [=[ Add-on Management functions {{{
 function hhtd:OnInitialize()
-  -- Code that you want to run when the addon is first loaded goes here.
-  self.db = LibStub("AceDB-3.0"):New("HealersHaveToDieDB");
 
-  --self.TQ.RegisterCallback(self, "TalentQuery_Ready");
+  self.db = LibStub("AceDB-3.0"):New("HealersHaveToDieDB", defaults);
+
+  --options.args.profiles = LibStub("AceDBOptions-3.0"):GetOptionsTable(self.db);
+
+  LibStub("AceConfig-3.0"):RegisterOptionsTable("HealersHaveToDie", options, {"HealersHaveToDie", "hhtd"});
+  LibStub("AceConfigDialog-3.0"):AddToBlizOptions("HealersHaveToDie");
+
+  -- register slash command handler
+  --self:RegisterChatCommand("hhtd", "CLIhandler");
   
   self:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED");
-
   self:RegisterEvent("UPDATE_MOUSEOVER_UNIT", "TestUnit");
   self:RegisterEvent("PLAYER_TARGET_CHANGED", "TestUnit");
+
+  self:SetEnabledState(self.db.global.Enabled);
 
 end
 
 function hhtd:OnEnable()
-    self:Print("HealersHaveToDie enabled!");
-    -- Called when the addon is enabled
+    self:Print("HealersHaveToDie enabled! Type /hhtd for a list of options");
 end
 
 function hhtd:OnDisable()
-    self:Print("HealersHaveToDie has been disabled!\nType /hhtd standby to re-enable it.");
-    -- Called when the addon is disabled
+    self:Print("HealersHaveToDie has been disabled!\nType /hhtd enable to re-enable it.");
 end
 
-local UnitFactionGroup = _G.UnitFactionGroup;
-local UnitIsPlayer = _G.UnitIsPlayer;
-local UnitGUID = _G.UnitGUID;
-local UnitClass = _G.UnitClass;
-local UnitFactionGroup = _G.UnitFactionGroup;
-local GetTime	    = _G.GetTime;
-local PlaySoundFile	    = _G.PlaySoundFile;
+-- }}} ]=]
 
 
 function hhtd:TestUnit(EventName)
@@ -93,7 +152,7 @@ function hhtd:TestUnit(EventName)
 	return;
     end
 
-    local TheUnitClass = (select(2, UnitClass(Unit)));
+    local TheUnitClass_loc, TheUnitClass =UnitClass(Unit);
 
     if not TheUnitClass then
 	self:Print("No unit Class");
@@ -103,28 +162,16 @@ function hhtd:TestUnit(EventName)
     -- is the unit class able to heal?
     if HHTD_C.HealingClasses[TheUnitClass] then
 
-	--self:Print(TheUnitClass);
-
 	if hhtd.EnemyHealers[TheUG] then
 	    if GetTime() - hhtd.EnemyHealers[TheUG] > 180 then
 		self:Print((UnitName(Unit)), " did not heal for more than 180s, removed.");
 		hhtd.EnemyHealers[TheUG] = nil;
 	    else
-		self:Print("|cFFFF0000", (UnitName(Unit)), "a", TheUnitClass, "is a healer!", "|r");
+		self:Print("|cFFFF0000", (UnitName(Unit)), "a", TheUnitClass_loc, "is a healer!", "|r");
 		PlaySoundFile("Sound\\interface\\AlarmClockWarning3.wav");
 	    end
 	    
 	end
-
-	--[==[ query its talents if we don't have them
-	if not hhtd.IsInspecting and not self.EnemiesTalent[TheUG] then
-	    self:Print("Querring talent");
-	    self.TQ:Query(Unit);
-	    hhtd.IsInspecting = true;
-	elseif self.EnemiesTalent[TheUG] then
-	    self:Print((UnitName(Unit)), unpack(self.EnemiesTalent[TheUG]));
-	end
-	--]==]
 
     end
 end
@@ -132,20 +179,18 @@ end
 
 
 do
-
-    local bit = _G.bit;
-    local band = bit.band;
-    local bor = bit.bor;
-    local UnitGUID = _G.UnitGUID;
-    local sub	= _G.string.sub;
-    local GetTime	    = _G.GetTime;
+    local bit	    = _G.bit;
+    local band	    = _G.bit.band;
+    local bor	    = _G.bit.bor;
+    local UnitGUID  = _G.UnitGUID;
+    local sub	    = _G.string.sub;
+    local GetTime   = _G.GetTime;
     
     local PET			= COMBATLOG_OBJECT_TYPE_PET;
 
     local OUTSIDER		= COMBATLOG_OBJECT_AFFILIATION_OUTSIDER;
     local HOSTILE_OUTSIDER	= bit.bor (COMBATLOG_OBJECT_AFFILIATION_OUTSIDER, COMBATLOG_OBJECT_REACTION_HOSTILE);
     local FRIENDLY_TARGET	= bit.bor (COMBATLOG_OBJECT_TARGET, COMBATLOG_OBJECT_REACTION_FRIENDLY);
-    local ME
 
     -- http://www.wowwiki.com/API_COMBAT_LOG_EVENT
     function hhtd:COMBAT_LOG_EVENT_UNFILTERED(e, timestamp, event, sourceGUID, sourceName, sourceFlags, destGUID, destName, destFlags, arg9, arg10, arg11, arg12)
@@ -163,80 +208,5 @@ do
 
     end
 end
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
---[==[ useless things {{{
-function hhtd:TalentQuery_Ready(e, name, realm, unitid)
-
-    hhtd.IsInspecting = false;
-    local isnotplayer = not UnitIsUnit(unitid, "player")
-    local spec = {};
-    local HasTalent = 0;
-	self:Print("getting talents: ", e, name, realm, unitid);
-    for tab = 1, GetNumTalentTabs(isnotplayer) do
-	local treename, _, pointsspent = GetTalentTabInfo(tab, isnotplayer)
-	tinsert(spec, pointsspent)
-	HasTalent = HasTalent + pointsspent;
-    end
-    local TheUG = UnitGUID(unitid);
-    if TheUG and HasTalent > 0 then
-	self:Print("setting talents: ", e, name, realm, unitid, TheUG);
-	self.EnemiesTalent[TheUG] = spec;
-    else
-	self:Print("Error: ", TheUG, HasTalent);
-    end
-
-end
-
-function hhtd:INSPECT_TALENT_READY()
-    hhtd.IsInspecting = false;
-end
-
-
--- functions inspired from AceConsole-2.0
-local function tostring_args(a1, ...)
-	if select('#', ...) < 1 then
-		return tostring(a1)
-	end
-	return tostring(a1), tostring_args(...)
-end
-
-local function tostring_args(a1, ...)
-	if select('#', ...) < 1 then
-		return tostring(a1)
-	end
-	return tostring(a1), tostring_args(...)
-end
-
-function hhtd:Printf(s, ... ) --{{{
-
-if tostring(a1):find("%%") and select('#', ...) >= 1 then
-    local success, text = pcall(string.format, tostring_args(a1, ...))
-    if success then
-	return self:Print(text)
-    end
-    return self:Print((", "):join(tostring_args(a1, ...)));
-end
-
-return self:Print((", "):join(tostring_args(a1, ...)), self, r, g, b, frame or self.printFrame, delay)
-
-
-end --}}}
-
-
-}}} --]==]
 
 
