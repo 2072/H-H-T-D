@@ -1,16 +1,18 @@
 ## Interface: 30100
 
 ## Title: Healers Have To Die
-## Notes: A simple Add-on that beeps when you hover an enemy healer with you mouse pointer
+## Notes: A simple Add-on that rings when you hover or target an enemy healer.
 ## Author: Archarodim
-## Version: 0.1
+## Version: @project-version@
 
 ## SavedVariables: HealersHaveToDieDB
 
-## X-License: All rights resered
+## X-License: All Rights Reserved
 
-## OptionalDeps: Ace3
+## OptionalDeps: Ace3, CallbackHandler-1.0
+## X-Embeds: Ace3, CallbackHandler-1.0
 
+## X-ReleaseDate: "@project-date-iso@"
 ## X-Category: PvP
 ## X-eMail: archarodim@teaser.fr
 
