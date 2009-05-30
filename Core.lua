@@ -3,13 +3,16 @@ HealersHaveToDie World of Warcraft Add-on
 Copyright (c) 2009 by John Wellesz (Archarodim@teaser.fr)
 All rights reserved
 
-Version 0.1
+Version @project-version@
 
 This is a very simple and light add-on that rings when you hover or target a
 unit of the opposite faction who healed someone during the last 60 seconds (can
 be configured).
 Now you can spot healers instantly and help them to die.
+
 This add-on uses the Ace3 framework.
+
+type /hhtd to get a list of existing options.
 
 
 --]=]
