@@ -157,7 +157,7 @@ function hhtd:TestUnit(EventName)
 	return;
     end
 
-    if not UnitIsPlayer(Unit) then
+    if not UnitIsPlayer(Unit) or UnitIsDead(Unit) then
 	return;
     end
 
@@ -173,9 +173,10 @@ function hhtd:TestUnit(EventName)
     if UnitIsUnit("mouseover", "target") then
 	--self:Debug("mouseover is target");
 	return;
-    elseif LastDetectedGUID == TheUG then
-	PlaySoundFile("Sound\\Doodad\\BellTollTribal.wav");
-	self:Print("c|FF00FF22You got it!|r");
+    elseif LastDetectedGUID == TheUG and Unit == "target" then
+	--PlaySoundFile("Sound\\Doodad\\BellTollTribal.wav");
+	PlaySoundFile("Sound\\interface\\AuctionWindowOpen.wav");
+	self:Print("|cFF00FF22You got it!|r");
 	
     end
 
@@ -200,8 +201,14 @@ function hhtd:TestUnit(EventName)
 		self:Debug((UnitName(Unit)), " did not heal for more than", hhtd.db.global.HFT, ", removed.");
 		hhtd.EnemyHealers[TheUG] = nil;
 	    else
-		self:Print("|cFFFF0000", (UnitName(Unit)), "a", TheUnitClass_loc, "is a healer!", "|r");
-		LastDetectedGUID = TheUG;
+		if LastDetectedGUID ~= TheUG then
+		    self:Print("|cFFFF0000", (UnitName(Unit)), "a", TheUnitClass_loc, "is a healer!", "|r");
+		end
+
+		if Unit == "mouseover" then
+		    LastDetectedGUID = TheUG;
+		end
+
 		PlaySoundFile("Sound\\interface\\AlarmClockWarning3.wav");
 	    end
 	    
