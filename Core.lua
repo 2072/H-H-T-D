@@ -5,14 +5,19 @@ All rights reserved
 
 Version 0.1
 
+This is a very simple and light add-on that rings when you hover or target a
+unit of the opposite faction who healed someone during the last 60 seconds (can
+be configured).
+Now you can spot healers instantly and help them to die.
+This add-on uses the Ace3 framework.
+
+
 --]=]
 
 -- [=[ Add-on basics and variable declarations {{{
 hhtd = LibStub("AceAddon-3.0"):NewAddon("Healers Have To Die", "AceConsole-3.0", "AceEvent-3.0");
 
 local hhtd = hhtd;
-
---hhtd.BC	= LibStub("LibBabble-Class-3.0"):GetLookupTable();
 
 -- Constants values holder
 local HHTD_C = {};
@@ -107,14 +112,9 @@ function hhtd:OnInitialize()
 
   self.db = LibStub("AceDB-3.0"):New("HealersHaveToDieDB", defaults);
 
-  --options.args.profiles = LibStub("AceDBOptions-3.0"):GetOptionsTable(self.db);
-
   LibStub("AceConfig-3.0"):RegisterOptionsTable("Healers Have To Die", options, {"HealersHaveToDie", "hhtd"});
   LibStub("AceConfigDialog-3.0"):AddToBlizOptions("Healers Have To Die");
 
-  -- register slash command handler
-  --self:RegisterChatCommand("hhtd", "CLIhandler");
-  
   self:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED");
   self:RegisterEvent("UPDATE_MOUSEOVER_UNIT", "TestUnit");
   self:RegisterEvent("PLAYER_TARGET_CHANGED", "TestUnit");
@@ -128,7 +128,6 @@ function hhtd:OnEnable()
     self:Print("enabled! Type /hhtd for a list of options");
 
     PlayerFaction = UnitFactionGroup("player");
-
 end
 
 function hhtd:OnDisable()
@@ -164,7 +163,6 @@ function hhtd:TestUnit(EventName)
     local UnitFaction = UnitFactionGroup(Unit);
 
     if UnitFaction == PlayerFaction then
-	--self:Debug("friendly");
 	return;
     end
 
@@ -180,7 +178,6 @@ function hhtd:TestUnit(EventName)
 	
     end
 
-
     if not TheUG then
 	self:Debug("No unit GUID");
 	return;
@@ -193,7 +190,7 @@ function hhtd:TestUnit(EventName)
 	return;
     end
 
-    -- is the unit class able to heal?
+    -- Is the unit class able to heal?
     if HHTD_C.HealingClasses[TheUnitClass] then
 
 	if hhtd.EnemyHealers[TheUG] then
@@ -239,8 +236,6 @@ function hhtd:CleanHealers()
     LastCleaned = Time;
 
 end
-
--- TODO add auto clean old healers
 
 do
     local bit	    = _G.bit;
