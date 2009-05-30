@@ -14,7 +14,6 @@ This add-on uses the Ace3 framework.
 
 type /hhtd to get a list of existing options.
 
-
 --]=]
 
 -- [=[ Add-on basics and variable declarations {{{
@@ -52,6 +51,16 @@ local options = {
     handler = hhtd,
     type = 'group',
     args = {
+	VersionHeader = {
+	    type = 'header',
+	    name = 'version: @project-version@',
+	    order = 1,
+	},
+	ReleaseDateHeader = {
+	    type = 'header',
+	    name = 'Release Date: @project-date-iso@',
+	    order = 2,
+	},
         on = {
             type = 'toggle',
             name = 'on',
@@ -97,6 +106,14 @@ local options = {
 	    set = function(info, value) hhtd.db.global.Debug = value; hhtd:Print("Debugging status is", value); return value; end,
             get = function(info) return hhtd.db.global.Debug end,
 	    order = 1000,
+        },
+	version = {
+	    type = 'execute',
+	    name = 'version',
+	    desc = 'Display version and release date',
+	    guiHidden = true,
+	    func = function () hhtd:Print('version: @project-version@, released on: @project-date-iso@') end,
+	    order = 1010,
         },
     },
 }
