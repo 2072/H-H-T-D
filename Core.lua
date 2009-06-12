@@ -14,6 +14,11 @@ This add-on uses the Ace3 framework.
 
 type /hhtd to get a list of existing options.
 
+-----
+    Core.lua
+-----
+
+
 --]=]
 
 -- [=[ Add-on basics and variable declarations {{{
@@ -23,6 +28,7 @@ local hhtd = hhtd;
 
 -- Constants values holder
 local HHTD_C = {};
+hhtd.C = HHTD_C;
 
 HHTD_C.HealingClasses = {
     ["PRIEST"]	= true,
@@ -35,13 +41,18 @@ hhtd.EnemyHealers = {};
 
 
 -- upvalues
-local UnitFactionGroup	= _G.UnitFactionGroup;
 local UnitIsPlayer	= _G.UnitIsPlayer;
+local UnitIsDead	= _G.UnitIsDead;
+local UnitFactionGroup	= _G.UnitFactionGroup;
 local UnitGUID		= _G.UnitGUID;
+local UnitIsUnit	= _G.UnitIsUnit;
+local UnitSex		= _G.UnitSex;
 local UnitClass		= _G.UnitClass;
+local UnitName		= _G.UnitName;
 local UnitFactionGroup	= _G.UnitFactionGroup;
 local GetTime		= _G.GetTime;
 local PlaySoundFile	= _G.PlaySoundFile;
+
 
 -- }}} ]=]
 
@@ -139,6 +150,8 @@ function hhtd:OnInitialize()
   self:RegisterEvent("UPDATE_MOUSEOVER_UNIT", "TestUnit");
   self:RegisterEvent("PLAYER_TARGET_CHANGED", "TestUnit");
 
+  self:CreateClassColorTables();
+
   self:SetEnabledState(self.db.global.Enabled);
 
 end
@@ -187,6 +200,7 @@ function hhtd:TestUnit(EventName)
     end
 
     local TheUG = UnitGUID(Unit);
+    local TheUnitClass_loc, TheUnitClass;
 
     if UnitIsUnit("mouseover", "target") then
 	--self:Debug("mouseover is target");
@@ -194,7 +208,12 @@ function hhtd:TestUnit(EventName)
     elseif LastDetectedGUID == TheUG and Unit == "target" then
 	--PlaySoundFile("Sound\\Doodad\\BellTollTribal.wav");
 	PlaySoundFile("Sound\\interface\\AuctionWindowOpen.wav");
-	self:Print("|cFF00FF22You got it!|r");
+	local sex = UnitSex(Unit);
+	local what = (sex == 1 and "it" or sex == 2 and "him" or "her");
+	TheUnitClass_loc, TheUnitClass = UnitClass(Unit);
+
+	self:Print("|cFF00FF22", ("You got %s!"):format(self:ColorText(what, self:GetClassHexColor(TheUnitClass))), "|r");
+	return;
 	
     end
 
@@ -203,7 +222,7 @@ function hhtd:TestUnit(EventName)
 	return;
     end
 
-    local TheUnitClass_loc, TheUnitClass =UnitClass(Unit);
+    TheUnitClass_loc, TheUnitClass = UnitClass(Unit);
 
     if not TheUnitClass then
 	self:Debug("No unit Class");
@@ -219,7 +238,7 @@ function hhtd:TestUnit(EventName)
 		hhtd.EnemyHealers[TheUG] = nil;
 	    else
 		if LastDetectedGUID ~= TheUG then
-		    self:Print("|cFFFF0000", (UnitName(Unit)), "a", TheUnitClass_loc, "is a healer!", "|r");
+		    self:Print("|cFFFF0000", ("%s is a healer!"):format(self:ColorText((UnitName(Unit)), self:GetClassHexColor(TheUnitClass))), "|r");
 		end
 
 		if Unit == "mouseover" then
@@ -236,6 +255,7 @@ function hhtd:TestUnit(EventName)
     hhtd:CleanHealers();
 
 end
+
 
 local LastCleaned = 0;
 local Time = 0;
