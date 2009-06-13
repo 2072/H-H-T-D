@@ -241,9 +241,7 @@ function hhtd:TestUnit(EventName)
 		    self:Print("|cFFFF0000", ("%s is a healer!"):format(self:ColorText((UnitName(Unit)), self:GetClassHexColor(TheUnitClass))), "|r");
 		end
 
-		if Unit == "mouseover" then
-		    LastDetectedGUID = TheUG;
-		end
+		LastDetectedGUID = TheUG;
 
 		PlaySoundFile("Sound\\interface\\AlarmClockWarning3.wav");
 	    end
