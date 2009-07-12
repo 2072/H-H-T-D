@@ -1,0 +1,5 @@
+# vim:syntax=YAML:expandtab
+-
+    type: markdown
+    input-file: "Doc/Description.txt"
+    output-page: "Main"
