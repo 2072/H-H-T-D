@@ -1,4 +1,4 @@
-## Interface: 30100
+## Interface: 30200
 
 ## Title: Healers Have To Die
 ## Notes: A simple Add-on that rings when you hover or target an enemy healer.
