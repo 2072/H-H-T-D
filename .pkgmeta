@@ -11,9 +11,9 @@ externals:
     Libs/CallbackHandler-1.0: svn://svn.wowace.com/wow/callbackhandler/mainline/trunk/CallbackHandler-1.0
 
 
-optional-dependencies:
-    - ace3
-    - callbackhandler
+#optional-dependencies:
+#    - ace3
+#    - callbackhandler
 
 #manual-changelog: changelog.txt
 
