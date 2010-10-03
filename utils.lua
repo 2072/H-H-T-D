@@ -32,6 +32,7 @@ end --}}}
 
 local RAID_CLASS_COLORS = _G.RAID_CLASS_COLORS;
 HHTD_C.ClassesColors = { };
+HHTD_C.LC = _G.LOCALIZED_CLASS_NAMES_MALE;
 
 function hhtd:GetClassColor (EnglishClass)
     if not HHTD_C.ClassesColors[EnglishClass] then
@@ -64,10 +65,11 @@ function hhtd:CreateClassColorTables ()
     if RAID_CLASS_COLORS then
         local class, colors;
         for class in pairs(RAID_CLASS_COLORS) do
-            if not class:find(" ") then -- thank to a wonderful add-on that adds the wrong translation "Death Knight" to the global RAID_CLASS_COLORS....
+            if HHTD_C.LC[class] then -- thank to a wonderful add-on that adds the wrong translation "Death Knight" to the global RAID_CLASS_COLORS....
                 hhtd:GetClassHexColor(class);
             else
                 RAID_CLASS_COLORS[class] = nil; -- Eat that!
+                print("HHTD: |cFFFF0000Stupid value found in _G.RAID_CLASS_COLORS table|r\nThis will cause many issues (tainting), HHTD will display this message until the culprit add-on is fixed or removed, the Stupid value is: '", class, "'");
             end
         end
     else
