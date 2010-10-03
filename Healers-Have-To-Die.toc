@@ -24,6 +24,7 @@
 
 embeds.xml
 
+Localization.lua
 Core.lua
 utils.lua
 

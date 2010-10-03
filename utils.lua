@@ -21,8 +21,10 @@ type /hhtd to get a list of existing options.
 
 --]=]
 
+local addonName, T = ...;
+local hhtd = T.hhtd;
 
-local HHTD_C = hhtd.C;
+local HHTD_C = T.hhtd.C;
 
 function hhtd:ColorText (text, color) --{{{
     return "|c".. color .. text .. "|r";

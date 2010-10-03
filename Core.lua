@@ -20,11 +20,15 @@ type /hhtd to get a list of existing options.
 
 
 --]=]
+local addonName, T = ...;
 
 -- [=[ Add-on basics and variable declarations {{{
-hhtd = LibStub("AceAddon-3.0"):NewAddon("Healers Have To Die", "AceConsole-3.0", "AceEvent-3.0");
+T.hhtd = LibStub("AceAddon-3.0"):NewAddon("Healers Have To Die", "AceConsole-3.0", "AceEvent-3.0");
+local hhtd = T.hhtd;
 
-local hhtd = hhtd;
+hhtd.L = LibStub("AceLocale-3.0"):GetLocale("HealersHaveToDie", true);
+
+local L = hhtd.L;
 
 -- Constants values holder
 local HHTD_C = {};
@@ -66,26 +70,26 @@ local options = {
     args = {
         VersionHeader = {
             type = 'header',
-            name = 'version: @project-version@',
+            name = L["VERSION"] .. ' @project-version@',
             order = 1,
         },
         ReleaseDateHeader = {
             type = 'header',
-            name = 'Release Date: @project-date-iso@',
+            name = L["RELEASE_DATE"] .. ' @project-date-iso@',
             order = 2,
         },
         on = {
             type = 'toggle',
-            name = 'on',
-            desc = 'Enables HHTD',
+            name = L["OPT_ON"],
+            desc = L["OPT_ON_DESC"],
             set = function(info) hhtd.db.global.Enabled = hhtd:Enable(); return hhtd.db.global.Enabled; end,
             get = function(info) return hhtd:IsEnabled(); end,
             order = 10,
         },
         off = {
             type = 'toggle',
-            name = 'off',
-            desc = 'Disables HHTD',
+            name = L["OPT_OFF"],
+            desc = L["OPT_OFF_DESC"],
             set = function(info) hhtd.db.global.Enabled = not hhtd:Disable(); return not hhtd.db.global.Enabled; end,
             get = function(info) return not hhtd:IsEnabled(); end,
             order = 20,
@@ -97,8 +101,8 @@ local options = {
         },
         HFT = {
             type = "range",
-            name = "Healer Forget Timer",
-            desc = "Set the Healer Forget Timer (the time in seconds an enemy will remain considered has a healer)",
+            name = L["OPT_HEALER_FORGET_TIMER"],
+            desc = L["OPT_HEALER_FORGET_TIMER_DESC"],
             min = 10,
             max = 60 * 10,
             step = 1,
@@ -114,18 +118,18 @@ local options = {
         },
         debug = {
             type = 'toggle',
-            name = 'debug',
-            desc = 'Enables / disables debugging',
-            set = function(info, value) hhtd.db.global.Debug = value; hhtd:Print("Debugging status is", value); return value; end,
+            name = L["OPT_DEBUG"],
+            desc = L["OPT_DEBUG_DESC"],
+            set = function(info, value) hhtd.db.global.Debug = value; hhtd:Print(L["DEBUGGING_STATUS"], value and L["OPT_ON"] or L["OPT_OFF"]); return value; end,
             get = function(info) return hhtd.db.global.Debug end,
             order = 1000,
         },
         version = {
             type = 'execute',
-            name = 'version',
-            desc = 'Display version and release date',
+            name = L["OPT_VERSION"],
+            desc = L["OPT_VERSION_DESC"],
             guiHidden = true,
-            func = function () hhtd:Print('version: @project-version@, released on: @project-date-iso@') end,
+            func = function () hhtd:Print(L["VERSION"], '@project-version@,', L["RELEASE_DATE"], '@project-date-iso@') end,
             order = 1010,
         },
     },
@@ -160,13 +164,13 @@ end
 
 local PlayerFaction = "";
 function hhtd:OnEnable()
-    self:Print("enabled! Type /hhtd for a list of options");
+    self:Print(L["ENABLED"]);
 
     PlayerFaction = UnitFactionGroup("player");
 end
 
 function hhtd:OnDisable()
-    self:Print("hhtd has been disabled!\nType /hhtd enable to re-enable it.");
+    self:Print(L["DISABLED"]);
 end
 
 function hhtd:Debug(...)
@@ -187,7 +191,7 @@ function hhtd:TestUnit(EventName)
     elseif EventName=="PLAYER_TARGET_CHANGED" then
         Unit = "target";
     else
-        self:Print("called on unvalid event");
+        self:Print("called on invalid event");
         return;
     end
 
@@ -212,10 +216,11 @@ function hhtd:TestUnit(EventName)
         self:Debug("AuctionWindowOpen.wav played");
 
         local sex = UnitSex(Unit);
-        local what = (sex == 1 and "it" or sex == 2 and "him" or "her");
+        local what = (sex == 1 and L["YOU_GOT_IT"] or sex == 2 and L["YOU_GOT_HIM"] or L["YOU_GOT_HER"]);
         TheUnitClass_loc, TheUnitClass = UnitClass(Unit);
+        local subjectColor = self:GetClassHexColor(TheUnitClass);
 
-        self:Print("|cFF00FF22", ("You got %s!"):format(self:ColorText(what, self:GetClassHexColor(TheUnitClass))), "|r");
+        self:Print(what:format("|c" .. subjectColor ));
         return;
         
     end
@@ -241,7 +246,7 @@ function hhtd:TestUnit(EventName)
                 hhtd.EnemyHealers[TheUG] = nil;
             else
                 if LastDetectedGUID ~= TheUG then
-                    self:Print("|cFFFF0000", ("%s is a healer!"):format(self:ColorText((UnitName(Unit)), self:GetClassHexColor(TheUnitClass))), "|r");
+                    self:Print("|cFFFF0000", (L["IS_A_HEALER"]):format(self:ColorText((UnitName(Unit)), self:GetClassHexColor(TheUnitClass))), "|r");
                 end
 
                 LastDetectedGUID = TheUG;
