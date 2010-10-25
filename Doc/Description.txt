@@ -10,24 +10,28 @@ a unit of the opposite faction who healed someone else during the last 60
 seconds (*can be configured*).
 
 This add-on uses the Ace3 framework.
+******************************************
+* **NEW FEATURE** (2010-10-25)
 
-* NEW - NEW - NEW *
-
-[alpha version only][dev]: HHTD is now able to add a big red cross above enemy
+([alpha version only][dev]): HHTD is now able to add a **red cross** above enemy
 name plates when they've been caught healing. It's still a work in progress but it does
-work :-)
+work!
 
 **Note: in the current WoW live version (4.0.1) there is a bug with name plates**:
 
-You need to uncheck the option **'Sticky target'** under
-Interface->Control else some name plates may not be displayed.
+You need to uncheck the **'Sticky target'** option under
+*Interface->Control* else some name plates may not be displayed.
 
-**type /hhtd to get a list of existing options**
+******************************************
+
+*type /hhtd to get a list of existing options*
 
 **Comments and suggestions are welcome** :-)
+
 A new [forum][forum] is also available.
 
 
-[dev]: http://www.wowace.com/addons/healers-have-to-die/files/
+[dev]: http://www.2072productions.com/to/hhtd_dev
 [forum]: http://www.wowace.com/addons/healers-have-to-die/forum/
+
 
