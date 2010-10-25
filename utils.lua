@@ -26,6 +26,11 @@ local hhtd = T.hhtd;
 
 local HHTD_C = T.hhtd.C;
 
+local ERROR     = 1;
+local WARNING   = 2;
+local INFO      = 3;
+local INFO2     = 4;
+
 function hhtd:ColorText (text, color) --{{{
     return "|c".. color .. text .. "|r";
 end --}}}
@@ -79,6 +84,8 @@ function hhtd:CreateClassColorTables ()
     end
 end
 
+local UnitName = _G.UnitName;
+
 function hhtd:UnitName(Unit)
     local name, server = UnitName(Unit);
         if ( server and server ~= "" ) then
@@ -86,4 +93,37 @@ function hhtd:UnitName(Unit)
         else
             return name;
         end 
+end
+
+local mrad = _G.math.rad;
+local mcos = _G.math.cos;
+local msin = _G.math.sin;
+-- inspired from http://www.wowwiki.com/SetTexCoord_Transformations#Simple_rotation_of_square_textures_around_the_center
+function hhtd:RotateTexture(self, degrees)
+	local angle = mrad(degrees)
+	local cos, sin = mcos(angle), msin(angle)
+        self:SetTexCoord(
+        0.5-sin, 0.5+cos,
+        0.5+cos, 0.5+sin,
+        0.5-cos, 0.5-sin,
+        0.5+sin, 0.5-cos
+        );
+end
+
+
+local DebugTemplates = {
+    [ERROR]     = "|cFFFF2222Debug:|r|cFFFF5555",
+    [WARNING]   = "|cFFFF2222Debug:|r|cFF55FF55",
+    [INFO]      = "|cFFFF2222Debug:|r|cFF5555FF",
+    [INFO2]     = "|cFFFF2222Debug:|r|cFFFF9922",
+}
+local select, type = _G.select, _G.type;
+function hhtd:Debug(...)
+    if not self.db.global.Debug then return end;
+
+    if type((select(1,...))) == "number" then
+        self:Print(DebugTemplates[(select(1, ...))], select(2, ...));
+    else
+        self:Print("|cFFFF2222Debug:|r", ...);
+    end
 end

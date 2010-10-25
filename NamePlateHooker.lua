@@ -29,22 +29,12 @@ local hhtd = T.hhtd;
 local L = hhtd.L;
 local LibNameplate = LibStub("LibNameplate-1.0");
 
+local ERROR     = 1;
+local WARNING   = 2;
+local INFO      = 3;
+local INFO2     = 4;
 
-local mrad = _G.math.rad;
-local mcos = _G.math.cos;
-local msin = _G.math.sin;
--- http://www.wowwiki.com/SetTexCoord_Transformations#Simple_rotation_of_square_textures_around_the_center
-local function RotateTexture(self, degrees)
-	local angle = mrad(degrees)
-	local cos, sin = mcos(angle), msin(angle)
-        self:SetTexCoord(
-        0.5-sin, 0.5+cos,
-        0.5+cos, 0.5+sin,
-        0.5-cos, 0.5-sin,
-        0.5+sin, 0.5-cos
-        );
-end
-
+local CreateFrame = _G.CreateFrame;
 
 function hhtd:AddCrossToPlate (plate)
 
@@ -54,7 +44,7 @@ function hhtd:AddCrossToPlate (plate)
 
     if not plate.HHTD then
         plate.HHTD = {};
-        self:Debug("Creating texture for", plateName);
+        self:Debug(INFO, "Creating texture for", plateName);
         local f = CreateFrame("Frame", nil, plate)
         f:SetWidth(64);
         f:SetHeight(64);
@@ -64,7 +54,7 @@ function hhtd:AddCrossToPlate (plate)
         f.tex1:SetPoint("CENTER",f ,"CENTER",0,0)
         f.tex1:SetTexture("Interface\\RaidFrame\\ReadyCheck-NotReady.blp");
         -- rotate it by Pi/2
-        RotateTexture(f.tex1, 90);
+        self:RotateTexture(f.tex1, 90);
 
         plate.HHTD.frame = f;
         plate.HHTD.frame:Show()
@@ -75,7 +65,7 @@ function hhtd:AddCrossToPlate (plate)
 
     end
 
-    hhtd.EnemyHealersPlates[plateName] = plate;
+    self.EnemyHealersPlates[plateName] = plate;
 
     return true;
 
@@ -90,22 +80,35 @@ function hhtd:LibNameplate_NewNameplate(event, plate)
     --local plateClass    = LibNameplate:GetClass(plate);
 
     --self:Debug(plateName, "is on screen and is a", plateReaction, plateType, plateClass);
-    -- Check if this name plate is of interest
 
-    if hhtd.EnemyHealersByName[plateName] then
-        hhtd:AddCrossToPlate(plate);
+    -- Check if this name plate is of interest
+    if self.EnemyHealersByName[plateName] then
+        self:AddCrossToPlate(plate);
     end
 end
 
 function hhtd:LibNameplate_RecycleNameplate(event, plate)
     if plate.HHTD then
         plate.HHTD.frame:Hide()
-        hhtd.EnemyHealersPlates[plate.HHTD.plateName] = false;
+        self.EnemyHealersPlates[plate.HHTD.plateName] = false;
     end
 end
 
+function hhtd:HideCross(plateName)
+    if self.EnemyHealersPlates[plateName] then
 
-function hhtd:LibNameplate_FoundGUID(event, plate, GUID, UnitID)
-    --local plateName = LibNameplate:GetName(plate);
-    --self:Debug("Found a GUID for ", plateName, "(", UnitID, "):", GUID);
+        self.EnemyHealersPlates[plateName].HHTD.frame:Hide();
+        self.EnemyHealersPlates[plateName] = false;
+
+        self:Debug(INFO2, "Cross hidden for", plateName);
+    end
 end
+
+--[=[
+function hhtd:LibNameplate_FoundGUID(event, plate, GUID, UnitID)
+    local plateName = LibNameplate:GetName(plate);
+    self:Debug("Found a GUID for ", plateName, "(", UnitID, "):", GUID);
+end
+--]=]
+
+

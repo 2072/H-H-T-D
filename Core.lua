@@ -65,6 +65,10 @@ local GetTime           = _G.GetTime;
 local PlaySoundFile     = _G.PlaySoundFile;
 local pairs             = _G.pairs;
 
+local ERROR     = 1;
+local WARNING   = 2;
+local INFO      = 3;
+local INFO2     = 4;
 
 -- }}} ]=]
 
@@ -201,14 +205,8 @@ function hhtd:OnDisable()
 
     self:Print(L["DISABLED"]);
 end
-
-function hhtd:Debug(...)
-    if not self.db.global.Debug then return end;
-
-    self:Print("|cFFFF2222Debug:|r", ...);
-end
-
 -- }}} ]=]
+
 
 local LastDetectedGUID = "";
 function hhtd:TestUnit(EventName)
@@ -225,12 +223,14 @@ function hhtd:TestUnit(EventName)
     end
 
     if not UnitIsPlayer(Unit) or UnitIsDead(Unit) then
+        hhtd:HideCross((UnitName(Unit)));
         return;
     end
 
     local UnitFaction = UnitFactionGroup(Unit);
 
     if UnitFaction == PlayerFaction then
+        --self:Debug(INFO, (UnitName(Unit)), "is not your enemy");
         return;
     end
 
@@ -242,7 +242,7 @@ function hhtd:TestUnit(EventName)
         return;
     elseif LastDetectedGUID == TheUG and Unit == "target" then
         PlaySoundFile("Sound\\interface\\AuctionWindowOpen.wav");
-        self:Debug("AuctionWindowOpen.wav played");
+        --self:Debug(INFO, "AuctionWindowOpen.wav played");
 
         local sex = UnitSex(Unit);
         local what = (sex == 1 and L["YOU_GOT_IT"] or sex == 2 and L["YOU_GOT_HIM"] or L["YOU_GOT_HER"]);
@@ -255,14 +255,14 @@ function hhtd:TestUnit(EventName)
     end
 
     if not TheUG then
-        self:Debug("No unit GUID");
+        self:Debug(WARNING, "No unit GUID");
         return;
     end
 
     TheUnitClass_loc, TheUnitClass = UnitClass(Unit);
 
     if not TheUnitClass then
-        self:Debug("No unit Class");
+        self:Debug(WARNING, "No unit Class");
         return;
     end
 
@@ -271,7 +271,7 @@ function hhtd:TestUnit(EventName)
 
         if hhtd.EnemyHealers[TheUG] then
             if (GetTime() - hhtd.EnemyHealers[TheUG]) > hhtd.db.global.HFT then
-                self:Debug(self:UnitName(Unit), " did not heal for more than", hhtd.db.global.HFT, ", removed.");
+                self:Debug(INFO2, self:UnitName(Unit), " did not heal for more than", hhtd.db.global.HFT, ", removed.");
                 hhtd.EnemyHealers[TheUG] = nil;
                 hhtd.EnemyHealersByName[(UnitName(Unit))] = nil;
             else
@@ -282,11 +282,12 @@ function hhtd:TestUnit(EventName)
                 LastDetectedGUID = TheUG;
 
                 PlaySoundFile("Sound\\interface\\AlarmClockWarning3.wav");
-                self:Debug("AlarmClockWarning3.wav played");
+                -- self:Debug(INFO, "AlarmClockWarning3.wav played");
             end
             
         end
-
+    else
+        hhtd.EnemyHealersByNameBlacklist[(UnitName(Unit))] = GetTime();
     end
 
     hhtd:CleanHealers();
@@ -295,35 +296,55 @@ end
 
 
 local LastCleaned = 0;
+local LastBlackListCleaned = 0;
 local Time = 0;
 function hhtd:CleanHealers()
 
     Time = GetTime();
-    if (Time - LastCleaned) < 60 then return end
+    if (Time - LastCleaned) < 60 then return end -- no need to run this cleaning more than once per minute
 
-    self:Debug("cleaning...");
+    self:Debug(INFO2, "cleaning...");
 
+    -- clean enemy healers GUID
     for GUID, LastHeal in pairs(hhtd.EnemyHealers) do
         if (Time - LastHeal) > hhtd.db.global.HFT then
             hhtd.EnemyHealers[GUID] = nil;
             
-            self:Debug(GUID, "removed");
+            self:Debug(INFO2, GUID, "removed");
         end
     end
 
+    -- clean enemy healers Name
     for Name, LastHeal in pairs(hhtd.EnemyHealersByName) do
         if (Time - LastHeal) > hhtd.db.global.HFT then
             hhtd.EnemyHealersByName[Name] = nil;
 
+            -- disable their plates
             if hhtd.EnemyHealersPlates[Name] then
+                hhtd:HideCross(Name);
                 hhtd.EnemyHealersPlates[Name] = nil;
             end
 
-            self:Debug(Name, "removed");
+            self:Debug(INFO2, Name, "removed");
         end
     end
 
     LastCleaned = Time;
+
+    -- clean player class blacklist
+    if (Time - LastBlackListCleaned) < 3600 then return end
+
+    for Name, LastSeen in pairs(hhtd.EnemyHealersByNameBlacklist) do
+
+        if (Time - LastSeen) > hhtd.db.global.HFT then
+            hhtd.EnemyHealersByNameBlacklist[Name] = nil;
+
+            self:Debug(INFO2, Name, "removed from class blacklist");
+        end
+    end
+
+
+    LastBlackListCleaned = Time;
 
 end
 
@@ -349,7 +370,7 @@ do
 
         if not sourceGUID then return end
 
-        -- the heal needs to be from an hostile unit and not for a pet
+        -- the heal needs to be from a hostile unit and not for a pet
         if band (sourceFlags, HOSTILE_OUTSIDER) ~= HOSTILE_OUTSIDER or band(destFlags, PET) == PET then
             return;
         end
@@ -358,20 +379,22 @@ do
 
             FirstName = str_match(sourceName, "^[^-]+");
 
-            -- by GUID
-            hhtd.EnemyHealers[sourceGUID] = GetTime();
+            -- Only if the unit class can heal
+            if not hhtd.EnemyHealersByNameBlacklist[FirstName] then
 
-            -- by Name
-            hhtd.EnemyHealersByName[FirstName] = hhtd.EnemyHealers[sourceGUID];
+                -- by GUID
+                hhtd.EnemyHealers[sourceGUID] = GetTime();
+                -- by Name
+                hhtd.EnemyHealersByName[FirstName] = hhtd.EnemyHealers[sourceGUID];
+                -- update plate
+                if not hhtd.EnemyHealersPlates[FirstName] then
+                    hhtd:AddCrossToPlate (LibNameplate:GetNameplateByName(FirstName));
+                end
 
-            -- update plate
-            if not hhtd.EnemyHealersPlates[FirstName] then
-                hhtd:AddCrossToPlate (LibNameplate:GetNameplateByName(FirstName));
+                -- TODO for GEHR: make activity light blink
+
             end
-
-            -- TODO for GEHR: make activity light blink
         end
-
     end
 end
 
