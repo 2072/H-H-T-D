@@ -79,6 +79,9 @@ do
     
     L["DEBUGGING_STATUS"] = "Debugging status is"
 
+    L["OPT_ENABLE_GEHR"] = "Enable Graphical Reporter"
+    L["OPT_ENABLE_GEHR_DESC"] = "Displays a graphical list of detected enemy healers with various features"
+
 
     --]==]
     --@end-do-not-package@

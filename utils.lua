@@ -79,3 +79,11 @@ function hhtd:CreateClassColorTables ()
     end
 end
 
+function hhtd:UnitName(Unit)
+    local name, server = UnitName(Unit);
+        if ( server and server ~= "" ) then
+            return name.."-"..server;
+        else
+            return name;
+        end 
+end

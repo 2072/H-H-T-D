@@ -1,6 +1,6 @@
 --[=[
 HealersHaveToDie World of Warcraft Add-on
-Copyright (c) 2009 by John Wellesz (Archarodim@teaser.fr)
+Copyright (c) 2009-2010 by John Wellesz (Archarodim@teaser.fr)
 All rights reserved
 
 Version @project-version@
@@ -26,9 +26,13 @@ local addonName, T = ...;
 T.hhtd = LibStub("AceAddon-3.0"):NewAddon("Healers Have To Die", "AceConsole-3.0", "AceEvent-3.0");
 local hhtd = T.hhtd;
 
+--hhtddebug = hhtd;
+
 hhtd.L = LibStub("AceLocale-3.0"):GetLocale("HealersHaveToDie", true);
 
 local L = hhtd.L;
+
+local LibNameplate = LibStub("LibNameplate-1.0");
 
 -- Constants values holder
 local HHTD_C = {};
@@ -42,6 +46,9 @@ HHTD_C.HealingClasses = {
 };
 
 hhtd.EnemyHealers = {};
+hhtd.EnemyHealersByName = {};
+hhtd.EnemyHealersByNameBlacklist = {};
+hhtd.EnemyHealersPlates = {};
 
 
 -- upvalues
@@ -56,6 +63,7 @@ local UnitName          = _G.UnitName;
 local UnitFactionGroup  = _G.UnitFactionGroup;
 local GetTime           = _G.GetTime;
 local PlaySoundFile     = _G.PlaySoundFile;
+local pairs             = _G.pairs;
 
 
 -- }}} ]=]
@@ -94,6 +102,16 @@ local options = {
             get = function(info) return not hhtd:IsEnabled(); end,
             order = 20,
         },
+        --@debug@
+        GEHR = {
+            type = 'toggle',
+            name = L["OPT_ENABLE_GEHR"],
+            desc = L["OPT_ENABLE_GEHR_DESC"],
+            set = function(info, v) if v then hhtd.GEH:Enable() else hhtd.GEH:Disable() end end,
+            get = function(info) return hhtd.db.global.GEHDEnabled; end,
+            order = 22,
+        },
+        --@end-debug@
         Header1 = {
             type = 'header',
             name = '',
@@ -140,6 +158,7 @@ local defaults = {
       HFT = 60,
       Enabled = true,
       Debug = false,
+      GEHDEnabled = true,
   }
 };
 -- }}} ]=]
@@ -166,10 +185,20 @@ local PlayerFaction = "";
 function hhtd:OnEnable()
     self:Print(L["ENABLED"]);
 
+
+    LibNameplate.RegisterCallback(hhtd, "LibNameplate_NewNameplate");
+    LibNameplate.RegisterCallback(hhtd, "LibNameplate_RecycleNameplate");
+    --LibNameplate.RegisterCallback(hhtd, "LibNameplate_FoundGUID");
+
     PlayerFaction = UnitFactionGroup("player");
 end
 
 function hhtd:OnDisable()
+
+    LibNameplate.UnregisterCallback(hhtd, "LibNameplate_NewNameplate");
+    LibNameplate.RegisterCallback(hhtd, "LibNameplate_RecycleNameplate");
+    --LibNameplate.UnregisterCallback(hhtd, "LibNameplate_FoundGUID");
+
     self:Print(L["DISABLED"]);
 end
 
@@ -242,8 +271,9 @@ function hhtd:TestUnit(EventName)
 
         if hhtd.EnemyHealers[TheUG] then
             if (GetTime() - hhtd.EnemyHealers[TheUG]) > hhtd.db.global.HFT then
-                self:Debug((UnitName(Unit)), " did not heal for more than", hhtd.db.global.HFT, ", removed.");
+                self:Debug(self:UnitName(Unit), " did not heal for more than", hhtd.db.global.HFT, ", removed.");
                 hhtd.EnemyHealers[TheUG] = nil;
+                hhtd.EnemyHealersByName[(UnitName(Unit))] = nil;
             else
                 if LastDetectedGUID ~= TheUG then
                     self:Print("|cFFFF0000", (L["IS_A_HEALER"]):format(self:ColorText((UnitName(Unit)), self:GetClassHexColor(TheUnitClass))), "|r");
@@ -276,7 +306,20 @@ function hhtd:CleanHealers()
     for GUID, LastHeal in pairs(hhtd.EnemyHealers) do
         if (Time - LastHeal) > hhtd.db.global.HFT then
             hhtd.EnemyHealers[GUID] = nil;
+            
             self:Debug(GUID, "removed");
+        end
+    end
+
+    for Name, LastHeal in pairs(hhtd.EnemyHealersByName) do
+        if (Time - LastHeal) > hhtd.db.global.HFT then
+            hhtd.EnemyHealersByName[Name] = nil;
+
+            if hhtd.EnemyHealersPlates[Name] then
+                hhtd.EnemyHealersPlates[Name] = nil;
+            end
+
+            self:Debug(Name, "removed");
         end
     end
 
@@ -291,6 +334,9 @@ do
     local UnitGUID  = _G.UnitGUID;
     local sub       = _G.string.sub;
     local GetTime   = _G.GetTime;
+    local str_match = _G.string.match;
+
+    local FirstName = "";
     
     local PET                   = COMBATLOG_OBJECT_TYPE_PET;
 
@@ -303,12 +349,27 @@ do
 
         if not sourceGUID then return end
 
+        -- the heal needs to be from an hostile unit and not for a pet
         if band (sourceFlags, HOSTILE_OUTSIDER) ~= HOSTILE_OUTSIDER or band(destFlags, PET) == PET then
             return;
         end
 
         if event:sub(-5) == "_HEAL" and sourceGUID ~= destGUID then
+
+            FirstName = str_match(sourceName, "^[^-]+");
+
+            -- by GUID
             hhtd.EnemyHealers[sourceGUID] = GetTime();
+
+            -- by Name
+            hhtd.EnemyHealersByName[FirstName] = hhtd.EnemyHealers[sourceGUID];
+
+            -- update plate
+            if not hhtd.EnemyHealersPlates[FirstName] then
+                hhtd:AddCrossToPlate (LibNameplate:GetNameplateByName(FirstName));
+            end
+
+            -- TODO for GEHR: make activity light blink
         end
 
     end

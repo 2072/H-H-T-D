@@ -13,8 +13,8 @@
 
 ## X-License: All Rights Reserved
 
-## OptionalDeps: Ace3, CallbackHandler-1.0
-## X-Embeds: Ace3, CallbackHandler-1.0
+## OptionalDeps: Ace3, LibNameplate-1.0
+## X-Embeds: Ace3, LibNameplate-1.0
 
 ## X-ReleaseDate: "@project-date-iso@"
 ## X-Category: PvP
@@ -28,3 +28,6 @@ Localization.lua
 Core.lua
 utils.lua
 
+NamePlateHooker.lua
+
+GraphicalReporter.lua
