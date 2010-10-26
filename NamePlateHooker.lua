@@ -98,7 +98,7 @@ function hhtd:HideCross(plateName)
     if self.EnemyHealersPlates[plateName] then
 
         self.EnemyHealersPlates[plateName].HHTD.frame:Hide();
-        self.EnemyHealersPlates[plateName] = false;
+        self.EnemyHealersPlates[plateName] = nil;
 
         self:Debug(INFO2, "Cross hidden for", plateName);
     end

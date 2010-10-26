@@ -11,10 +11,10 @@ seconds (*can be configured*).
 
 This add-on uses the Ace3 framework.
 ******************************************
-* **NEW FEATURE** (2010-10-26)
+* **NEW FEATURE in HHTD 1.5** (2010-10-26)
 
 HHTD is now able to add a **red cross** above enemy name plates when they've
-been caught healing. It's still a work in progress but it does work!
+been caught healing.
 
 **Note: in the current WoW live version (4.0.1) there is a bug with name plates**:
 

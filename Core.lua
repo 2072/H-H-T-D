@@ -283,6 +283,7 @@ function hhtd:TestUnit(EventName)
                 self:Debug(INFO2, self:UnitName(Unit), " did not heal for more than", hhtd.db.global.HFT, ", removed.");
                 hhtd.EnemyHealers[TheUG] = nil;
                 hhtd.EnemyHealersByName[(UnitName(Unit))] = nil;
+                hhtd:HideCross((UnitName(Unit)));
             else
                 if LastDetectedGUID ~= TheUG then
                     self:Announce("|cFFFF0000", (L["IS_A_HEALER"]):format(self:ColorText((UnitName(Unit)), self:GetClassHexColor(TheUnitClass))), "|r");
@@ -293,7 +294,6 @@ function hhtd:TestUnit(EventName)
                 PlaySoundFile("Sound\\interface\\AlarmClockWarning3.wav");
                 -- self:Debug(INFO, "AlarmClockWarning3.wav played");
             end
-            
         end
     else
         hhtd.EnemyHealersByNameBlacklist[(UnitName(Unit))] = GetTime();
@@ -331,7 +331,6 @@ function hhtd:CleanHealers()
             -- disable their plates
             if hhtd.EnemyHealersPlates[Name] then
                 hhtd:HideCross(Name);
-                hhtd.EnemyHealersPlates[Name] = nil;
             end
 
             self:Debug(INFO2, Name, "removed");
