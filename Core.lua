@@ -239,6 +239,7 @@ function hhtd:TestUnit(EventName)
     local UnitFaction = UnitFactionGroup(Unit);
 
     if UnitFaction == PlayerFaction then
+        hhtd:HideCross((UnitName(Unit)));
         --self:Debug(INFO, (UnitName(Unit)), "is not your enemy");
         return;
     end
@@ -271,6 +272,7 @@ function hhtd:TestUnit(EventName)
     TheUnitClass_loc, TheUnitClass = UnitClass(Unit);
 
     if not TheUnitClass then
+        hhtd:HideCross((UnitName(Unit)));
         self:Debug(WARNING, "No unit Class");
         return;
     end
@@ -296,6 +298,7 @@ function hhtd:TestUnit(EventName)
             end
         end
     else
+        hhtd:HideCross((UnitName(Unit)));
         hhtd.EnemyHealersByNameBlacklist[(UnitName(Unit))] = GetTime();
     end
 
