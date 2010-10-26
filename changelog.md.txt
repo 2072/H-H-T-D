@@ -1,0 +1,11 @@
+Healers Have To Die
+===================
+
+*Change log*
+------------
+
+**version 1.5.1 (2010-10-26):**
+
+ - HHTD is now able to add a red cross above enemy name plates when they've been caught healing.
+ - New option to disable messages printed by HHTD.
+
