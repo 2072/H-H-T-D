@@ -82,6 +82,8 @@ do
     L["OPT_ENABLE_GEHR"] = "Enable Graphical Reporter"
     L["OPT_ENABLE_GEHR_DESC"] = "Displays a graphical list of detected enemy healers with various features"
 
+    L["OPT_ANNOUNCE"] = "Show messages"
+    L["OPT_ANNOUNCE_DESC"] = "HHTD will display messages when you target or mouse-over an enemy healer."
 
     --]==]
     --@end-do-not-package@

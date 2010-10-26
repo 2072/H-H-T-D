@@ -116,6 +116,14 @@ local options = {
             order = 22,
         },
         --@end-debug@
+        Announce = {
+            type = 'toggle',
+            name = L["OPT_ANNOUNCE"],
+            desc = L["OPT_ANNOUNCE_DESC"],
+            set = function(info, v) hhtd.db.global[info[#info]] = v; return v; end,
+            get = function(info) return hhtd.db.global[info[#info]]; end,
+            order = 24,
+        },
         Header1 = {
             type = 'header',
             name = '',
@@ -163,6 +171,7 @@ local defaults = {
       Enabled = true,
       Debug = false,
       GEHDEnabled = true,
+      Announce = true,
   }
 };
 -- }}} ]=]
@@ -249,7 +258,7 @@ function hhtd:TestUnit(EventName)
         TheUnitClass_loc, TheUnitClass = UnitClass(Unit);
         local subjectColor = self:GetClassHexColor(TheUnitClass);
 
-        self:Print(what:format("|c" .. subjectColor ));
+        self:Announce(what:format("|c" .. subjectColor));
         return;
         
     end
@@ -276,7 +285,7 @@ function hhtd:TestUnit(EventName)
                 hhtd.EnemyHealersByName[(UnitName(Unit))] = nil;
             else
                 if LastDetectedGUID ~= TheUG then
-                    self:Print("|cFFFF0000", (L["IS_A_HEALER"]):format(self:ColorText((UnitName(Unit)), self:GetClassHexColor(TheUnitClass))), "|r");
+                    self:Announce("|cFFFF0000", (L["IS_A_HEALER"]):format(self:ColorText((UnitName(Unit)), self:GetClassHexColor(TheUnitClass))), "|r");
                 end
 
                 LastDetectedGUID = TheUG;

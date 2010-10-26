@@ -5,17 +5,16 @@ Healers Have To Die (for World of Warcraft)
 *Now you can spot those nasty healers instantly and help them to accomplish their destiny!*
 
 
-This is a very simple and light add-on. It just rings when you hover or target
+This is a very simple and light add-on. It rings when you hover or target
 a unit of the opposite faction who healed someone else during the last 60
 seconds (*can be configured*).
 
 This add-on uses the Ace3 framework.
 ******************************************
-* **NEW FEATURE** (2010-10-25)
+* **NEW FEATURE** (2010-10-26)
 
-([alpha version only][dev]): HHTD is now able to add a **red cross** above enemy
-name plates when they've been caught healing. It's still a work in progress but it does
-work!
+HHTD is now able to add a **red cross** above enemy name plates when they've
+been caught healing. It's still a work in progress but it does work!
 
 **Note: in the current WoW live version (4.0.1) there is a bug with name plates**:
 

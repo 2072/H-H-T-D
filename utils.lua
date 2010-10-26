@@ -127,3 +127,9 @@ function hhtd:Debug(...)
         self:Print("|cFFFF2222Debug:|r", ...);
     end
 end
+
+function hhtd:Announce(...)
+    if hhtd.db.global.Announce then
+        self:Print(...);
+    end
+end
