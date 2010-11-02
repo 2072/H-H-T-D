@@ -5,7 +5,7 @@
 ## X-Min-Interface: 30300
 
 ## Title: Healers Have To Die
-## Notes: A simple Add-on that rings when you hover or target an enemy healer.
+## Notes: A simple Add-on that rings when you hover or target an enemy healer. It also adds a red cross above their name plates.
 ## Author: Archarodim
 ## Version: @project-version@
 

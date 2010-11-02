@@ -25,28 +25,20 @@ This component displays a list of known healers with a proximity sensor, the lis
 
 --]=]
 
+local ERROR     = 1;
+local WARNING   = 2;
+local INFO      = 3;
+local INFO2     = 4;
 
-local addonName, T = ...;
-local hhtd = T.hhtd;
-local L = hhtd.L;
+local ADDON_NAME, T = ...;
+local HHTD = T.Healers_Have_To_Die;
+local L = HHTD.Localized_Text;
 
-hhtd.GEH = {};
+-- Create module
+HHTD.Graphical_Reporter = HHTD:NewModule("GR")
+local GR = HHTD.Graphical_Reporter;
 
-local GEH = hhtd.GEH;
-GEH.prototype = {};
-GEH.metatable ={ __index = GEH.prototype };
-
-GEH.EHo_count = 0;
-GEH.Initialized = false;
-
-
-function GEH:new(...)
-    local instance = setmetatable({}, self.metatable);
-    instance:init(...);
-    return instance;
-end
-
-function GEH:Create_GEH_list_anchor() -- {{{
+function GR:CreateGRObjectsAnchor() -- {{{
     self.Anchor = {};
     self.Anchor.frame = CreateFrame ("Frame", nil, UIParent);
     local frame = self.Anchor.frame;
@@ -69,37 +61,48 @@ function GEH:Create_GEH_list_anchor() -- {{{
 
 end -- }}}
 
-
-function GEH:Enable()
-    hhtd.db.global.GEHDEnabled = true;
+function GR:OnEnable() -- {{{
+    self:Debug(INFO, "OnEnable");
     -- start roaming updater code here
+end -- }}}
 
-    if not GEH.Initialized then
-
-
-
-
-        GEH.Initialized = true;
-    end
-
-end
-
-function GEH:Disable()
-    hhtd.db.global.GEHDEnabled = false;
+function GR:OnDisable() -- {{{
+    self:Debug(INFO, "OnDisable");
     -- stop roaming update here and hide evrything
+end -- }}}
+
+
+
+-- Graphical Reporter Objects constructor
+GR.GRObject = {};
+
+local GRObject = GR.GRObject;
+GRObject.Prototype = {};
+GRObject.Metatable ={ __index = GRObject.Prototype };
+
+GRObject.Count = 0;
+GRObject.Initialized = false;
+
+
+function GRObject:new(...)
+    local instance = setmetatable({}, self.Metatable);
+    instance:Init(...);
+    return instance;
 end
 
-function GEH.prototype:init(EH_name)
 
-    if not hhtd.initOK then
-        hhtd:Debug("Initializing EH object for", EH_name, "failed, initialization incomplete");
+
+function GRObject.Prototype:Init(healerName)
+
+    if not HHTD.initOK then
+        HHTD:Debug(INFO, "Initializing EH object for", healerName, "failed, initialization incomplete");
         return;
     end
 
-    hhtd:Debug("Initializing EH object for", EH_name);
+    HHTD:Debug(INFO, "Initializing EH object for", healerName);
 
 
-    GEH.EHo_count = GEH.EHo_count + 1;
+    GRObject.Count = GRObject.Count + 1;
 
     self.Shown = false;
     self.ProximitySensor = false;

@@ -21,72 +21,78 @@ type /hhtd to get a list of existing options.
 
 --]=]
 
-local addonName, T = ...;
-local hhtd = T.hhtd;
-
-local HHTD_C = T.hhtd.C;
-
 local ERROR     = 1;
 local WARNING   = 2;
 local INFO      = 3;
 local INFO2     = 4;
 
-function hhtd:ColorText (text, color) --{{{
+
+local ADDON_NAME, T = ...;
+local HHTD = T.Healers_Have_To_Die;
+
+local HHTD_C = T.Healers_Have_To_Die.Constants;
+
+
+
+function HHTD:ColorText (text, color) --{{{
     return "|c".. color .. text .. "|r";
 end --}}}
 
 
-
+-- Class coloring related functions {{{
 local RAID_CLASS_COLORS = _G.RAID_CLASS_COLORS;
-HHTD_C.ClassesColors = { };
-HHTD_C.LC = _G.LOCALIZED_CLASS_NAMES_MALE;
 
-function hhtd:GetClassColor (EnglishClass)
-    if not HHTD_C.ClassesColors[EnglishClass] then
-        if RAID_CLASS_COLORS and RAID_CLASS_COLORS[EnglishClass] then
-            HHTD_C.ClassesColors[EnglishClass] = { RAID_CLASS_COLORS[EnglishClass].r, RAID_CLASS_COLORS[EnglishClass].g, RAID_CLASS_COLORS[EnglishClass].b };
+HHTD_C.ClassesColors = { };
+
+local LC = _G.LOCALIZED_CLASS_NAMES_MALE;
+
+function HHTD:GetClassColor (englishClass) -- {{{
+    if not HHTD_C.ClassesColors[englishClass] then
+        if RAID_CLASS_COLORS and RAID_CLASS_COLORS[englishClass] then
+            HHTD_C.ClassesColors[englishClass] = { RAID_CLASS_COLORS[englishClass].r, RAID_CLASS_COLORS[englishClass].g, RAID_CLASS_COLORS[englishClass].b };
         else
-            HHTD_C.ClassesColors[EnglishClass] = { 0.63, 0.63, 0.63 };
+            HHTD_C.ClassesColors[englishClass] = { 0.63, 0.63, 0.63 };
         end
     end
-    return unpack(HHTD_C.ClassesColors[EnglishClass]);
-end
+    return unpack(HHTD_C.ClassesColors[englishClass]);
+end -- }}}
 
 HHTD_C.HexClassColor = { };
 
-function hhtd:GetClassHexColor(EnglishClass)
+function HHTD:GetClassHexColor(englishClass) -- {{{
 
-    if not HHTD_C.HexClassColor[EnglishClass] then
+    if not HHTD_C.HexClassColor[englishClass] then
 
-        local r, g, b = self:GetClassColor(EnglishClass);
+        local r, g, b = self:GetClassColor(englishClass);
 
-        HHTD_C.HexClassColor[EnglishClass] = ("FF%02x%02x%02x"):format( r * 255, g * 255, b * 255);
+        HHTD_C.HexClassColor[englishClass] = ("FF%02x%02x%02x"):format( r * 255, g * 255, b * 255);
 
     end
 
-    return HHTD_C.HexClassColor[EnglishClass];
-end
+    return HHTD_C.HexClassColor[englishClass];
+end -- }}}
 
-
-function hhtd:CreateClassColorTables ()
+function HHTD:CreateClassColorTables () -- {{{
     if RAID_CLASS_COLORS then
         local class, colors;
         for class in pairs(RAID_CLASS_COLORS) do
-            if HHTD_C.LC[class] then -- thank to a wonderful add-on that adds the wrong translation "Death Knight" to the global RAID_CLASS_COLORS....
-                hhtd:GetClassHexColor(class);
+            if LC[class] then -- thank to a wonderful add-on that adds the wrong translation "Death Knight" to the global RAID_CLASS_COLORS....
+                HHTD:GetClassHexColor(class);
             else
                 RAID_CLASS_COLORS[class] = nil; -- Eat that!
                 print("HHTD: |cFFFF0000Stupid value found in _G.RAID_CLASS_COLORS table|r\nThis will cause many issues (tainting), HHTD will display this message until the culprit add-on is fixed or removed, the Stupid value is: '", class, "'");
             end
         end
     else
-        hhtd:Debug("global RAID_CLASS_COLORS does not exist...");
+        HHTD:Debug(ERROR, "global RAID_CLASS_COLORS does not exist...");
     end
-end
+end -- }}}
+-- }}}
 
+
+-- function HHTD:UnitName(Unit) {{{
 local UnitName = _G.UnitName;
-
-function hhtd:UnitName(Unit)
+function HHTD:UnitName(Unit)
     local name, server = UnitName(Unit);
         if ( server and server ~= "" ) then
             return name.."-"..server;
@@ -94,12 +100,14 @@ function hhtd:UnitName(Unit)
             return name;
         end 
 end
+-- }}}
 
+-- function HHTD:RotateTexture(self, degrees) {{{
 local mrad = _G.math.rad;
 local mcos = _G.math.cos;
 local msin = _G.math.sin;
 -- inspired from http://www.wowwiki.com/SetTexCoord_Transformations#Simple_rotation_of_square_textures_around_the_center
-function hhtd:RotateTexture(self, degrees)
+function HHTD:RotateTexture(self, degrees)
 	local angle = mrad(degrees)
 	local cos, sin = mcos(angle), msin(angle)
         self:SetTexCoord(
@@ -108,28 +116,35 @@ function hhtd:RotateTexture(self, degrees)
         0.5-cos, 0.5-sin,
         0.5+sin, 0.5-cos
         );
-end
+end -- }}}
 
+--  function HHTD:Debug(...) {{{
+do
+    local Debug_Templates = {
+        [ERROR]     = "|cFFFF2222Debug:|cFFCC4444[%s.%3d]:|r|cFFFF5555",
+        [WARNING]   = "|cFFFF2222Debug:|cFFCC4444[%s.%3d]:|r|cFF55FF55",
+        [INFO]      = "|cFFFF2222Debug:|cFFCC4444[%s.%3d]:|r|cFF5555FF",
+        [INFO2]     = "|cFFFF2222Debug:|cFFCC4444[%s.%3d]:|r|cFFFF9922",
+        [false]     = "|cFFFF2222Debug:|cFFCC4444[%s.%3d]:|r",
+    }
+    local select, type = _G.select, _G.type;
+    function HHTD:Debug(...)
+        if not HHTD.db.global.Debug then return end;
 
-local DebugTemplates = {
-    [ERROR]     = "|cFFFF2222Debug:|r|cFFFF5555",
-    [WARNING]   = "|cFFFF2222Debug:|r|cFF55FF55",
-    [INFO]      = "|cFFFF2222Debug:|r|cFF5555FF",
-    [INFO2]     = "|cFFFF2222Debug:|r|cFFFF9922",
-}
-local select, type = _G.select, _G.type;
-function hhtd:Debug(...)
-    if not self.db.global.Debug then return end;
+        local template = type((select(1,...))) == "number" and (select(1, ...)) or false;
 
-    if type((select(1,...))) == "number" then
-        self:Print(DebugTemplates[(select(1, ...))], select(2, ...));
-    else
-        self:Print("|cFFFF2222Debug:|r", ...);
+        local DebugHeader = (Debug_Templates[template]):format(date("%M"), (GetTime() % 1) * 1000);
+
+        if template then
+            self:Print(DebugHeader, select(2, ...));
+        else
+            self:Print(DebugHeader, ...);
+        end
     end
-end
+end -- }}}
 
-function hhtd:Announce(...)
-    if hhtd.db.global.Announce then
+function HHTD:Announce(...)
+    if HHTD.db.global.Announce then
         self:Print(...);
     end
 end

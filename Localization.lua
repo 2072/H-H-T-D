@@ -39,8 +39,6 @@ type /hhtd to get a list of existing options.
 --]=]
 
 
-
-
 do
     local L = LibStub("AceLocale-3.0"):NewLocale("HealersHaveToDie", "enUS", true);
 

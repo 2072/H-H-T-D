@@ -23,27 +23,112 @@ This component hooks the name plates above characters and adds a sign on top to 
 
 --]=]
 
-
-local addonName, T = ...;
-local hhtd = T.hhtd;
-local L = hhtd.L;
-local LibNameplate = LibStub("LibNameplate-1.0");
-
 local ERROR     = 1;
 local WARNING   = 2;
 local INFO      = 3;
 local INFO2     = 4;
 
-local CreateFrame = _G.CreateFrame;
 
-function hhtd:AddCrossToPlate (plate)
+local ADDON_NAME, T = ...;
+local HHTD = T.Healers_Have_To_Die;
+local L = HHTD.Localized_Text;
+local LNP = LibStub("LibNameplate-1.0");
+
+
+-- Create module
+HHTD.Name_Plate_Hooker = HHTD:NewModule("NPH")
+local NPH = HHTD.Name_Plate_Hooker;
+
+NPH.Enemy_Healers_Plates = {};
+
+-- Up values {{{
+local CreateFrame = _G.CreateFrame;
+-- }}}
+
+
+function NPH:OnEnable() -- {{{
+    self:Debug(INFO, "OnEnable");
+
+    -- Subscribe to callbacks
+    LNP.RegisterCallback(self, "LibNameplate_NewNameplate");
+    LNP.RegisterCallback(self, "LibNameplate_RecycleNameplate");
+    --LNP.RegisterCallback(self, "LibNameplate_FoundGUID");
+    
+    -- Subscribe to HHTD callbacks
+    self:RegisterMessage("HHTD_DROP_HEALER");
+    self:RegisterMessage("HHTD_HEALER_DETECTED");
+
+    -- Add nameplates to known healers
+    for healerName, lastHeal in pairs(HHTD.Enemy_Healers_By_Name) do
+        self:AddCrossToPlate (LNP:GetNameplateByName(healerName));
+    end
+
+end -- }}}
+
+function NPH:OnDisable() -- {{{
+    self:Debug(INFO, "OnDisable");
+
+    LNP.UnregisterCallback(self, "LibNameplate_NewNameplate");
+    LNP.UnregisterCallback(self, "LibNameplate_RecycleNameplate");
+    --LNP.UnregisterCallback(self, "LibNameplate_FoundGUID");
+    
+    self:UnregisterMessage("HHTD_DROP_HEALER");
+    self:UnregisterMessage("HHTD_HEALER_DETECTED");
+
+    -- clean all nameplates
+    for plateName, plate in pairs(self.Enemy_Healers_Plates) do
+        self:HideCrossFromPlate(plateName);
+    end
+end -- }}}
+
+
+-- Internal CallBacks (HHTD_DROP_HEALER -- HHTD_HEALER_DETECTED) {{{
+function NPH:HHTD_DROP_HEALER(healerName)
+    self:HideCrossFromPlate(healerName);
+end
+
+function NPH:HHTD_HEALER_DETECTED (healerName, healerGuid)
+    if not self.Enemy_Healers_Plates[healerName] then
+        self:AddCrossToPlate (LNP:GetNameplateByName(healerName));
+    end
+end
+-- }}}
+
+-- Lib Name Plates CallBacks {{{
+function NPH:LibNameplate_NewNameplate(event, plate)
+
+    local plateName     = LNP:GetName(plate);
+    --local plateReaction = LNP:GetReaction(plate);
+    --local plateType     = LNP:GetType(plate);
+    --local plateClass    = LNP:GetClass(plate);
+
+    --self:Debug(plateName, "is on screen and is a", plateReaction, plateType, plateClass);
+
+    -- Check if this name plate is of interest
+    if HHTD.Enemy_Healers_By_Name[plateName] then
+        self:AddCrossToPlate(plate);
+    end
+end
+
+function NPH:LibNameplate_RecycleNameplate(event, plate)
+    if plate.HHTD_Private then
+        plate.HHTD_Private.frame:Hide()
+        self.Enemy_Healers_Plates[plate.HHTD_Private.PlateName] = false;
+    end
+end
+-- }}}
+
+
+
+
+function NPH:AddCrossToPlate (plate) -- {{{
 
     if not plate then return false end
 
-    local plateName     = LibNameplate:GetName(plate);
+    local plateName = LNP:GetName(plate);
 
-    if not plate.HHTD then
-        plate.HHTD = {};
+    if not plate.HHTD_Private then
+        plate.HHTD_Private = {};
         self:Debug(INFO, "Creating texture for", plateName);
         local f = CreateFrame("Frame", nil, plate)
         f:SetWidth(64);
@@ -54,61 +139,30 @@ function hhtd:AddCrossToPlate (plate)
         f.tex1:SetPoint("CENTER",f ,"CENTER",0,0)
         f.tex1:SetTexture("Interface\\RaidFrame\\ReadyCheck-NotReady.blp");
         -- rotate it by Pi/2
-        self:RotateTexture(f.tex1, 90);
+        HHTD:RotateTexture(f.tex1, 90);
 
-        plate.HHTD.frame = f;
-        plate.HHTD.frame:Show()
-        plate.HHTD.plateName = plateName;
+        plate.HHTD_Private.frame = f;
+        plate.HHTD_Private.frame:Show()
+        plate.HHTD_Private.PlateName = plateName;
 
     else
-        plate.HHTD.frame:Show()
+        plate.HHTD_Private.frame:Show()
 
     end
 
-    self.EnemyHealersPlates[plateName] = plate;
+    self.Enemy_Healers_Plates[plateName] = plate;
 
     return true;
 
-end
+end -- }}}
 
+function NPH:HideCrossFromPlate(plateName) -- {{{
+    if self.Enemy_Healers_Plates[plateName] then
 
-function hhtd:LibNameplate_NewNameplate(event, plate)
-
-    local plateName     = LibNameplate:GetName(plate);
-    --local plateReaction = LibNameplate:GetReaction(plate);
-    --local plateType     = LibNameplate:GetType(plate);
-    --local plateClass    = LibNameplate:GetClass(plate);
-
-    --self:Debug(plateName, "is on screen and is a", plateReaction, plateType, plateClass);
-
-    -- Check if this name plate is of interest
-    if self.EnemyHealersByName[plateName] then
-        self:AddCrossToPlate(plate);
-    end
-end
-
-function hhtd:LibNameplate_RecycleNameplate(event, plate)
-    if plate.HHTD then
-        plate.HHTD.frame:Hide()
-        self.EnemyHealersPlates[plate.HHTD.plateName] = false;
-    end
-end
-
-function hhtd:HideCross(plateName)
-    if self.EnemyHealersPlates[plateName] then
-
-        self.EnemyHealersPlates[plateName].HHTD.frame:Hide();
-        self.EnemyHealersPlates[plateName] = nil;
+        self.Enemy_Healers_Plates[plateName].HHTD_Private.frame:Hide();
+        self.Enemy_Healers_Plates[plateName] = nil;
 
         self:Debug(INFO2, "Cross hidden for", plateName);
     end
-end
-
---[=[
-function hhtd:LibNameplate_FoundGUID(event, plate, GUID, UnitID)
-    local plateName = LibNameplate:GetName(plate);
-    self:Debug("Found a GUID for ", plateName, "(", UnitID, "):", GUID);
-end
---]=]
-
+end -- }}}
 

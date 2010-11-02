@@ -20,38 +20,70 @@ type /hhtd to get a list of existing options.
 
 
 --]=]
-local addonName, T = ...;
+
+--========= NAMING Convention ==========
+--      VARIABLES AND FUNCTIONS (upvalues excluded)
+-- global variable                == _NAME_WORD2 (underscore + full uppercase)
+-- semi-global (file locals)      == NAME_WORD2 (full uppercase)
+-- locals to closures or members  == NameWord2
+-- locals to functions            == nameWord2
+--
+--      TABLES
+--  globale                       == NAME__WORD2
+--  locals                        == name_word2
+--  members                       == Name_Word2
+
+-- Debug templates
+local ERROR     = 1;
+local WARNING   = 2;
+local INFO      = 3;
+local INFO2     = 4;
+
+local ADDON_NAME, T = ...;
 
 -- [=[ Add-on basics and variable declarations {{{
-T.hhtd = LibStub("AceAddon-3.0"):NewAddon("Healers Have To Die", "AceConsole-3.0", "AceEvent-3.0");
-local hhtd = T.hhtd;
+T.Healers_Have_To_Die = LibStub("AceAddon-3.0"):NewAddon("Healers Have To Die", "AceConsole-3.0", "AceEvent-3.0");
+local HHTD = T.Healers_Have_To_Die;
 
---hhtddebug = hhtd;
+--@debug@
+_HHTD_DEBUG = HHTD;
+--@end-debug@
 
-hhtd.L = LibStub("AceLocale-3.0"):GetLocale("HealersHaveToDie", true);
+HHTD.Localized_Text = LibStub("AceLocale-3.0"):GetLocale("HealersHaveToDie", true);
 
-local L = hhtd.L;
+local L = HHTD.Localized_Text;
 
-local LibNameplate = LibStub("LibNameplate-1.0");
+HHTD.Constants = {};
+local HHTD_C = HHTD.Constants;
 
--- Constants values holder
-local HHTD_C = {};
-hhtd.C = HHTD_C;
-
-HHTD_C.HealingClasses = {
+HHTD_C.Healing_Classes = {
     ["PRIEST"]  = true,
     ["PALADIN"] = true,
     ["DRUID"]   = true,
     ["SHAMAN"]  = true,
 };
 
-hhtd.EnemyHealers = {};
-hhtd.EnemyHealersByName = {};
-hhtd.EnemyHealersByNameBlacklist = {};
-hhtd.EnemyHealersPlates = {};
+HHTD.Enemy_Healers = {};
+HHTD.Enemy_Healers_By_Name = {};
+HHTD.Enemy_Healers_By_Name_Blacklist = {};
 
+-- Modules standards configurations {{{
+-- Configure default libraries for modules
+HHTD:SetDefaultModuleLibraries( "AceConsole-3.0", "AceEvent-3.0")
 
--- upvalues
+-- Set the default prototype
+HHTD:SetDefaultModulePrototype( {
+    OnEnable = function(self) self:Debug(INFO, "prototype OnEnable called!") end,
+    OnDisable = function(self) self:Debug(INFO, "prototype OnDisable called!") end,
+    OnInitialize = function(self) HHTD:AddModule (self:GetName()); self:Debug(INFO, "prototype OnInitialize called!"); end,
+    Debug = function(self, ...) HHTD.Debug(self, ...) end,
+} )
+
+-- Set the default state to "enabled"
+HHTD:SetDefaultModuleState( true )
+-- }}}
+
+-- upvalues {{{
 local UnitIsPlayer      = _G.UnitIsPlayer;
 local UnitIsDead        = _G.UnitIsDead;
 local UnitFactionGroup  = _G.UnitFactionGroup;
@@ -64,64 +96,99 @@ local UnitFactionGroup  = _G.UnitFactionGroup;
 local GetTime           = _G.GetTime;
 local PlaySoundFile     = _G.PlaySoundFile;
 local pairs             = _G.pairs;
-
-local ERROR     = 1;
-local WARNING   = 2;
-local INFO      = 3;
-local INFO2     = 4;
+-- }}}
 
 -- }}} ]=]
 
+-- modules handling functions {{{
+
+function HHTD:FeedModuleOptions (moduleName, options)
+    self.Options.Plugins[moduleName] = options;
+end
+
+
+do
+    local Enable_Module_CheckBox = {
+        type = 'toggle',
+        name = function (info) return info[#info] end, -- it should be the localized module name
+        get = "get",
+        set = "set",
+        disabled = "disabled",
+    };
+
+    function HHTD:AddModule (moduleName)
+        if not self.Options.args.Modules.args[moduleName] then
+            self.Options.args.Modules.args[moduleName] = Enable_Module_CheckBox;
+        else
+            error("HHTD: module name collision!");
+        end
+    end
+
+end
+
+
+-- }}}
+
 -- 03 Ghosts I
 
--- [=[ options and defaults {{{
-local options = {
+-- [=[ Options and defaults {{{
+HHTD.Options = {
     name = "Healers Have To Die",
-    handler = hhtd,
+    handler = HHTD,
     type = 'group',
     args = {
-        VersionHeader = {
+        Version_Header = {
             type = 'header',
             name = L["VERSION"] .. ' @project-version@',
             order = 1,
         },
-        ReleaseDateHeader = {
+        Release_Date_Header = {
             type = 'header',
             name = L["RELEASE_DATE"] .. ' @project-date-iso@',
             order = 2,
         },
-        on = {
+        On = {
             type = 'toggle',
             name = L["OPT_ON"],
             desc = L["OPT_ON_DESC"],
-            set = function(info) hhtd.db.global.Enabled = hhtd:Enable(); return hhtd.db.global.Enabled; end,
-            get = function(info) return hhtd:IsEnabled(); end,
+            set = function(info) HHTD.db.global.Enabled = HHTD:Enable(); return HHTD.db.global.Enabled; end,
+            get = function(info) return HHTD:IsEnabled(); end,
             order = 10,
         },
-        off = {
+        Off = {
             type = 'toggle',
             name = L["OPT_OFF"],
             desc = L["OPT_OFF_DESC"],
-            set = function(info) hhtd.db.global.Enabled = not hhtd:Disable(); return not hhtd.db.global.Enabled; end,
-            get = function(info) return not hhtd:IsEnabled(); end,
+            set = function(info) HHTD.db.global.Enabled = not HHTD:Disable(); return not HHTD.db.global.Enabled; end,
+            get = function(info) return not HHTD:IsEnabled(); end,
             order = 20,
         },
-        --@debug@
-        GEHR = {
-            type = 'toggle',
-            name = L["OPT_ENABLE_GEHR"],
-            desc = L["OPT_ENABLE_GEHR_DESC"],
-            set = function(info, v) if v then hhtd.GEH:Enable() else hhtd.GEH:Disable() end end,
-            get = function(info) return hhtd.db.global.GEHDEnabled; end,
-            order = 22,
+        Modules = {
+            type = 'group',
+            name = 'Modules',
+            inline = true,
+            handler = {
+                ["hidden"]   = function () return not HHTD:IsEnabled(); end,
+                ["disabled"] = function () return not HHTD:IsEnabled(); end,
+
+                ["get"] = function (handler, info) return (HHTD:GetModule(info[#info])):IsEnabled(); end,
+                ["set"] = function (handler, info, value) 
+                    if value then
+                        return HHTD:EnableModule(info[#info]);
+                    else
+                        return HHTD:DisableModule(info[#info]);
+                    end
+                end,
+            },
+            -- Enable-modules-check-boxes (filled by modules)
+            args = {},
         },
-        --@end-debug@
         Announce = {
             type = 'toggle',
             name = L["OPT_ANNOUNCE"],
             desc = L["OPT_ANNOUNCE_DESC"],
-            set = function(info, v) hhtd.db.global[info[#info]] = v; return v; end,
-            get = function(info) return hhtd.db.global[info[#info]]; end,
+            set = function(info, v) HHTD.db.global[info[#info]] = v; return v; end,
+            get = function(info) return HHTD.db.global[info[#info]]; end,
             order = 24,
         },
         Header1 = {
@@ -137,8 +204,8 @@ local options = {
             max = 60 * 10,
             step = 1,
             bigStep = 5,
-            set = function(info, value) hhtd.db.global.HFT = value; return value; end,
-            get = function(info) return hhtd.db.global.HFT; end,
+            set = function(info, value) HHTD.db.global.HFT = value; return value; end,
+            get = function(info) return HHTD.db.global.HFT; end,
             order = 30,
         },
         Header1000 = {
@@ -146,26 +213,26 @@ local options = {
             name = '',
             order = 999,
         },
-        debug = {
+        Debug = {
             type = 'toggle',
             name = L["OPT_DEBUG"],
             desc = L["OPT_DEBUG_DESC"],
-            set = function(info, value) hhtd.db.global.Debug = value; hhtd:Print(L["DEBUGGING_STATUS"], value and L["OPT_ON"] or L["OPT_OFF"]); return value; end,
-            get = function(info) return hhtd.db.global.Debug end,
+            set = function(info, value) HHTD.db.global.Debug = value; HHTD:Print(L["DEBUGGING_STATUS"], value and L["OPT_ON"] or L["OPT_OFF"]); return value; end,
+            get = function(info) return HHTD.db.global.Debug end,
             order = 1000,
         },
-        version = {
+        Version = {
             type = 'execute',
             name = L["OPT_VERSION"],
             desc = L["OPT_VERSION_DESC"],
             guiHidden = true,
-            func = function () hhtd:Print(L["VERSION"], '@project-version@,', L["RELEASE_DATE"], '@project-date-iso@') end,
+            func = function () HHTD:Print(L["VERSION"], '@project-version@,', L["RELEASE_DATE"], '@project-date-iso@') end,
             order = 1010,
         },
     },
 }
 
-local defaults = {
+local DEFAULT__CONFIGURATION = {
   global = {
       HFT = 60,
       Enabled = true,
@@ -174,14 +241,14 @@ local defaults = {
       Announce = true,
   }
 };
--- }}} ]=]
+-- }}}
 
 -- [=[ Add-on Management functions {{{
-function hhtd:OnInitialize()
+function HHTD:OnInitialize()
 
-  self.db = LibStub("AceDB-3.0"):New("HealersHaveToDieDB", defaults);
+  self.db = LibStub("AceDB-3.0"):New("HealersHaveToDieDB", DEFAULT__CONFIGURATION);
 
-  LibStub("AceConfig-3.0"):RegisterOptionsTable("Healers Have To Die", options, {"HealersHaveToDie", "hhtd"});
+  LibStub("AceConfig-3.0"):RegisterOptionsTable("Healers Have To Die", self.Options, {"HealersHaveToDie", "hhtd"});
   LibStub("AceConfigDialog-3.0"):AddToBlizOptions("Healers Have To Die");
 
   self:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED");
@@ -194,171 +261,115 @@ function hhtd:OnInitialize()
 
 end
 
-local PlayerFaction = "";
-function hhtd:OnEnable()
+local PLAYER_FACTION = "";
+function HHTD:OnEnable()
     self:Print(L["ENABLED"]);
 
-
-    LibNameplate.RegisterCallback(hhtd, "LibNameplate_NewNameplate");
-    LibNameplate.RegisterCallback(hhtd, "LibNameplate_RecycleNameplate");
-    --LibNameplate.RegisterCallback(hhtd, "LibNameplate_FoundGUID");
-
-    PlayerFaction = UnitFactionGroup("player");
+    PLAYER_FACTION = UnitFactionGroup("player");
 end
 
-function hhtd:OnDisable()
-
-    LibNameplate.UnregisterCallback(hhtd, "LibNameplate_NewNameplate");
-    LibNameplate.RegisterCallback(hhtd, "LibNameplate_RecycleNameplate");
-    --LibNameplate.UnregisterCallback(hhtd, "LibNameplate_FoundGUID");
+function HHTD:OnDisable()
 
     self:Print(L["DISABLED"]);
 end
 -- }}} ]=]
 
 
-local LastDetectedGUID = "";
-function hhtd:TestUnit(EventName)
+-- MouseOver and Target trigger {{{
+do
+    local LastDetectedGUID = "";
+    function HHTD:TestUnit(eventName)
 
-    local Unit="";
+        local unit="";
 
-    if EventName=="UPDATE_MOUSEOVER_UNIT" then
-        Unit = "mouseover";
-    elseif EventName=="PLAYER_TARGET_CHANGED" then
-        Unit = "target";
-    else
-        self:Print("called on invalid event");
-        return;
-    end
+        if eventName=="UPDATE_MOUSEOVER_UNIT" then
+            unit = "mouseover";
+        elseif eventName=="PLAYER_TARGET_CHANGED" then
+            unit = "target";
+        else
+            self:Print("called on invalid event");
+            return;
+        end
 
-    if not UnitIsPlayer(Unit) or UnitIsDead(Unit) then
-        hhtd:HideCross((UnitName(Unit)));
-        return;
-    end
+        local unitFirstName =  (UnitName(unit));
 
-    local UnitFaction = UnitFactionGroup(Unit);
+        if not UnitIsPlayer(unit) or UnitIsDead(unit) then
+            self:SendMessage("HHTD_DROP_HEALER", unitFirstName)
+            return;
+        end
 
-    if UnitFaction == PlayerFaction then
-        hhtd:HideCross((UnitName(Unit)));
-        --self:Debug(INFO, (UnitName(Unit)), "is not your enemy");
-        return;
-    end
+        if UnitFactionGroup(unit) == PLAYER_FACTION then
+            self:SendMessage("HHTD_DROP_HEALER", unitFirstName)
+            --self:Debug(INFO, unitFirstName, "is not your enemy");
+            return;
+        end
 
-    local TheUG = UnitGUID(Unit);
-    local TheUnitClass_loc, TheUnitClass;
+        local unitGuid = UnitGUID(unit);
+        local localizedUnitClass, unitClass;
 
-    if UnitIsUnit("mouseover", "target") then
-        --self:Debug("mouseover is target");
-        return;
-    elseif LastDetectedGUID == TheUG and Unit == "target" then
-        PlaySoundFile("Sound\\interface\\AuctionWindowOpen.wav");
-        --self:Debug(INFO, "AuctionWindowOpen.wav played");
+        if UnitIsUnit("mouseover", "target") then
+            --self:Debug("mouseover is target");
+            return;
+        elseif LastDetectedGUID == unitGuid and unit == "target" then
+            self:SendMessage("HHTD_TARGET_LOCKED", unit)
+            PlaySoundFile("Sound\\interface\\AuctionWindowOpen.wav");
+            --self:Debug(INFO, "AuctionWindowOpen.wav played");
 
-        local sex = UnitSex(Unit);
-        local what = (sex == 1 and L["YOU_GOT_IT"] or sex == 2 and L["YOU_GOT_HIM"] or L["YOU_GOT_HER"]);
-        TheUnitClass_loc, TheUnitClass = UnitClass(Unit);
-        local subjectColor = self:GetClassHexColor(TheUnitClass);
+            local sex = UnitSex(unit);
+            local what = (sex == 1 and L["YOU_GOT_IT"] or sex == 2 and L["YOU_GOT_HIM"] or L["YOU_GOT_HER"]);
+            localizedUnitClass, unitClass = UnitClass(unit);
+            local subjectColor = self:GetClassHexColor(unitClass);
 
-        self:Announce(what:format("|c" .. subjectColor));
-        return;
-        
-    end
+            self:Announce(what:format("|c" .. subjectColor));
+            return;
 
-    if not TheUG then
-        self:Debug(WARNING, "No unit GUID");
-        return;
-    end
+        end
 
-    TheUnitClass_loc, TheUnitClass = UnitClass(Unit);
+        if not unitGuid then
+            self:Debug(WARNING, "No unit GUID");
+            return;
+        end
 
-    if not TheUnitClass then
-        hhtd:HideCross((UnitName(Unit)));
-        self:Debug(WARNING, "No unit Class");
-        return;
-    end
+        localizedUnitClass, unitClass = UnitClass(unit);
 
-    -- Is the unit class able to heal?
-    if HHTD_C.HealingClasses[TheUnitClass] then
+        if not unitClass then
+            self:SendMessage("HHTD_DROP_HEALER", unitFirstName)
+            self:Debug(WARNING, "No unit Class");
+            return;
+        end
 
-        if hhtd.EnemyHealers[TheUG] then
-            if (GetTime() - hhtd.EnemyHealers[TheUG]) > hhtd.db.global.HFT then
-                self:Debug(INFO2, self:UnitName(Unit), " did not heal for more than", hhtd.db.global.HFT, ", removed.");
-                hhtd.EnemyHealers[TheUG] = nil;
-                hhtd.EnemyHealersByName[(UnitName(Unit))] = nil;
-                hhtd:HideCross((UnitName(Unit)));
-            else
-                if LastDetectedGUID ~= TheUG then
-                    self:Announce("|cFFFF0000", (L["IS_A_HEALER"]):format(self:ColorText((UnitName(Unit)), self:GetClassHexColor(TheUnitClass))), "|r");
+        -- Is the unit class able to heal?
+        if HHTD_C.Healing_Classes[unitClass] then
+
+            if HHTD.Enemy_Healers[unitGuid] then
+                if (GetTime() - HHTD.Enemy_Healers[unitGuid]) > HHTD.db.global.HFT then
+                    self:Debug(INFO2, self:UnitName(unit), " did not heal for more than", HHTD.db.global.HFT, ", removed.");
+                    HHTD.Enemy_Healers[unitGuid] = nil;
+                    HHTD.Enemy_Healers_By_Name[unitFirstName] = nil;
+                    self:SendMessage("HHTD_DROP_HEALER", unitFirstName)
+                else
+                    self:SendMessage("HHTD_HEALER_UNDER_MOUSE", unit)
+                    if LastDetectedGUID ~= unitGuid then
+                        self:Announce("|cFFFF0000", (L["IS_A_HEALER"]):format(self:ColorText(unitFirstName, self:GetClassHexColor(unitClass))), "|r");
+                    end
+
+                    LastDetectedGUID = unitGuid;
+
+                    PlaySoundFile("Sound\\interface\\AlarmClockWarning3.wav");
+                    -- self:Debug(INFO, "AlarmClockWarning3.wav played");
                 end
-
-                LastDetectedGUID = TheUG;
-
-                PlaySoundFile("Sound\\interface\\AlarmClockWarning3.wav");
-                -- self:Debug(INFO, "AlarmClockWarning3.wav played");
             end
+        else
+            self:SendMessage("HHTD_DROP_HEALER", unitFirstName)
+            HHTD.Enemy_Healers_By_Name_Blacklist[unitFirstName] = GetTime();
         end
-    else
-        hhtd:HideCross((UnitName(Unit)));
-        hhtd.EnemyHealersByNameBlacklist[(UnitName(Unit))] = GetTime();
+
+        HHTD:Undertaker();
     end
-
-    hhtd:CleanHealers();
-
-end
+end -- }}}
 
 
-local LastCleaned = 0;
-local LastBlackListCleaned = 0;
-local Time = 0;
-function hhtd:CleanHealers()
-
-    Time = GetTime();
-    if (Time - LastCleaned) < 60 then return end -- no need to run this cleaning more than once per minute
-
-    self:Debug(INFO2, "cleaning...");
-
-    -- clean enemy healers GUID
-    for GUID, LastHeal in pairs(hhtd.EnemyHealers) do
-        if (Time - LastHeal) > hhtd.db.global.HFT then
-            hhtd.EnemyHealers[GUID] = nil;
-            
-            self:Debug(INFO2, GUID, "removed");
-        end
-    end
-
-    -- clean enemy healers Name
-    for Name, LastHeal in pairs(hhtd.EnemyHealersByName) do
-        if (Time - LastHeal) > hhtd.db.global.HFT then
-            hhtd.EnemyHealersByName[Name] = nil;
-
-            -- disable their plates
-            if hhtd.EnemyHealersPlates[Name] then
-                hhtd:HideCross(Name);
-            end
-
-            self:Debug(INFO2, Name, "removed");
-        end
-    end
-
-    LastCleaned = Time;
-
-    -- clean player class blacklist
-    if (Time - LastBlackListCleaned) < 3600 then return end
-
-    for Name, LastSeen in pairs(hhtd.EnemyHealersByNameBlacklist) do
-
-        if (Time - LastSeen) > hhtd.db.global.HFT then
-            hhtd.EnemyHealersByNameBlacklist[Name] = nil;
-
-            self:Debug(INFO2, Name, "removed from class blacklist");
-        end
-    end
-
-
-    LastBlackListCleaned = Time;
-
-end
-
+-- Combat Event Listener (Main Healer Detection) {{{
 do
     local bit       = _G.bit;
     local band      = _G.bit.band;
@@ -377,7 +388,7 @@ do
     local FRIENDLY_TARGET       = bit.bor (COMBATLOG_OBJECT_TARGET, COMBATLOG_OBJECT_REACTION_FRIENDLY);
 
     -- http://www.wowwiki.com/API_COMBAT_LOG_EVENT
-    function hhtd:COMBAT_LOG_EVENT_UNFILTERED(e, timestamp, event, sourceGUID, sourceName, sourceFlags, destGUID, destName, destFlags, arg9, arg10, arg11, arg12)
+    function HHTD:COMBAT_LOG_EVENT_UNFILTERED(e, timestamp, event, sourceGUID, sourceName, sourceFlags, destGUID, destName, destFlags, arg9, arg10, arg11, arg12)
 
         if not sourceGUID then return end
 
@@ -391,22 +402,71 @@ do
             FirstName = str_match(sourceName, "^[^-]+");
 
             -- Only if the unit class can heal
-            if not hhtd.EnemyHealersByNameBlacklist[FirstName] then
+            if not HHTD.Enemy_Healers_By_Name_Blacklist[FirstName] then
 
                 -- by GUID
-                hhtd.EnemyHealers[sourceGUID] = GetTime();
+                HHTD.Enemy_Healers[sourceGUID] = GetTime();
                 -- by Name
-                hhtd.EnemyHealersByName[FirstName] = hhtd.EnemyHealers[sourceGUID];
+                HHTD.Enemy_Healers_By_Name[FirstName] = HHTD.Enemy_Healers[sourceGUID];
                 -- update plate
-                if not hhtd.EnemyHealersPlates[FirstName] then
-                    hhtd:AddCrossToPlate (LibNameplate:GetNameplateByName(FirstName));
-                end
+                self:SendMessage("HHTD_HEALER_DETECTED", FirstName, sourceGUID);
 
                 -- TODO for GEHR: make activity light blink
 
             end
         end
     end
-end
+end -- }}}
+
+-- Undertaker {{{
+local LastCleaned = 0;
+local LastBlackListCleaned = 0;
+local Time = 0;
+-- The Undertaker will garbage collect healers who have not been healing recently (whatever the reason...)
+function HHTD:Undertaker()
+
+    Time = GetTime();
+    if (Time - LastCleaned) < 60 then return end -- no need to run this cleaning more than once per minute
+
+    self:Debug(INFO2, "cleaning...");
+
+    -- clean enemy healers GUID
+    for guid, lastHeal in pairs(HHTD.Enemy_Healers) do
+        if (Time - lastHeal) > HHTD.db.global.HFT then
+            HHTD.Enemy_Healers[guid] = nil;
+            
+            self:Debug(INFO2, guid, "removed");
+        end
+    end
+
+    -- clean enemy healers Name
+    for healerName, lastHeal in pairs(HHTD.Enemy_Healers_By_Name) do
+        if (Time - lastHeal) > HHTD.db.global.HFT then
+            HHTD.Enemy_Healers_By_Name[healerName] = nil;
+
+            self:SendMessage("HHTD_DROP_HEALER", healerName)
+
+            self:Debug(INFO2, healerName, "removed");
+        end
+    end
+
+    LastCleaned = Time;
+
+    -- clean player class blacklist
+    if (Time - LastBlackListCleaned) < 3600 then return end
+
+    for Name, LastSeen in pairs(HHTD.Enemy_Healers_By_Name_Blacklist) do
+
+        if (Time - LastSeen) > HHTD.db.global.HFT then
+            HHTD.Enemy_Healers_By_Name_Blacklist[Name] = nil;
+
+            self:Debug(INFO2, Name, "removed from class blacklist");
+        end
+    end
+
+
+    LastBlackListCleaned = Time;
+
+end -- }}}
 
 
