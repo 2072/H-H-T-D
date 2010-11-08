@@ -83,6 +83,11 @@ do
     L["OPT_ANNOUNCE"] = "Show messages"
     L["OPT_ANNOUNCE_DESC"] = "HHTD will display messages when you target or mouse-over an enemy healer."
 
+    L["OPT_CORE_OPTIONS"] = "Core options"
+    L["OPT_MODULES"] = "Modules"
+
+    L["Announcer"] = "Announcer Module"
+
     --]==]
     --@end-do-not-package@
 

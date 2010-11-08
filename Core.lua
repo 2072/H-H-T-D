@@ -41,7 +41,7 @@ local INFO2     = 4;
 
 local ADDON_NAME, T = ...;
 
--- [=[ Add-on basics and variable declarations {{{
+-- === Add-on basics and variable declarations {{{
 T.Healers_Have_To_Die = LibStub("AceAddon-3.0"):NewAddon("Healers Have To Die", "AceConsole-3.0", "AceEvent-3.0");
 local HHTD = T.Healers_Have_To_Die;
 
@@ -101,23 +101,21 @@ local PlaySoundFile     = _G.PlaySoundFile;
 local pairs             = _G.pairs;
 -- }}}
 
--- }}} ]=]
+-- }}}
 
 -- modules handling functions {{{
 
 function HHTD:SetModulesStates ()
-    -- Enable all modules
     for moduleName, module in self:IterateModules() do
         module:SetEnabledState(self.db.global.Modules[moduleName].Enabled);
     end
 end
 
-
 -- }}}
 
 -- 03 Ghosts I
 
--- [=[ Options and defaults {{{
+-- == Options and defaults {{{
 do
 
     local function GetCoreOptions() -- {{{
@@ -126,7 +124,7 @@ do
         args = {
             core = {
                 type = 'group',
-                name = "Core options", --XXX to localize
+                name =  L["OPT_CORE_OPTIONS"],
                 order = 1,
                 args = {
                     Version_Header = {
@@ -157,7 +155,7 @@ do
                     },
                     Modules = {
                         type = 'group',
-                        name = 'Modules',
+                        name = L["OPT_MODULES"],
                         inline = true,
                         handler = {
                             ["hidden"]   = function () return not HHTD:IsEnabled(); end,
@@ -251,7 +249,6 @@ do
         end
 
         return options;
-
     end
 end
 
@@ -267,12 +264,11 @@ local DEFAULT__CONFIGURATION = {
         HFT = 60,
         Enabled = true,
         Debug = false,
-        GEHDEnabled = true,
     }
 };
 -- }}}
 
--- [=[ Add-on Management functions {{{
+-- = Add-on Management functions {{{
 function HHTD:OnInitialize()
 
     self.db = LibStub("AceDB-3.0"):New("Healers_Have_To_Die", DEFAULT__CONFIGURATION);
@@ -292,17 +288,20 @@ end
 
 local PLAYER_FACTION = "";
 function HHTD:OnEnable()
+
     PLAYER_FACTION = UnitFactionGroup("player");
     self:Print(L["ENABLED"]);
 
     self:SetModulesStates();
+
 end
 
 function HHTD:OnDisable()
 
     self:Print(L["DISABLED"]);
+
 end
--- }}} ]=]
+-- }}}
 
 
 -- MouseOver and Target trigger {{{
@@ -363,7 +362,7 @@ do
             if HHTD.Enemy_Healers[unitGuid] then
                 -- Is this sitill true?
                 if (GetTime() - HHTD.Enemy_Healers[unitGuid]) > HHTD.db.global.HFT then
-                    -- CLEANING
+                    -- else CLEANING
 
                     self:Debug(INFO2, self:UnitName(unit), " did not heal for more than", HHTD.db.global.HFT, ", removed.");
 

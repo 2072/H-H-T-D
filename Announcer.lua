@@ -48,7 +48,7 @@ local select        = _G.select;
 function Announcer:GetOptions ()
     return {
         [Announcer:GetName()] = {
-            name = Announcer:GetName(), -- XXX To localize
+            name = L[Announcer:GetName()],
             type = 'group',
             args = {
                 Announce = {
@@ -68,21 +68,15 @@ end
 function Announcer:OnEnable() -- {{{
     self:Debug(INFO, "OnEnable");
 
-    -- Subscribe to callbacks
-
     -- Subscribe to HHTD callbacks
-    --    self:RegisterMessage("HHTD_DROP_HEALER");
-    --    self:RegisterMessage("HHTD_HEALER_DETECTED");
     self:RegisterMessage("HHTD_HEALER_UNDER_MOUSE");
     self:RegisterMessage("HHTD_TARGET_LOCKED");
 
 end -- }}}
 
 function Announcer:OnDisable() -- {{{
-    self:Debug(INFO, "OnDisable");
+    self:Debug(INFO2 "OnDisable");
 
---    self:UnregisterMessage("HHTD_DROP_HEALER");
---    self:UnregisterMessage("HHTD_HEALER_DETECTED");
     self:UnregisterMessage("HHTD_HEALER_UNDER_MOUSE");
     self:UnregisterMessage("HHTD_TARGET_LOCKED");
 

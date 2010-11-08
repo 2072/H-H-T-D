@@ -52,7 +52,6 @@ function NPH:OnEnable() -- {{{
     -- Subscribe to callbacks
     LNP.RegisterCallback(self, "LibNameplate_NewNameplate");
     LNP.RegisterCallback(self, "LibNameplate_RecycleNameplate");
-    --LNP.RegisterCallback(self, "LibNameplate_FoundGUID");
     
     -- Subscribe to HHTD callbacks
     self:RegisterMessage("HHTD_DROP_HEALER");
@@ -70,7 +69,6 @@ function NPH:OnDisable() -- {{{
 
     LNP.UnregisterCallback(self, "LibNameplate_NewNameplate");
     LNP.UnregisterCallback(self, "LibNameplate_RecycleNameplate");
-    --LNP.UnregisterCallback(self, "LibNameplate_FoundGUID");
     
     self:UnregisterMessage("HHTD_DROP_HEALER");
     self:UnregisterMessage("HHTD_HEALER_DETECTED");
@@ -98,11 +96,6 @@ end
 function NPH:LibNameplate_NewNameplate(selfevent, plate)
 
     local plateName     = LNP:GetName(plate);
-    --local plateReaction = LNP:GetReaction(plate);
-    --local plateType     = LNP:GetType(plate);
-    --local plateClass    = LNP:GetClass(plate);
-
-    --self:Debug(plateName, "is on screen and is a", plateReaction, plateType, plateClass);
 
     -- Check if this name plate is of interest
     if HHTD.Enemy_Healers_By_Name[plateName] then
