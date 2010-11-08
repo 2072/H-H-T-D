@@ -1,6 +1,6 @@
 --[=[
 HealersHaveToDie World of Warcraft Add-on
-Copyright (c) 2009 by John Wellesz (Archarodim@teaser.fr)
+Copyright (c) 2009-2010 by John Wellesz (Archarodim@teaser.fr)
 All rights reserved
 
 Version @project-version@
@@ -133,7 +133,7 @@ do
 
         local template = type((select(1,...))) == "number" and (select(1, ...)) or false;
 
-        local DebugHeader = (Debug_Templates[template]):format(date("%M"), (GetTime() % 1) * 1000);
+        local DebugHeader = (Debug_Templates[template]):format(date("%S"), (GetTime() % 1) * 1000);
 
         if template then
             self:Print(DebugHeader, select(2, ...));
@@ -143,8 +143,3 @@ do
     end
 end -- }}}
 
-function HHTD:Announce(...)
-    if HHTD.db.global.Announce then
-        self:Print(...);
-    end
-end

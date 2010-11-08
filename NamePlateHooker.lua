@@ -83,11 +83,11 @@ end -- }}}
 
 
 -- Internal CallBacks (HHTD_DROP_HEALER -- HHTD_HEALER_DETECTED) {{{
-function NPH:HHTD_DROP_HEALER(healerName)
+function NPH:HHTD_DROP_HEALER(selfevent, healerName)
     self:HideCrossFromPlate(healerName);
 end
 
-function NPH:HHTD_HEALER_DETECTED (healerName, healerGuid)
+function NPH:HHTD_HEALER_DETECTED (selfevent, healerName, healerGuid)
     if not self.Enemy_Healers_Plates[healerName] then
         self:AddCrossToPlate (LNP:GetNameplateByName(healerName));
     end
@@ -95,7 +95,7 @@ end
 -- }}}
 
 -- Lib Name Plates CallBacks {{{
-function NPH:LibNameplate_NewNameplate(event, plate)
+function NPH:LibNameplate_NewNameplate(selfevent, plate)
 
     local plateName     = LNP:GetName(plate);
     --local plateReaction = LNP:GetReaction(plate);
@@ -110,7 +110,7 @@ function NPH:LibNameplate_NewNameplate(event, plate)
     end
 end
 
-function NPH:LibNameplate_RecycleNameplate(event, plate)
+function NPH:LibNameplate_RecycleNameplate(selfevent, plate)
     if plate.HHTD_Private then
         plate.HHTD_Private.frame:Hide()
         self.Enemy_Healers_Plates[plate.HHTD_Private.PlateName] = false;

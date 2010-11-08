@@ -29,6 +29,7 @@ You need to uncheck the **'Sticky target'** option under
 
 A new [forum][forum] is also available.
 
+![stats](http://www.2072productions.com/to/hhtdcursedisplaystat.gif)
 
 [dev]: http://www.2072productions.com/to/hhtd_dev
 [forum]: http://www.wowace.com/addons/healers-have-to-die/forum/

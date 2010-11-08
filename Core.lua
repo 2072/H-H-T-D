@@ -68,19 +68,22 @@ HHTD.Enemy_Healers_By_Name = {};
 HHTD.Enemy_Healers_By_Name_Blacklist = {};
 
 -- Modules standards configurations {{{
+
 -- Configure default libraries for modules
 HHTD:SetDefaultModuleLibraries( "AceConsole-3.0", "AceEvent-3.0")
 
--- Set the default prototype
+-- Set the default prototype for modules
 HHTD:SetDefaultModulePrototype( {
     OnEnable = function(self) self:Debug(INFO, "prototype OnEnable called!") end,
     OnDisable = function(self) self:Debug(INFO, "prototype OnDisable called!") end,
-    OnInitialize = function(self) HHTD:AddModule (self:GetName()); self:Debug(INFO, "prototype OnInitialize called!"); end,
+    OnInitialize = function(self)
+        self:Debug(INFO, "prototype OnInitialize called!");
+    end,
     Debug = function(self, ...) HHTD.Debug(self, ...) end,
 } )
 
--- Set the default state to "enabled"
-HHTD:SetDefaultModuleState( true )
+-- Set modules' default state to "false"
+HHTD:SetDefaultModuleState( false )
 -- }}}
 
 -- upvalues {{{
@@ -102,28 +105,11 @@ local pairs             = _G.pairs;
 
 -- modules handling functions {{{
 
-function HHTD:FeedModuleOptions (moduleName, options)
-    self.Options.Plugins[moduleName] = options;
-end
-
-
-do
-    local Enable_Module_CheckBox = {
-        type = 'toggle',
-        name = function (info) return info[#info] end, -- it should be the localized module name
-        get = "get",
-        set = "set",
-        disabled = "disabled",
-    };
-
-    function HHTD:AddModule (moduleName)
-        if not self.Options.args.Modules.args[moduleName] then
-            self.Options.args.Modules.args[moduleName] = Enable_Module_CheckBox;
-        else
-            error("HHTD: module name collision!");
-        end
+function HHTD:SetModulesStates ()
+    -- Enable all modules
+    for moduleName, module in self:IterateModules() do
+        module:SetEnabledState(self.db.global.Modules[moduleName].Enabled);
     end
-
 end
 
 
@@ -132,140 +118,184 @@ end
 -- 03 Ghosts I
 
 -- [=[ Options and defaults {{{
-HHTD.Options = {
-    name = "Healers Have To Die",
-    handler = HHTD,
-    type = 'group',
-    args = {
-        Version_Header = {
-            type = 'header',
-            name = L["VERSION"] .. ' @project-version@',
-            order = 1,
-        },
-        Release_Date_Header = {
-            type = 'header',
-            name = L["RELEASE_DATE"] .. ' @project-date-iso@',
-            order = 2,
-        },
-        On = {
-            type = 'toggle',
-            name = L["OPT_ON"],
-            desc = L["OPT_ON_DESC"],
-            set = function(info) HHTD.db.global.Enabled = HHTD:Enable(); return HHTD.db.global.Enabled; end,
-            get = function(info) return HHTD:IsEnabled(); end,
-            order = 10,
-        },
-        Off = {
-            type = 'toggle',
-            name = L["OPT_OFF"],
-            desc = L["OPT_OFF_DESC"],
-            set = function(info) HHTD.db.global.Enabled = not HHTD:Disable(); return not HHTD.db.global.Enabled; end,
-            get = function(info) return not HHTD:IsEnabled(); end,
-            order = 20,
-        },
-        Modules = {
-            type = 'group',
-            name = 'Modules',
-            inline = true,
-            handler = {
-                ["hidden"]   = function () return not HHTD:IsEnabled(); end,
-                ["disabled"] = function () return not HHTD:IsEnabled(); end,
+do
 
-                ["get"] = function (handler, info) return (HHTD:GetModule(info[#info])):IsEnabled(); end,
-                ["set"] = function (handler, info, value) 
-                    if value then
-                        return HHTD:EnableModule(info[#info]);
-                    else
-                        return HHTD:DisableModule(info[#info]);
-                    end
-                end,
+    local function GetCoreOptions() -- {{{
+    return {
+        type = 'group',
+        args = {
+            core = {
+                type = 'group',
+                name = "Core options", --XXX to localize
+                order = 1,
+                args = {
+                    Version_Header = {
+                        type = 'header',
+                        name = L["VERSION"] .. ' @project-version@',
+                        order = 1,
+                    },
+                    Release_Date_Header = {
+                        type = 'header',
+                        name = L["RELEASE_DATE"] .. ' @project-date-iso@',
+                        order = 2,
+                    },
+                    On = {
+                        type = 'toggle',
+                        name = L["OPT_ON"],
+                        desc = L["OPT_ON_DESC"],
+                        set = function(info) HHTD.db.global.Enabled = HHTD:Enable(); return HHTD.db.global.Enabled; end,
+                        get = function(info) return HHTD:IsEnabled(); end,
+                        order = 10,
+                    },
+                    Off = {
+                        type = 'toggle',
+                        name = L["OPT_OFF"],
+                        desc = L["OPT_OFF_DESC"],
+                        set = function(info) HHTD.db.global.Enabled = not HHTD:Disable(); return not HHTD.db.global.Enabled; end,
+                        get = function(info) return not HHTD:IsEnabled(); end,
+                        order = 20,
+                    },
+                    Modules = {
+                        type = 'group',
+                        name = 'Modules',
+                        inline = true,
+                        handler = {
+                            ["hidden"]   = function () return not HHTD:IsEnabled(); end,
+                            ["disabled"] = function () return not HHTD:IsEnabled(); end,
+
+                            ["get"] = function (handler, info) return (HHTD:GetModule(info[#info])):IsEnabled(); end,
+                            ["set"] = function (handler, info, value) 
+
+                                HHTD.db.global.Modules[info[#info]].Enabled = value;
+
+                                if value then
+                                    return HHTD:EnableModule(info[#info]);
+                                else
+                                    return HHTD:DisableModule(info[#info]);
+                                end
+                            end,
+                        },
+                        -- Enable-modules-check-boxes (filled by modules)
+                        args = {},
+                    },
+                    Header1 = {
+                        type = 'header',
+                        name = '',
+                        order = 25,
+                    },
+                    HFT = {
+                        type = "range",
+                        name = L["OPT_HEALER_FORGET_TIMER"],
+                        desc = L["OPT_HEALER_FORGET_TIMER_DESC"],
+                        min = 10,
+                        max = 60 * 10,
+                        step = 1,
+                        bigStep = 5,
+                        set = function(info, value) HHTD.db.global.HFT = value; return value; end,
+                        get = function(info) return HHTD.db.global.HFT; end,
+                        order = 30,
+                    },
+                    Header1000 = {
+                        type = 'header',
+                        name = '',
+                        order = 999,
+                    },
+                    Debug = {
+                        type = 'toggle',
+                        name = L["OPT_DEBUG"],
+                        desc = L["OPT_DEBUG_DESC"],
+                        set = function(info, value) HHTD.db.global.Debug = value; HHTD:Print(L["DEBUGGING_STATUS"], value and L["OPT_ON"] or L["OPT_OFF"]); return value; end,
+                        get = function(info) return HHTD.db.global.Debug end,
+                        order = 1000,
+                    },
+                    Version = {
+                        type = 'execute',
+                        name = L["OPT_VERSION"],
+                        desc = L["OPT_VERSION_DESC"],
+                        guiHidden = true,
+                        func = function () HHTD:Print(L["VERSION"], '@project-version@,', L["RELEASE_DATE"], '@project-date-iso@') end,
+                        order = 1010,
+                    },
+                },
             },
-            -- Enable-modules-check-boxes (filled by modules)
-            args = {},
         },
-        Announce = {
-            type = 'toggle',
-            name = L["OPT_ANNOUNCE"],
-            desc = L["OPT_ANNOUNCE_DESC"],
-            set = function(info, v) HHTD.db.global[info[#info]] = v; return v; end,
-            get = function(info) return HHTD.db.global[info[#info]]; end,
-            order = 24,
-        },
-        Header1 = {
-            type = 'header',
-            name = '',
-            order = 25,
-        },
-        HFT = {
-            type = "range",
-            name = L["OPT_HEALER_FORGET_TIMER"],
-            desc = L["OPT_HEALER_FORGET_TIMER_DESC"],
-            min = 10,
-            max = 60 * 10,
-            step = 1,
-            bigStep = 5,
-            set = function(info, value) HHTD.db.global.HFT = value; return value; end,
-            get = function(info) return HHTD.db.global.HFT; end,
-            order = 30,
-        },
-        Header1000 = {
-            type = 'header',
-            name = '',
-            order = 999,
-        },
-        Debug = {
-            type = 'toggle',
-            name = L["OPT_DEBUG"],
-            desc = L["OPT_DEBUG_DESC"],
-            set = function(info, value) HHTD.db.global.Debug = value; HHTD:Print(L["DEBUGGING_STATUS"], value and L["OPT_ON"] or L["OPT_OFF"]); return value; end,
-            get = function(info) return HHTD.db.global.Debug end,
-            order = 1000,
-        },
-        Version = {
-            type = 'execute',
-            name = L["OPT_VERSION"],
-            desc = L["OPT_VERSION_DESC"],
-            guiHidden = true,
-            func = function () HHTD:Print(L["VERSION"], '@project-version@,', L["RELEASE_DATE"], '@project-date-iso@') end,
-            order = 1010,
-        },
-    },
-}
+    };
+    end -- }}}
+
+    local Enable_Module_CheckBox = {
+        type = 'toggle',
+        name = function (info) return info[#info] end, -- it should be the localized module name
+        get = "get",
+        set = "set",
+        disabled = "disabled",
+    };
+
+    -- get the option tables feeding it with the core options and adding modules options
+    function HHTD.GetOptions()
+        local options = GetCoreOptions();
+
+        -- Add modules enable/disable checkboxes
+        for moduleName, module in HHTD:IterateModules() do
+            if not options.args.core.args.Modules.args[moduleName] then
+                options.args.core.args.Modules.args[moduleName] = Enable_Module_CheckBox;
+            else
+                error("HHTD: module name collision!");
+            end
+            -- Add modules specific options
+            if module:IsEnabled() then
+                if module.GetOptions then
+                    if not options.plugins then options.plugins = {} end;
+                    options.plugins[moduleName] = module:GetOptions();
+                end
+            end
+        end
+
+        return options;
+
+    end
+end
+
 
 local DEFAULT__CONFIGURATION = {
-  global = {
-      HFT = 60,
-      Enabled = true,
-      Debug = false,
-      GEHDEnabled = true,
-      Announce = true,
-  }
+    global = {
+        Modules = {
+            ['**'] = {
+                -- Modules are enabled by default
+                Enabled = true,
+            },
+        },
+        HFT = 60,
+        Enabled = true,
+        Debug = false,
+        GEHDEnabled = true,
+    }
 };
 -- }}}
 
 -- [=[ Add-on Management functions {{{
 function HHTD:OnInitialize()
 
-  self.db = LibStub("AceDB-3.0"):New("HealersHaveToDieDB", DEFAULT__CONFIGURATION);
+    self.db = LibStub("AceDB-3.0"):New("Healers_Have_To_Die", DEFAULT__CONFIGURATION);
 
-  LibStub("AceConfig-3.0"):RegisterOptionsTable("Healers Have To Die", self.Options, {"HealersHaveToDie", "hhtd"});
-  LibStub("AceConfigDialog-3.0"):AddToBlizOptions("Healers Have To Die");
+    LibStub("AceConfig-3.0"):RegisterOptionsTable(tostring(self), self.GetOptions, {"HealersHaveToDie", "hhtd"});
+    LibStub("AceConfigDialog-3.0"):AddToBlizOptions(tostring(self));
 
-  self:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED");
-  self:RegisterEvent("UPDATE_MOUSEOVER_UNIT", "TestUnit");
-  self:RegisterEvent("PLAYER_TARGET_CHANGED", "TestUnit");
+    self:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED");
+    self:RegisterEvent("UPDATE_MOUSEOVER_UNIT", "TestUnit");
+    self:RegisterEvent("PLAYER_TARGET_CHANGED", "TestUnit");
 
-  self:CreateClassColorTables();
+    self:CreateClassColorTables();
 
-  self:SetEnabledState(self.db.global.Enabled);
+    self:SetEnabledState(self.db.global.Enabled);
 
 end
 
 local PLAYER_FACTION = "";
 function HHTD:OnEnable()
+    PLAYER_FACTION = UnitFactionGroup("player");
     self:Print(L["ENABLED"]);
 
-    PLAYER_FACTION = UnitFactionGroup("player");
+    self:SetModulesStates();
 end
 
 function HHTD:OnDisable()
@@ -300,29 +330,17 @@ do
 
         if UnitFactionGroup(unit) == PLAYER_FACTION then
             self:SendMessage("HHTD_DROP_HEALER", unitFirstName)
-            --self:Debug(INFO, unitFirstName, "is not your enemy");
             return;
         end
 
         local unitGuid = UnitGUID(unit);
-        local localizedUnitClass, unitClass;
 
         if UnitIsUnit("mouseover", "target") then
-            --self:Debug("mouseover is target");
             return;
         elseif LastDetectedGUID == unitGuid and unit == "target" then
             self:SendMessage("HHTD_TARGET_LOCKED", unit)
-            PlaySoundFile("Sound\\interface\\AuctionWindowOpen.wav");
-            --self:Debug(INFO, "AuctionWindowOpen.wav played");
 
-            local sex = UnitSex(unit);
-            local what = (sex == 1 and L["YOU_GOT_IT"] or sex == 2 and L["YOU_GOT_HIM"] or L["YOU_GOT_HER"]);
-            localizedUnitClass, unitClass = UnitClass(unit);
-            local subjectColor = self:GetClassHexColor(unitClass);
-
-            self:Announce(what:format("|c" .. subjectColor));
             return;
-
         end
 
         if not unitGuid then
@@ -330,7 +348,7 @@ do
             return;
         end
 
-        localizedUnitClass, unitClass = UnitClass(unit);
+        local localizedUnitClass, unitClass = UnitClass(unit);
 
         if not unitClass then
             self:SendMessage("HHTD_DROP_HEALER", unitFirstName)
@@ -341,26 +359,25 @@ do
         -- Is the unit class able to heal?
         if HHTD_C.Healing_Classes[unitClass] then
 
+            -- Has the unit healed recently?
             if HHTD.Enemy_Healers[unitGuid] then
+                -- Is this sitill true?
                 if (GetTime() - HHTD.Enemy_Healers[unitGuid]) > HHTD.db.global.HFT then
+                    -- CLEANING
+
                     self:Debug(INFO2, self:UnitName(unit), " did not heal for more than", HHTD.db.global.HFT, ", removed.");
+
                     HHTD.Enemy_Healers[unitGuid] = nil;
                     HHTD.Enemy_Healers_By_Name[unitFirstName] = nil;
-                    self:SendMessage("HHTD_DROP_HEALER", unitFirstName)
+
+                    self:SendMessage("HHTD_DROP_HEALER", unitFirstName);
                 else
-                    self:SendMessage("HHTD_HEALER_UNDER_MOUSE", unit)
-                    if LastDetectedGUID ~= unitGuid then
-                        self:Announce("|cFFFF0000", (L["IS_A_HEALER"]):format(self:ColorText(unitFirstName, self:GetClassHexColor(unitClass))), "|r");
-                    end
-
+                    self:SendMessage("HHTD_HEALER_UNDER_MOUSE", unit, LastDetectedGUID);
                     LastDetectedGUID = unitGuid;
-
-                    PlaySoundFile("Sound\\interface\\AlarmClockWarning3.wav");
-                    -- self:Debug(INFO, "AlarmClockWarning3.wav played");
                 end
             end
         else
-            self:SendMessage("HHTD_DROP_HEALER", unitFirstName)
+            self:SendMessage("HHTD_DROP_HEALER", unitFirstName);
             HHTD.Enemy_Healers_By_Name_Blacklist[unitFirstName] = GetTime();
         end
 
@@ -380,7 +397,7 @@ do
     local str_match = _G.string.match;
 
     local FirstName = "";
-    
+
     local PET                   = COMBATLOG_OBJECT_TYPE_PET;
 
     local OUTSIDER              = COMBATLOG_OBJECT_AFFILIATION_OUTSIDER;
@@ -434,7 +451,7 @@ function HHTD:Undertaker()
     for guid, lastHeal in pairs(HHTD.Enemy_Healers) do
         if (Time - lastHeal) > HHTD.db.global.HFT then
             HHTD.Enemy_Healers[guid] = nil;
-            
+
             self:Debug(INFO2, guid, "removed");
         end
     end

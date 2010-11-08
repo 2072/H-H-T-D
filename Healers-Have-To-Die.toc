@@ -9,7 +9,7 @@
 ## Author: Archarodim
 ## Version: @project-version@
 
-## SavedVariables: HealersHaveToDieDB
+## SavedVariables: Healers_Have_To_Die
 
 ## X-License: All Rights Reserved
 
@@ -31,3 +31,5 @@ utils.lua
 NamePlateHooker.lua
 
 GraphicalReporter.lua
+
+Announcer.lua
