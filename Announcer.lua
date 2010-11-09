@@ -88,7 +88,7 @@ function Announcer:OnEnable() -- {{{
 end -- }}}
 
 function Announcer:OnDisable() -- {{{
-    self:Debug(INFO2 "OnDisable");
+    self:Debug(INFO2, "OnDisable");
 
     self:UnregisterMessage("HHTD_HEALER_UNDER_MOUSE");
     self:UnregisterMessage("HHTD_TARGET_LOCKED");

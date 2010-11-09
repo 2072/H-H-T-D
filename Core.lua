@@ -121,6 +121,7 @@ do
     local function GetCoreOptions() -- {{{
     return {
         type = 'group',
+        childGroups = 'tab',
         args = {
             core = {
                 type = 'group',
@@ -240,8 +241,8 @@ do
                 error("HHTD: module name collision!");
             end
             -- Add modules specific options
-            if module:IsEnabled() then
-                if module.GetOptions then
+            if module.GetOptions then
+                if module:IsEnabled() then
                     if not options.plugins then options.plugins = {} end;
                     options.plugins[moduleName] = module:GetOptions();
                 end
@@ -274,6 +275,7 @@ function HHTD:OnInitialize()
 
     LibStub("AceConfig-3.0"):RegisterOptionsTable(tostring(self), self.GetOptions, {"HealersHaveToDie", "hhtd"});
     LibStub("AceConfigDialog-3.0"):AddToBlizOptions(tostring(self));
+    
 
     self:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED");
     self:RegisterEvent("UPDATE_MOUSEOVER_UNIT", "TestUnit");
