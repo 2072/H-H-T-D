@@ -45,24 +45,37 @@ local UnitSex       = _G.UnitSex;
 local PlaySoundFile = _G.PlaySoundFile;
 local select        = _G.select;
 
-function Announcer:GetOptions ()
+function Announcer:OnInitialize() -- {{{
+    self:Debug(INFO, "OnInitialize called!");
+    self.db = HHTD.db:RegisterNamespace('Announcer', {
+        global = {
+            ChatMessages = false,
+        },
+    })
+end -- }}}
+
+function Announcer:GetOptions () -- {{{
     return {
         [Announcer:GetName()] = {
             name = L[Announcer:GetName()],
             type = 'group',
+            handler = {
+                ["get"] = function (handler, info) return Announcer.db.global[info[#info]]; end,
+                ["set"] = function (handler, info, value) Announcer.db.global[info[#info]] = value; return v end
+            },
             args = {
-                Announce = {
+                ChatMessages = {
                     type = 'toggle',
                     name = L["OPT_ANNOUNCE"],
                     desc = L["OPT_ANNOUNCE_DESC"],
-                    set = function(info, v) HHTD.db.global[info[#info]] = v; return v; end,
-                    get = function(info) return HHTD.db.global[info[#info]]; end,
+                    set = "set",
+                    get = "get",
                     order = 1,
                 },
             },
         },
     };
-end
+end -- }}}
 
 
 function Announcer:OnEnable() -- {{{
@@ -121,8 +134,8 @@ end
 -- }}}
 
 
-function Announcer:Announce(...)
-    if HHTD.db.global.Announce then
+function Announcer:Announce(...) -- {{{
+    if self.db.global.ChatMessages then
         self:Print(...);
     end
-end
+end -- }}}

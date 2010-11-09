@@ -257,8 +257,7 @@ local DEFAULT__CONFIGURATION = {
     global = {
         Modules = {
             ['**'] = {
-                -- Modules are enabled by default
-                Enabled = true,
+                Enabled = true, -- Modules are enabled by default
             },
         },
         HFT = 60,
