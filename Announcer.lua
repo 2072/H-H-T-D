@@ -136,6 +136,6 @@ end
 
 function Announcer:Announce(...) -- {{{
     if self.db.global.ChatMessages then
-        self:Print(...);
+        HHTD:Print(...);
     end
 end -- }}}
