@@ -9,6 +9,12 @@
 ## Author: Archarodim
 ## Version: @project-version@
 
+## LoadManagers: AddonLoader
+
+## X-LoadOn-Slash: /hhtd
+## X-LoadOn-PvPFlagged: true
+## X-LoadOn-Battleground: true
+
 ## SavedVariables: Healers_Have_To_Die
 
 ## X-License: All Rights Reserved
