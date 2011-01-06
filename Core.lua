@@ -409,8 +409,8 @@ do
 
         if not sourceGUID then return end
 
-        -- the heal needs to be from a hostile unit and not for a pet
-        if band (sourceFlags, HOSTILE_OUTSIDER) ~= HOSTILE_OUTSIDER or band(destFlags, PET) == PET then
+        -- the heal needs to be from a hostile unit and not for a pet nor from a pet
+        if band (sourceFlags, HOSTILE_OUTSIDER) ~= HOSTILE_OUTSIDER or band(destFlags, PET) == PET or band(sourceFlags, PET) == PET then
             return;
         end
 
