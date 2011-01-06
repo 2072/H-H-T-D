@@ -60,25 +60,19 @@ function Announcer:GetOptions () -- {{{
         [Announcer:GetName()] = {
             name = L[Announcer:GetName()],
             type = 'group',
-            handler = {
-                ["get"] = function (handler, info) return Announcer.db.global[info[#info]]; end,
-                ["set"] = function (handler, info, value) Announcer.db.global[info[#info]] = value; return v end
-            },
+            get = function (info) return Announcer.db.global[info[#info]]; end,
+            set = function (info, value) HHTD:SetHandler(self, info, value) end,
             args = {
                 ChatMessages = {
                     type = 'toggle',
                     name = L["OPT_ANNOUNCE"],
                     desc = L["OPT_ANNOUNCE_DESC"],
-                    set = "set",
-                    get = "get",
                     order = 1,
                 },
                 Sounds = {
                     type = 'toggle',
                     name = L["OPT_SOUNDS"],
                     desc = L["OPT_SOUNDS_DESC"],
-                    set = "set",
-                    get = "get",
                     order = 10,
                 },
             },

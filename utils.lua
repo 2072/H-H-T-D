@@ -35,6 +35,11 @@ local HHTD_C = T.Healers_Have_To_Die.Constants;
 
 
 function HHTD:ColorText (text, color) --{{{
+
+    if type(text) ~= "string" then
+        text = tostring(text)
+    end
+
     return "|c".. color .. text .. "|r";
 end --}}}
 
@@ -141,5 +146,10 @@ do
             self:Print(DebugHeader, ...);
         end
     end
+end -- }}}
+
+-- function HHTD:GetOPtionPath(info) {{{
+function HHTD:GetOPtionPath(info)
+    return table.concat(info, "->");
 end -- }}}
 

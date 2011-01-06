@@ -75,10 +75,13 @@ HHTD:SetDefaultModuleLibraries( "AceConsole-3.0", "AceEvent-3.0")
 -- Set the default prototype for modules
 HHTD:SetDefaultModulePrototype( {
     OnEnable = function(self) self:Debug(INFO, "prototype OnEnable called!") end,
+
     OnDisable = function(self) self:Debug(INFO, "prototype OnDisable called!") end,
+
     OnInitialize = function(self)
         self:Debug(INFO, "prototype OnInitialize called!");
     end,
+
     Debug = function(self, ...) HHTD.Debug(self, ...) end,
 } )
 
@@ -121,6 +124,8 @@ do
     local function GetCoreOptions() -- {{{
     return {
         type = 'group',
+        get = function (info) return HHTD.db.global[info[#info]]; end,
+        set = function (info, value) HHTD:SetHandler(HHTD, info, value) end,
         childGroups = 'tab',
         name = "Healers Have To Die",
         args = {
@@ -167,12 +172,21 @@ do
                             ["set"] = function (handler, info, value) 
 
                                 HHTD.db.global.Modules[info[#info]].Enabled = value;
+                                local result;
 
                                 if value then
-                                    return HHTD:EnableModule(info[#info]);
+                                    result = HHTD:EnableModule(info[#info]);
+                                    if result then
+                                        HHTD:Print(info[#info], HHTD:ColorText(L["OPT_ON"], "FF00FF00"));
+                                    end
                                 else
-                                    return HHTD:DisableModule(info[#info]);
+                                    result = HHTD:DisableModule(info[#info]);
+                                    if result then
+                                        HHTD:Print(info[#info], HHTD:ColorText(L["OPT_OFF"], "FFFF0000"));
+                                    end
                                 end
+
+                                return result;
                             end,
                         },
                         -- Enable-modules-check-boxes (filled by modules)
@@ -191,8 +205,6 @@ do
                         max = 60 * 10,
                         step = 1,
                         bigStep = 5,
-                        set = function(info, value) HHTD.db.global.HFT = value; return value; end,
-                        get = function(info) return HHTD.db.global.HFT; end,
                         order = 30,
                     },
                     Header1000 = {
@@ -204,8 +216,6 @@ do
                         type = 'toggle',
                         name = L["OPT_DEBUG"],
                         desc = L["OPT_DEBUG_DESC"],
-                        set = function(info, value) HHTD.db.global.Debug = value; HHTD:Print(L["DEBUGGING_STATUS"], value and L["OPT_ON"] or L["OPT_OFF"]); return value; end,
-                        get = function(info) return HHTD.db.global.Debug end,
                         order = 1000,
                     },
                     Version = {
@@ -221,6 +231,24 @@ do
         },
     };
     end -- }}}
+
+    -- Used in Ace3 option table to get feedback when setting options through command line
+    function HHTD:SetHandler (module, info, value)
+
+        module.db.global[info[#info]] = value;
+
+        if info["uiType"] == "cmd" then
+
+            if value == true then
+                value = L["OPT_ON"];
+            elseif value == false then
+                value = L["OPT_OFF"];
+            end
+
+            self:Print(HHTD:ColorText(HHTD:GetOPtionPath(info), "FF00DD00"), "=>", HHTD:ColorText(value, "FF3399EE"));
+        end
+    end
+    
 
     local Enable_Module_CheckBox = {
         type = 'toggle',
