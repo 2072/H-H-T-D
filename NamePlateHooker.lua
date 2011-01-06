@@ -65,7 +65,7 @@ function NPH:OnEnable() -- {{{
 end -- }}}
 
 function NPH:OnDisable() -- {{{
-    self:Debug(INFO, "OnDisable");
+    self:Debug(INFO2, "OnDisable");
 
     LNP.UnregisterCallback(self, "LibNameplate_NewNameplate");
     LNP.UnregisterCallback(self, "LibNameplate_RecycleNameplate");

@@ -122,6 +122,7 @@ do
     return {
         type = 'group',
         childGroups = 'tab',
+        name = "Healers Have To Die",
         args = {
             core = {
                 type = 'group',
@@ -223,7 +224,8 @@ do
 
     local Enable_Module_CheckBox = {
         type = 'toggle',
-        name = function (info) return info[#info] end, -- it should be the localized module name
+        name = function (info) return L[info[#info]] end, -- it should be the localized module name
+        desc = function (info) return L[info[#info] .. "_DESC"] end, 
         get = "get",
         set = "set",
         disabled = "disabled",

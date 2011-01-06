@@ -50,6 +50,7 @@ function Announcer:OnInitialize() -- {{{
     self.db = HHTD.db:RegisterNamespace('Announcer', {
         global = {
             ChatMessages = false,
+            Sounds = true,
         },
     })
 end -- }}}
@@ -71,6 +72,14 @@ function Announcer:GetOptions () -- {{{
                     set = "set",
                     get = "get",
                     order = 1,
+                },
+                Sounds = {
+                    type = 'toggle',
+                    name = L["OPT_SOUNDS"],
+                    desc = L["OPT_SOUNDS_DESC"],
+                    set = "set",
+                    get = "get",
+                    order = 10,
                 },
             },
         },
@@ -112,12 +121,12 @@ function Announcer:HHTD_HEALER_UNDER_MOUSE(selfevent, unit, previousUnitGuid)
         );
     end
 
-    PlaySoundFile("Sound\\interface\\AlarmClockWarning3.wav");
+    self:PlaySoundFile("Sound\\interface\\AlarmClockWarning3.wav");
     -- self:Debug(INFO, "AlarmClockWarning3.wav played");
 end
 
 function Announcer:HHTD_TARGET_LOCKED (selfevent, unit)
-    PlaySoundFile("Sound\\interface\\AuctionWindowOpen.wav");
+    self:PlaySoundFile("Sound\\interface\\AuctionWindowOpen.wav");
     --self:Debug(INFO, "AuctionWindowOpen.wav played");
 
     local sex = UnitSex(unit);
@@ -137,5 +146,11 @@ end
 function Announcer:Announce(...) -- {{{
     if self.db.global.ChatMessages then
         HHTD:Print(...);
+    end
+end -- }}}
+
+function Announcer:PlaySoundFile(...) -- {{{
+    if self.db.global.Sounds then
+        PlaySoundFile(...);
     end
 end -- }}}

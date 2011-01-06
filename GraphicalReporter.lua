@@ -67,7 +67,7 @@ function GR:OnEnable() -- {{{
 end -- }}}
 
 function GR:OnDisable() -- {{{
-    self:Debug(INFO, "OnDisable");
+    self:Debug(INFO2, "OnDisable");
     -- stop roaming update here and hide evrything
 end -- }}}
 

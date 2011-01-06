@@ -40,7 +40,7 @@ type /hhtd to get a list of existing options.
 
 
 do
-    local L = LibStub("AceLocale-3.0"):NewLocale("HealersHaveToDie", "enUS", true);
+    local L = LibStub("AceLocale-3.0"):NewLocale("HealersHaveToDie", "enUS", true, true);
 
     if L then
         --@localization(locale="enUS", format="lua_additive_table")@
@@ -53,6 +53,12 @@ do
     L["ENABLED"] = "enabled! Type /hhtd for a list of options"
     L["DISABLED"] = "hhtd has been disabled!\nType /hhtd enable to re-enable it."
 
+    -- localized module's names
+    L["Announcer"] = "Announcer"
+    L["Announcer_DESC"] = "This module allows you to manage chat and sound alerts"
+    L["NPH"] = "Name Plate Hooker"
+    L["NPH_DESC"] = "This module adds a red cross to enemy healers' name plates"
+    --L["GR"] = "Graphical Reporter"
 
     L["YOU_GOT_HIM"] = "You got %shim|r!"
     L["YOU_GOT_HER"] = "You got %sher|r!"
@@ -82,6 +88,9 @@ do
 
     L["OPT_ANNOUNCE"] = "Show messages"
     L["OPT_ANNOUNCE_DESC"] = "HHTD will display messages when you target or mouse-over an enemy healer."
+    
+    L["OPT_SOUNDS"] = "Sounds alerts"
+    L["OPT_SOUNDS_DESC"] = "HHTD will play a specific sound when you hover or target an enemy healer"
 
     L["OPT_CORE_OPTIONS"] = "Core options"
     L["OPT_MODULES"] = "Modules"
@@ -158,4 +167,5 @@ do
         --@localization(locale="ruRU", format="lua_additive_table")@
     end
 end
+
 
