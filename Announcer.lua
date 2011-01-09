@@ -92,22 +92,18 @@ end -- }}}
 
 function Announcer:OnDisable() -- {{{
     self:Debug(INFO2, "OnDisable");
-
-    self:UnregisterMessage("HHTD_HEALER_UNDER_MOUSE");
-    self:UnregisterMessage("HHTD_TARGET_LOCKED");
-
 end -- }}}
 
 
 -- Internal CallBacks (HHTD_DROP_HEALER -- HHTD_HEALER_DETECTED) {{{
-function Announcer:HHTD_HEALER_UNDER_MOUSE(selfevent, unit, previousUnitGuid)
+function Announcer:HHTD_HEALER_UNDER_MOUSE(selfevent, unit, unitGuid, unitFirstName, previousUnitGuid)
 
     if previousUnitGuid ~= UnitGUID(unit) then
         self:Announce(
             "|cFFFF0000",
             (L["IS_A_HEALER"]):format(
                 HHTD:ColorText(
-                (UnitName(unit)),
+                unitFirstName,
                 HHTD:GetClassHexColor(  select(2, UnitClass(unit)) )
                 ),
             "|r"

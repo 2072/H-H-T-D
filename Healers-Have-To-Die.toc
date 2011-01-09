@@ -12,8 +12,10 @@
 ## LoadManagers: AddonLoader
 
 ## X-LoadOn-Slash: /hhtd
-## X-LoadOn-PvPFlagged: true
-## X-LoadOn-Battleground: true
+## X-LoadOn-Always: delayed
+
+# ## X-LoadOn-PvPFlagged: true
+# ## X-LoadOn-Battleground: true
 
 ## SavedVariables: Healers_Have_To_Die
 

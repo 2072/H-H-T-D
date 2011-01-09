@@ -160,6 +160,11 @@ do
                         get = function(info) return not HHTD:IsEnabled(); end,
                         order = 20,
                     },
+                    Pve = {
+                        type = 'toggle',
+                        name = L["OPT_PVE"],
+                        desc = L["OPT_PVE_DESC"],
+                    },
                     Modules = {
                         type = 'group',
                         name = L["OPT_MODULES"],
@@ -294,6 +299,7 @@ local DEFAULT__CONFIGURATION = {
         HFT = 60,
         Enabled = true,
         Debug = false,
+        Pve = true,
     }
 };
 -- }}}
@@ -341,6 +347,7 @@ do
     function HHTD:TestUnit(eventName)
 
         local unit="";
+        local pve = HHTD.db.global.Pve;
 
         if eventName=="UPDATE_MOUSEOVER_UNIT" then
             unit = "mouseover";
@@ -353,22 +360,31 @@ do
 
         local unitFirstName =  (UnitName(unit));
 
-        if not UnitIsPlayer(unit) or UnitIsDead(unit) then
+        if not pve and not UnitIsPlayer(unit) or UnitIsDead(unit) then
             self:SendMessage("HHTD_DROP_HEALER", unitFirstName)
+            --self:Debug("not pve and not UnitIsPlayer(unit) or UnitIsDead(unit)"); -- XXX
             return;
         end
 
         if UnitFactionGroup(unit) == PLAYER_FACTION then
             self:SendMessage("HHTD_DROP_HEALER", unitFirstName)
+            --self:Debug("UnitFactionGroup(unit) == PLAYER_FACTION"); -- XXX
             return;
         end
 
         local unitGuid = UnitGUID(unit);
 
         if UnitIsUnit("mouseover", "target") then
+            --self:Debug("UnitIsUnit(\"mouseover\", \"target\")"); -- XXX
+
+            if self.Enemy_Healers[unitGuid] then
+                self:SendMessage("HHTD_MOUSE_OVER_OR_TARGET", unit, unitGuid, unitFirstName);
+            end
+
             return;
         elseif LastDetectedGUID == unitGuid and unit == "target" then
-            self:SendMessage("HHTD_TARGET_LOCKED", unit)
+            self:SendMessage("HHTD_TARGET_LOCKED", unit, unitGuid, unitFirstName)
+            --self:Debug("LastDetectedGUID == unitGuid and unit == \"target\""); -- XXX
 
             return;
         end
@@ -400,14 +416,19 @@ do
                     HHTD.Enemy_Healers[unitGuid] = nil;
                     HHTD.Enemy_Healers_By_Name[unitFirstName] = nil;
 
-                    self:SendMessage("HHTD_DROP_HEALER", unitFirstName);
+                    self:SendMessage("HHTD_DROP_HEALER", unitFirstName, unitGuid);
                 else
-                    self:SendMessage("HHTD_HEALER_UNDER_MOUSE", unit, LastDetectedGUID);
+                    self:SendMessage("HHTD_HEALER_UNDER_MOUSE", unit, unitGuid, unitFirstName, LastDetectedGUID);
+                    --self:Debug("HHTD_HEALER_UNDER_MOUSE"); -- XXX
                     LastDetectedGUID = unitGuid;
                 end
+            else
+                self:Debug(INFO2, "did not heal");
+                self:SendMessage("HHTD_MOUSE_OVER_OR_TARGET", unit, unitGuid, unitFirstName);
             end
         else
-            self:SendMessage("HHTD_DROP_HEALER", unitFirstName);
+            -- self:Debug(WARNING, "Bad unit Class"); -- XXX
+            self:SendMessage("HHTD_DROP_HEALER", unitFirstName, unitGuid);
             HHTD.Enemy_Healers_By_Name_Blacklist[unitFirstName] = GetTime();
         end
 
@@ -427,37 +448,70 @@ do
     local str_match = _G.string.match;
 
     local FirstName = "";
+    local time = 0;
 
+    local NPC                   = COMBATLOG_OBJECT_CONTROL_NPC;
     local PET                   = COMBATLOG_OBJECT_TYPE_PET;
+    local PLAYER                = COMBATLOG_OBJECT_TYPE_PLAYER;
 
-    local OUTSIDER              = COMBATLOG_OBJECT_AFFILIATION_OUTSIDER;
+--    local OUTSIDER              = COMBATLOG_OBJECT_AFFILIATION_OUTSIDER;
     local HOSTILE_OUTSIDER      = bit.bor (COMBATLOG_OBJECT_AFFILIATION_OUTSIDER, COMBATLOG_OBJECT_REACTION_HOSTILE);
-    local FRIENDLY_TARGET       = bit.bor (COMBATLOG_OBJECT_TARGET, COMBATLOG_OBJECT_REACTION_FRIENDLY);
+--    local FRIENDLY_TARGET       = bit.bor (COMBATLOG_OBJECT_TARGET, COMBATLOG_OBJECT_REACTION_FRIENDLY);
+
+    local HOSTILE_OUTSIDER_NPC  =  bit.bor (HOSTILE_OUTSIDER, COMBATLOG_OBJECT_TYPE_NPC);
+    local HOSTILE_OUTSIDER_PLAYER = bit.bor (HOSTILE_OUTSIDER, COMBATLOG_OBJECT_TYPE_PLAYER);
+
+    local ACCEPTABLE_TARGETS = bit.bor (PLAYER, NPC);
+
 
     -- http://www.wowwiki.com/API_COMBAT_LOG_EVENT
     function HHTD:COMBAT_LOG_EVENT_UNFILTERED(e, timestamp, event, sourceGUID, sourceName, sourceFlags, destGUID, destName, destFlags, arg9, arg10, arg11, arg12)
 
         if not sourceGUID then return end
 
-        -- the heal needs to be from a hostile unit and not for a pet nor from a pet
-        if band (sourceFlags, HOSTILE_OUTSIDER) ~= HOSTILE_OUTSIDER or band(destFlags, PET) == PET or band(sourceFlags, PET) == PET then
+
+        -- Healers are only those caring for other players or NPC
+        if band(destFlags, ACCEPTABLE_TARGETS) == 0 then
+            if self.db.global.Debug and event:sub(-5) == "_HEAL" and sourceGUID ~= destGUID then
+                self:Debug(INFO2, "Bad target", sourceName, destName);
+            end
             return;
         end
 
+        local pve = self.db.global.Pve;
+
+        -- the healer is not a player or, if pve enabled a NPC
+        if not pve and band (sourceFlags, HOSTILE_OUTSIDER_PLAYER) ~= HOSTILE_OUTSIDER_PLAYER or band(sourceFlags, HOSTILE_OUTSIDER_NPC) ~= HOSTILE_OUTSIDER_NPC then
+            if  self.db.global.Debug and event:sub(-5) == "_HEAL" and sourceGUID ~= destGUID then
+                self:Debug(INFO2, "Bad source", sourceName, destName, pve);
+            end
+            return;
+        end
+
+        -- we look for healing events directed to others
         if event:sub(-5) == "_HEAL" and sourceGUID ~= destGUID then
+
 
             FirstName = str_match(sourceName, "^[^-]+");
 
             -- Only if the unit class can heal
-            if not HHTD.Enemy_Healers_By_Name_Blacklist[FirstName] then
+            if not self.Enemy_Healers_By_Name_Blacklist[FirstName] then
+                time = GetTime();
+
+                if self.Enemy_Healers[sourceGUID] and time - self.Enemy_Healers[sourceGUID] < 5 then
+                    self:Debug(WARNING, "Throtelling heal events for", FirstName);
+                    return
+                end
 
                 -- by GUID
-                HHTD.Enemy_Healers[sourceGUID] = GetTime();
+                self.Enemy_Healers[sourceGUID] = time
                 -- by Name
-                HHTD.Enemy_Healers_By_Name[FirstName] = HHTD.Enemy_Healers[sourceGUID];
+                self.Enemy_Healers_By_Name[FirstName] = self.Enemy_Healers[sourceGUID];
                 -- update plate
+                self:Debug(INFO, "Healer detected:", FirstName);
                 self:SendMessage("HHTD_HEALER_DETECTED", FirstName, sourceGUID);
 
+                HHTD:Undertaker();
                 -- TODO for GEHR: make activity light blink
 
             end

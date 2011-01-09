@@ -128,7 +128,7 @@ do
     local Debug_Templates = {
         [ERROR]     = "|cFFFF2222Debug:|cFFCC4444[%s.%3d]:|r|cFFFF5555",
         [WARNING]   = "|cFFFF2222Debug:|cFFCC4444[%s.%3d]:|r|cFF55FF55",
-        [INFO]      = "|cFFFF2222Debug:|cFFCC4444[%s.%3d]:|r|cFF5555FF",
+        [INFO]      = "|cFFFF2222Debug:|cFFCC4444[%s.%3d]:|r|cFF9999FF",
         [INFO2]     = "|cFFFF2222Debug:|cFFCC4444[%s.%3d]:|r|cFFFF9922",
         [false]     = "|cFFFF2222Debug:|cFFCC4444[%s.%3d]:|r",
     }
