@@ -6,11 +6,17 @@ Healers Have To Die (for World of Warcraft)
 
 
 This is a very simple and light add-on. It rings when you hover or target
-a unit of the opposite faction who healed someone else during the last 60
+a hostile unit (PVP and/or PVE) who healed someone else during the last 60
 seconds (*can be configured*).
+The current development version is now able to add a **red cross** over healer's name plates. (see the [screen-shot][redcross])
 
-This add-on uses the Ace3 framework.
 ******************************************
+* **NEW FEATURE in current alpha** (2011-01-09)
+
+HHTD is now working for PVE!!
+Many optimizations and enhancements, no longer report guardians or pet as healers.
+
+
 * **NEW FEATURE in HHTD 1.5** (2010-10-26)
 
 HHTD is now able to add a **red cross** above enemy name plates when they've
@@ -23,7 +29,8 @@ You need to uncheck the **'Sticky target'** option under
 
 ******************************************
 
-*type /hhtd to get a list of existing options*
+*type /hhtd to get a list of existing options through command line or use the graphical UI (/ace3)*
+
 
 **Comments and suggestions are welcome** :-)
 
@@ -33,5 +40,6 @@ A new [forum][forum] is also available.
 
 [dev]: http://www.2072productions.com/to/hhtd_dev
 [forum]: http://www.wowace.com/addons/healers-have-to-die/forum/
+[redcross]: http://www.wowace.com/addons/healers-have-to-die/images/1-red-cross/
 
 
