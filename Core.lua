@@ -313,9 +313,6 @@ function HHTD:OnInitialize()
     LibStub("AceConfigDialog-3.0"):AddToBlizOptions(tostring(self));
     
 
-    self:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED");
-    self:RegisterEvent("UPDATE_MOUSEOVER_UNIT", "TestUnit");
-    self:RegisterEvent("PLAYER_TARGET_CHANGED", "TestUnit");
 
     self:CreateClassColorTables();
 
@@ -326,11 +323,26 @@ end
 local PLAYER_FACTION = "";
 function HHTD:OnEnable()
 
-    PLAYER_FACTION = UnitFactionGroup("player");
+    self:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED");
+    self:RegisterEvent("UPDATE_MOUSEOVER_UNIT", "TestUnit");
+    self:RegisterEvent("PLAYER_TARGET_CHANGED", "TestUnit");
+    self:RegisterEvent("PLAYER_ALIVE"); -- talents SHOULD be available
+    
+
     self:Print(L["ENABLED"]);
 
     self:SetModulesStates();
 
+    PLAYER_FACTION = UnitFactionGroup("player");
+
+end
+
+function HHTD:PLAYER_ALIVE()
+    self:Debug("PLAYER_ALIVE");
+
+    PLAYER_FACTION = UnitFactionGroup("player");
+
+    self:UnregisterEvent("PLAYER_ALIVE");
 end
 
 function HHTD:OnDisable()
