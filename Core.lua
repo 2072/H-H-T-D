@@ -492,11 +492,25 @@ do
 
         local pve = self.db.global.Pve;
 
-        -- the healer is not a player or, if pve enabled a NPC
-        if not pve and band (sourceFlags, HOSTILE_OUTSIDER_PLAYER) ~= HOSTILE_OUTSIDER_PLAYER or band(sourceFlags, HOSTILE_OUTSIDER_NPC) ~= HOSTILE_OUTSIDER_NPC then
-            if  self.db.global.Debug and event:sub(-5) == "_HEAL" and sourceGUID ~= destGUID then
-                self:Debug(INFO2, "Bad source", sourceName, destName, pve);
+        -- if the source is not a player and if while pve, the source is not an npc, then we don't care about this event
+        -- ie we care if the source is a human player or pve is enaled and the source is an npc.
+        --      not (a or (b and c)) ==  !a and (not b or not c)
+        if not ( band (sourceFlags, HOSTILE_OUTSIDER_PLAYER) == HOSTILE_OUTSIDER_PLAYER or (pve and band(sourceFlags, HOSTILE_OUTSIDER_NPC) == HOSTILE_OUTSIDER_NPC)) then
+
+            --@debug@
+            if  self.db.global.Debug then
+                if  event:sub(-5) == "_HEAL" and sourceGUID ~= destGUID then
+                    self:Debug(INFO2, "Bad heal source:", sourceName, "Dest:", destName, "pve:", pve,
+                    "HOSTILE_OUTSIDER_PLAYER:", band (sourceFlags, HOSTILE_OUTSIDER_PLAYER) == HOSTILE_OUTSIDER_PLAYER,
+                    "HOSTILE_OUTSIDER_NPC:", band(sourceFlags, HOSTILE_OUTSIDER_NPC) == HOSTILE_OUTSIDER_NPC);
+                end
+
+                self:Debug(INFO2, "Bad source", sourceName, "Dest:", destName, "pve:", pve,
+                "HOSTILE_OUTSIDER_PLAYER:", band (sourceFlags, HOSTILE_OUTSIDER_PLAYER) == HOSTILE_OUTSIDER_PLAYER,
+                "HOSTILE_OUTSIDER_NPC:", band(sourceFlags, HOSTILE_OUTSIDER_NPC) == HOSTILE_OUTSIDER_NPC);
             end
+            --@end-debug@
+
             return;
         end
 
