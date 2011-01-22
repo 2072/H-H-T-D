@@ -498,6 +498,7 @@ do
         if not ( band (sourceFlags, HOSTILE_OUTSIDER_PLAYER) == HOSTILE_OUTSIDER_PLAYER or (pve and band(sourceFlags, HOSTILE_OUTSIDER_NPC) == HOSTILE_OUTSIDER_NPC)) then
 
             --@debug@
+            --[[
             if  self.db.global.Debug then
                 if  event:sub(-5) == "_HEAL" and sourceGUID ~= destGUID then
                     self:Debug(INFO2, "Bad heal source:", sourceName, "Dest:", destName, "pve:", pve,
@@ -509,6 +510,7 @@ do
                 "HOSTILE_OUTSIDER_PLAYER:", band (sourceFlags, HOSTILE_OUTSIDER_PLAYER) == HOSTILE_OUTSIDER_PLAYER,
                 "HOSTILE_OUTSIDER_NPC:", band(sourceFlags, HOSTILE_OUTSIDER_NPC) == HOSTILE_OUTSIDER_NPC);
             end
+            --]]
             --@end-debug@
 
             return;

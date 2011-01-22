@@ -4,6 +4,16 @@ Healers Have To Die
 *Change log*
 ------------
 
+**version 1.6.0 (2011-01-22):**
+
+ - Healers-Have-To-Die is now useful in PVE, it's able to ring and add crosses over NPC healers' name plates (can be disabled).
+ - Multiple fixes to detection algorithm: only actual players or NPCs (if option checked) will be reported as healers. (no longer reporting guardians, pets, etc...)
+ - Announcer module: Added an option to disable sounds.
+ - Massive code cleanup and re-organization, now using modules for the different add-on parts.
+ - Added support for AddonLoader.
+
+ - Localization is needed, if you want to contribute: http://www.wowace.com/addons/healers-have-to-die/localization/
+
 **version 1.5.1 (2010-10-26):**
 
  - HHTD is now able to add a red cross above enemy name plates when they've been caught healing.
