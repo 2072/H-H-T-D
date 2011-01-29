@@ -56,6 +56,15 @@ do
     L["OPT_PVE"] = "Enable for PVE"
     L["OPT_PVE_DESC"] = "HHTD will also work for NPCs."
 
+    L["OPT_PVPHEALERSSPECSONLY"] = "Pure healer' spells only"
+    L["OPT_PVPHEALERSSPECSONLY_DESC"] = "Only detect players specialized in healing."
+
+    L["OPT_USE_HEALER_MINIMUM_HEAL_AMOUNT"] = "Use minimum heal amount filter"
+    L["OPT_USE_HEALER_MINIMUM_HEAL_AMOUNT_DESC"] = "Healers will have to heal for a specified amount before being tagged as such."
+
+    L["OPT_HEALER_MINIMUM_HEAL_AMOUNT"] = "Set minimum heal amount"
+    L["OPT_HEALER_MINIMUM_HEAL_AMOUNT_DESC"] = "Healers won't be detected until they reach this amount of healing."
+
     L["OPT_STRICTGUIDPVE"] = "Accurate PVE detection"
     L["OPT_STRICTGUIDPVE_DESC"] = "When several NPCs share the same name, HHTD will only add a cross over those who actually healed instead of adding a cross to all of them. Note that most of the time, you'll need to target or mouse-over the unit for the cross to appear."
 

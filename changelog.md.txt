@@ -12,10 +12,23 @@ Healers Have To Die
  - Massive code cleanup and re-organization, now using modules for the different add-on parts.
  - Added support for AddonLoader.
 
- - Localization is needed, if you want to contribute: http://www.wowace.com/addons/healers-have-to-die/localization/
+ - Localization is needed, if you want to contribute: [http://www.wowace.com/addons/healers-have-to-die/localization/][localization]
 
 **version 1.5.1 (2010-10-26):**
 
  - HHTD is now able to add a red cross above enemy name plates when they've been caught healing.
  - New option to disable messages printed by HHTD.
 
+
+
+
+
+
+
+
+
+
+
+
+
+[localization]: http://www.wowace.com/addons/healers-have-to-die/localization/

@@ -67,7 +67,7 @@ function NPH:GetOptions () -- {{{
                     type = 'toggle',
                     name = L["OPT_STRICTGUIDPVE"],
                     desc = L["OPT_STRICTGUIDPVE_DESC"],
-                    disabled = function() return not HHTD.db.global.Pve end,
+                    disabled = function() return not HHTD.db.global.Pve or not HHTD:IsEnabled(); end,
                     order = 1,
                 },
             },
