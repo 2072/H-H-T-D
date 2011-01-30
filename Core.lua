@@ -462,6 +462,13 @@ do
             return;
         end
 
+        local unitGuid = UnitGUID(unit);
+
+        if not unitGuid then
+            --self:Debug(WARNING, "No unit GUID");
+            return;
+        end
+
         local unitFirstName =  (UnitName(unit));
 
         if not pve and not UnitIsPlayer(unit) or UnitIsDead(unit) then
@@ -476,8 +483,6 @@ do
             return;
         end
 
-        local unitGuid = UnitGUID(unit);
-
         if UnitIsUnit("mouseover", "target") then
             --self:Debug("UnitIsUnit(\"mouseover\", \"target\")"); -- XXX
 
@@ -490,11 +495,6 @@ do
             self:SendMessage("HHTD_TARGET_LOCKED", unit, unitGuid, unitFirstName)
             --self:Debug("LastDetectedGUID == unitGuid and unit == \"target\""); -- XXX
 
-            return;
-        end
-
-        if not unitGuid then
-            self:Debug(WARNING, "No unit GUID");
             return;
         end
 
@@ -593,6 +593,9 @@ do
             --@end-debug@
             return;
         end -- }}}
+
+        Source_Is_Hostile_NPC = false;
+        Source_Is_Hostile_Human = false;
 
         if band(sourceFlags, HOSTILE_OUTSIDER_NPC) == HOSTILE_OUTSIDER_NPC then
             Source_Is_Hostile_NPC = true;
