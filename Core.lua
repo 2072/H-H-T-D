@@ -583,12 +583,6 @@ do
 
         local configRef = self.db.global; -- config shortcut
 
-        -- Escape if scanning for pure healing specs and the spell doesn't match {{{
-        if configRef.PvpHSpecsOnly and not HHTD_C.Healers_Only_Spells_ByName[arg10] then
-            self:Debug(INFO2, "Spell", arg10, "is not a healer' spell");
-            return;
-        end -- }}}
-
         -- Escape if bad target {{{
         -- Healers are only those caring for other players or NPC
         if band(destFlags, ACCEPTABLE_TARGETS) == 0 then
@@ -606,6 +600,11 @@ do
             Source_Is_Hostile_Human = true;
         end
 
+        -- Escape if Source_Is_Hostile_Human and scanning for pure healing specs and the spell doesn't match {{{
+        if Source_Is_Hostile_Human and configRef.PvpHSpecsOnly and not HHTD_C.Healers_Only_Spells_ByName[arg10] then
+            self:Debug(INFO2, "Spell", arg10, "is not a healer' spell");
+            return;
+        end -- }}}
 
         -- Escape if bad source {{{
         -- if the source is not a player and if while pve, the source is not an npc, then we don't care about this event
