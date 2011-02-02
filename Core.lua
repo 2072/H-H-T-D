@@ -386,7 +386,7 @@ local DEFAULT__CONFIGURATION = {
         Pve = true,
         PvpHSpecsOnly = true,
         UHMHA = true,
-        HMHA = 1000,
+        HMHA = 4000,
     },
 };
 -- }}}
@@ -527,7 +527,7 @@ do
                     LastDetectedGUID = unitGuid;
                 end
             else
-                self:Debug(INFO2, "did not heal");
+                --self:Debug(INFO2, "did not heal");
                 self:SendMessage("HHTD_MOUSE_OVER_OR_TARGET", unit, unitGuid, unitFirstName);
             end
         else
@@ -587,9 +587,11 @@ do
         -- Healers are only those caring for other players or NPC
         if band(destFlags, ACCEPTABLE_TARGETS) == 0 then
             --@debug@
+            --[[
             if self.db.global.Debug and event:sub(-5) == "_HEAL" and sourceGUID ~= destGUID then
                 self:Debug(INFO2, "Bad target", sourceName, destName);
             end
+            --]]
             --@end-debug@
             return;
         end -- }}}
@@ -603,11 +605,6 @@ do
             Source_Is_Hostile_Human = true;
         end
 
-        -- Escape if Source_Is_Hostile_Human and scanning for pure healing specs and the spell doesn't match {{{
-        if Source_Is_Hostile_Human and configRef.PvpHSpecsOnly and not HHTD_C.Healers_Only_Spells_ByName[arg10] then
-            self:Debug(INFO2, "Spell", arg10, "is not a healer' spell");
-            return;
-        end -- }}}
 
         -- Escape if bad source {{{
         -- if the source is not a player and if while pve, the source is not an npc, then we don't care about this event
@@ -635,11 +632,19 @@ do
             return;
         end -- }}}
 
-         if event:sub(-5) == "_HEAL" and sourceGUID ~= destGUID then
-             isHealSpell = true;
-         else
-             isHealSpell = false;
-         end
+        -- Escape if Source_Is_Hostile_Human and scanning for pure healing specs and the spell doesn't match {{{
+        if Source_Is_Hostile_Human and configRef.PvpHSpecsOnly and not HHTD_C.Healers_Only_Spells_ByName[arg10] then
+            --@debug@
+            self:Debug(INFO2, "Spell", arg10, "is not a healer' spell");
+            --@end-debug@
+            return;
+        end -- }}}
+
+        if event:sub(-5) == "_HEAL" and sourceGUID ~= destGUID then
+            isHealSpell = true;
+        else
+            isHealSpell = false;
+        end
 
          -- Escape if not a heal spell and not PvpHSpecsOnly {{{
          -- we look for healing spells directed to others
@@ -651,7 +656,12 @@ do
          -- player or an ability available to specialized healers only
 
          -- get source name
-         FirstName = str_match(sourceName, "^[^-]+");
+         if sourceName then
+             FirstName = str_match(sourceName, "^[^-]+"); -- sourceName may be nil??
+         else
+             self:Print("|cFFFF0000NO NAME for GUID:", sourceGUID);
+             return;
+         end
 
         -- Escape if player got blacklisted has not a healer {{{
         -- Only if the unit class can heal - not post-blacklisted

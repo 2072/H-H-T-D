@@ -218,8 +218,8 @@ function NPH:HHTD_MOUSE_OVER_OR_TARGET(selfevent, unit, unitGuid, unitFirstName)
             if not Healer_Is_Not_Unique[unitFirstName] or self.db.global.sPve then
                 self:HideCrossFromPlate(plate); -- The name plate should be identifiable by the unit guid
             end
-        else
-            self:Debug(ERROR, "HHTD_MOUSE_OVER_OR_TARGET(): LNP:GetNameplateByGUID(unitGuid)==nil", unitGuid);
+        --else
+          --  self:Debug(ERROR, "HHTD_MOUSE_OVER_OR_TARGET(): LNP:GetNameplateByGUID(unitGuid)==nil", unitGuid);
         end
 
     elseif GetTime() - HHTD.Enemy_Healers[unitGuid] < HHTD.db.global.HFT then
