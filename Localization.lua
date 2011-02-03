@@ -52,6 +52,7 @@ do
     L["RELEASE_DATE"] = "Release Date:"
     L["ENABLED"] = "enabled! Type /hhtd for a list of options"
     L["DISABLED"] = "hhtd has been disabled!\nType /hhtd enable to re-enable it."
+    L["DESCRIPTION"] = "A simple Add-on that rings when you hover or target an enemy healer. It also adds a red cross above their name plates."
     
     L["OPT_PVE"] = "Enable for PVE"
     L["OPT_PVE_DESC"] = "HHTD will also work for NPCs."

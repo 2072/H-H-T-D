@@ -5,7 +5,18 @@
 ## X-Min-Interface: 30300
 
 ## Title: Healers Have To Die
-## Notes: A simple Add-on that rings when you hover or target an enemy healer. It also adds a red cross above their name plates.
+
+## Notes: @localization(locale="enUS", key="DESCRIPTION")@
+## Notes-frFR: @localization(locale="frFR", key="DESCRIPTION")@
+## Notes-deDE: @localization(locale="deDE", key="DESCRIPTION")@
+## Notes-esES: @localization(locale="esES", key="DESCRIPTION")@
+## Notes-esMX: @localization(locale="esMX", key="DESCRIPTION")@
+## Notes-koKR: @localization(locale="koKR", key="DESCRIPTION")@
+## Notes-ruRU: @localization(locale="ruRU", key="DESCRIPTION")@
+## Notes-zhCN: @localization(locale="zhCN", key="DESCRIPTION")@
+## Notes-zhTW: @localization(locale="zhTW", key="DESCRIPTION")@
+
+
 ## Author: Archarodim
 ## Version: @project-version@
 
