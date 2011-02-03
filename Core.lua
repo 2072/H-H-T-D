@@ -186,6 +186,11 @@ do
         childGroups = 'tab',
         name = "Healers Have To Die",
         args = {
+            Description = {
+                type = 'description',
+                name = L["DESCRIPTION"],
+                order = 0,
+            },
             On = {
                 type = 'toggle',
                 name = L["OPT_ON"],
@@ -195,7 +200,7 @@ do
                 hidden = function() return HHTD:IsEnabled(); end, 
 
                 disabled = false,
-                order = 0,
+                order = 1,
             },
             Off = {
                 type = 'toggle',

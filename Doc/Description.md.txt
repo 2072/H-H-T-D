@@ -2,17 +2,17 @@ Healers Have To Die (for World of Warcraft)
 ===========================================
 
 
-*Now you can spot those nasty healers instantly and help them to accomplish their destiny!*
+*Spot those bloody healers instantly and help them accomplish their destiny! (PVP and PVE)*
 
 
-This is a very simple and light add-on. It rings when you hover or target
-a hostile unit (PVP and/or PVE) who healed someone else during the last 60
-seconds (*can be configured*).
-HHTD also adds a **red cross** over healer's name plates. (see the [screen-shot][redcross])
+HHTD adds a big **red cross** over healer's name plates.  *You can't miss them!* (see the [screen-shot][redcross])
+
+It also rings when you hover or target a hostile unit (PVP and/or PVE) who healed
+someone else during the last 60 seconds (*can be configured*).
 
 ******************************************
 
-*type /hhtd to get a list of existing options through command line or use the graphical UI (/ace3)*
+*type /hhtdg to open the configuration interface, or /hhtd for command-line access (/ace3)*
 
 
 **Comments and suggestions are welcome** :-)
