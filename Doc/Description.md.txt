@@ -12,7 +12,7 @@ someone else during the last 60 seconds (*can be configured*).
 
 ******************************************
 
-*type /hhtdg to open the configuration interface, or /hhtd for command-line access (/ace3)*
+*type /hhtdg to open the configuration interface, or /hhtd for command-line access*
 
 
 **Comments and suggestions are welcome** :-)

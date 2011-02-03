@@ -1,9 +1,5 @@
 ## Interface: 40000
 
-## X-Compatible-With: 40000
-## X-Max-Interface: 40000
-## X-Min-Interface: 30300
-
 ## Title: Healers Have To Die
 
 ## Notes: @localization(locale="enUS", key="DESCRIPTION")@
@@ -25,8 +21,9 @@
 ## X-LoadOn-Slash: /hhtd
 ## X-LoadOn-Always: delayed
 
-# ## X-LoadOn-PvPFlagged: true
-# ## X-LoadOn-Battleground: true
+## X-Compatible-With: 40000
+## X-Max-Interface: 40000
+## X-Min-Interface: 30300
 
 ## SavedVariables: Healers_Have_To_Die
 

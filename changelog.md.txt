@@ -4,13 +4,13 @@ Healers Have To Die
 *Change log*
 ------------
 
-**version 1.6.1 (2011-02-03):**
+**version 1.7.0 beta 1 (2011-02-03):**
 
- - Added "Healer specialization detection" option. (thanks to Zalgorr for the spell list)
- - Added "Use minimum heal amount filter" option.
+ - New feature: "Healer specialization detection" option. (thanks to Zalgorr for the spell list)
+ - New feature: "Use minimum heal amount filter" option.
 
- - New command: /hhtdg to open the configuration UI
- - Fixes and optimizations
+ - New command: /hhtdg to open the configuration UI.
+ - Fixes and optimizations.
 
 
 **version 1.6.0 (2011-01-22):**
