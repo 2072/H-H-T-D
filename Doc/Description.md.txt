@@ -17,7 +17,7 @@ someone else during the last 60 seconds (*can be configured*).
 
 **Comments and suggestions are welcome** :-)
 
-A new [forum][forum] is also available.
+A [forum][forum] is also available.
 
 To report issues or ask for new features, use the [ticket system][tickets].
 

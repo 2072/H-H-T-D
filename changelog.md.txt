@@ -4,12 +4,15 @@ Healers Have To Die
 *Change log*
 ------------
 
-**version 1.7.0 beta 1 (2011-02-03):**
+**version 1.7.0 (2011-02-05):**
 
  - New feature: "Healer specialization detection" option. (thanks to Zalgorr for the spell list)
  - New feature: "Use minimum heal amount filter" option.
 
  - New command: /hhtdg to open the configuration UI.
+
+ - AceLocale-3.0 library was missing in previous releases preventing HHTD to
+   work in certain conditions.
  - Fixes and optimizations.
 
 
