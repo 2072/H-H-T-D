@@ -651,9 +651,9 @@ do
             isHealSpell = false;
         end
 
-         -- Escape if not a heal spell and not PvpHSpecsOnly {{{
+         -- Escape if not a heal spell and (not checking for spec's spells or source is a NPC) {{{
          -- we look for healing spells directed to others
-         if not isHealSpell and not configRef.PvpHSpecsOnly then
+         if not isHealSpell and (not configRef.PvpHSpecsOnly or Source_Is_Hostile_NPC) then
              return false;
          end -- }}}
 
