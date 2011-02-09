@@ -298,22 +298,29 @@ do
                         bigStep = 5,
                         order = 500,
                     },
-                    UHMHA = {
+                    UHMHAP = {
                         type = "toggle",
                         name = L["OPT_USE_HEALER_MINIMUM_HEAL_AMOUNT"],
                         desc = L["OPT_USE_HEALER_MINIMUM_HEAL_AMOUNT_DESC"],
                         order = 600,
                     },
-                    HMHA = {
+                    HMHAP = {
                         type = "range",
-                        disabled = function() return not HHTD.db.global.UHMHA or not HHTD:IsEnabled(); end,
-                        name = L["OPT_HEALER_MINIMUM_HEAL_AMOUNT"],
+                        disabled = function() return not HHTD.db.global.UHMHAP or not HHTD:IsEnabled(); end,
+                        name = function() return (L["OPT_HEALER_MINIMUM_HEAL_AMOUNT"]):format(HHTD:UpdateHealThreshold()) end,
                         desc = L["OPT_HEALER_MINIMUM_HEAL_AMOUNT_DESC"],
-                        min = 10,
-                        max = 80000,
-                        step = 1,
-                        bigStep = 1000,
+                        min = 0.01,
+                        max = 3,
+                        softMax = 1,
+                        step = 0.01,
+                        bigStep = 0.03,
                         order = 650,
+                        isPercent = true,
+
+                        set = function (info, value)
+                            HHTD:SetHandler(HHTD, info, value);
+                            HHTD:UpdateHealThreshold();
+                        end,
                     },
                     Header1000 = {
                         type = 'header',
@@ -390,8 +397,8 @@ local DEFAULT__CONFIGURATION = {
         Debug = false,
         Pve = true,
         PvpHSpecsOnly = true,
-        UHMHA = true,
-        HMHA = 4000,
+        UHMHAP = true,
+        HMHAP = 0.04,
     },
 };
 -- }}}
@@ -447,12 +454,20 @@ function HHTD:OnDisable()
 end
 -- }}}
 
+HHTD.HealThreshold = 0;
+function HHTD:UpdateHealThreshold()
+    if not self.db.global.UHMHAP then return end
 
+    HHTD.HealThreshold = math.ceil(self.db.global.HMHAP * UnitHealthMax('player'));
+
+    return HHTD.HealThreshold;
+end
 
 
 -- MouseOver and Target trigger {{{
 do
     local LastDetectedGUID = "";
+    local LastTasksRunTime = 0;
     function HHTD:TestUnit(eventName)
 
         local unit="";
@@ -541,7 +556,12 @@ do
             HHTD.Enemy_Healers_By_Name_Blacklist[unitFirstName] = GetTime();
         end
 
-        HHTD:Undertaker();
+
+        if GetTime() - LastTasksRunTime > 60 then
+            HHTD:Undertaker();
+            HHTD:UpdateHealThreshold();
+        end
+
     end
 end -- }}}
 
@@ -676,7 +696,7 @@ do
         end -- }}}
 
          -- If checking for minimum heal amount
-         if isHealSpell and configRef.UHMHA then
+         if isHealSpell and configRef.UHMHAP then
              -- store Heal score
              if not self.Total_Heal_By_Name[FirstName] then
                  self.Total_Heal_By_Name[FirstName] = 0;
@@ -684,7 +704,7 @@ do
              self.Total_Heal_By_Name[FirstName] = self.Total_Heal_By_Name[FirstName] + arg12;
 
              -- Escape if below minimum healing {{{
-             if self.Total_Heal_By_Name[FirstName] < configRef.HMHA then
+             if self.Total_Heal_By_Name[FirstName] < HHTD.HealThreshold then
                  self:Debug(INFO2, FirstName, "is below minimum healing amount:", self.Total_Heal_By_Name[FirstName]);
                  return;
              end -- }}}
@@ -720,7 +740,7 @@ do
  function HHTD:Undertaker()
 
      Time = GetTime();
-     if (Time - LastCleaned) < 60 then return end -- no need to run this cleaning more than once per minute
+     -- if (Time - LastCleaned) < 60 then return end -- no need to run this cleaning more than once per minute
 
      self:Debug(INFO2, "cleaning...");
 
