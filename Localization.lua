@@ -90,6 +90,9 @@ do
     L["YOU_GOT_HER"] = "You got %sher|r!"
     L["YOU_GOT_HIM"] = "You got %shim|r!"
     L["YOU_GOT_IT"] = "You got %sit|r!"
+
+    L["OPT_NPH_WARNING1"] = "WARNING: Enemies' name-plates are currently disabled. HHTD cannot add its red cross symbol.\nYou can enable name-plates display through the WoW UI's options or by using the assigned key-stroke."
+    L["OPT_NPH_WARNING2"] = "WARNING: Allies' name-plates are currently disabled. HHTD cannot add its green cross symbol.\nYou can enable name-plates display through the WoW UI's options or by using the assigned key-stroke."
     --]==]
     --@end-do-not-package@
 

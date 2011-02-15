@@ -63,6 +63,12 @@ function NPH:GetOptions () -- {{{
             get = function (info) return NPH.db.global[info[#info]]; end,
             set = function (info, value) HHTD:SetHandler(self, info, value) end,
             args = {
+                Warning1 = {
+                    type = 'description',
+                    name = HHTD:ColorText(L["OPT_NPH_WARNING1"], "FFFF0000"),
+                    hidden = function () return GetCVarBool("nameplateShowEnemies") end,
+                    order = 0,
+                },
                 sPve = {
                     type = 'toggle',
                     name = L["OPT_STRICTGUIDPVE"],

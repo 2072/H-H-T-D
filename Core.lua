@@ -398,7 +398,7 @@ local DEFAULT__CONFIGURATION = {
         Pve = true,
         PvpHSpecsOnly = true,
         UHMHAP = true,
-        HMHAP = 0.04,
+        HMHAP = 0.05,
     },
 };
 -- }}}
