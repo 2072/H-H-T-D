@@ -4,6 +4,10 @@ Healers Have To Die
 *Change log*
 ------------
 
+**version 1.8.0 beta 1 (2011-02-18):**
+
+ - New feature: HHTD now adds a special symbol on friendly Healers if allies' name-plates are shown so you can protect your beloved healers and prevent them from being slaughtered!!
+
 **version 1.7.0.1 (2011-02-06):**
 
  - FIX: PVE healer detection was broken when "Healer specialization detection" option was enabled (all NPCs were detected as healers)

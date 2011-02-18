@@ -14,6 +14,6 @@ externals:
 
     libs/LibNameplate-1.0: svn://svn.wowace.com/wow/libnameplate-1-0/mainline/trunk/LibNameplate-1.0
 
-#manual-changelog:
-#    filename: changelog.md.txt
-#    markup-type: markdown
+manual-changelog:
+    filename: changelog.md.txt
+    markup-type: markdown

@@ -5,9 +5,11 @@ Healers Have To Die
 *Spot those bloody healers instantly and help them accomplish their destiny! (PVP and PVE)*
 
 
-HHTD adds a big **red cross** over healer's name plates.  *You can't miss them!* (see the [screen-shot][redcross])
+HHTD adds a big **red cross** over *enemy* healer's name plates.  *You can't miss them!* (see the [screen-shot][redcross])
 **IMPORTANT NOTE: You have to enable enemies' name-plates, else you won't see the red crosses!**
 
+HHTD adds a **healer symbol** above the heads of *friendly* healers (since HHTD 1.8.0 only). Stop the slaughter!!
+**IMPORTANT NOTE: You have to enable allies' name-plates, else you won't see the healer symbol!**
 
 It also rings when you hover or target a hostile unit (PVP and/or PVE) who healed
 someone else during the last 60 seconds (*can be configured*).

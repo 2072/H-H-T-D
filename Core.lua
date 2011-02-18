@@ -66,7 +66,27 @@ HHTD_C.Healing_Classes = {
 HHTD.Enemy_Healers = {};
 HHTD.Enemy_Healers_By_Name = {};
 HHTD.Enemy_Healers_By_Name_Blacklist = {};
-HHTD.Total_Heal_By_Name = {};
+HHTD.Enemy_Total_Heal_By_Name = {};
+
+HHTD.Friendly_Healers = {};
+HHTD.Friendly_Healers_By_Name = {};
+HHTD.Friendly_Healers_By_Name_Blacklist = {}; -- nothing to fill it for now
+HHTD.Friendly_Total_Heal_By_Name = {};
+
+HHTD.Healer_Registry = {
+    [true] = {
+        ["Healers"] = HHTD.Friendly_Healers,
+        ["Healers_By_Name"] = HHTD.Friendly_Healers_By_Name,
+        ["Healers_By_Name_Blacklist"] = HHTD.Friendly_Healers_By_Name_Blacklist,
+        ["Total_Heal_By_Name"] = HHTD.Friendly_Total_Heal_By_Name,
+    },
+    [false] = {
+        ["Healers"] = HHTD.Enemy_Healers,
+        ["Healers_By_Name"] = HHTD.Enemy_Healers_By_Name,
+        ["Healers_By_Name_Blacklist"] = HHTD.Enemy_Healers_By_Name_Blacklist,
+        ["Total_Heal_By_Name"] = HHTD.Enemy_Total_Heal_By_Name,
+    }
+}
 
 -- local function REGISTER_HEALERS_ONLY_SPELLS_ONCE () -- {{{
 local function REGISTER_HEALERS_ONLY_SPELLS_ONCE ()
@@ -158,6 +178,7 @@ local UnitFactionGroup  = _G.UnitFactionGroup;
 local GetTime           = _G.GetTime;
 local PlaySoundFile     = _G.PlaySoundFile;
 local pairs             = _G.pairs;
+local ipairs             = _G.ipairs;
 -- }}}
 
 -- }}}
@@ -560,6 +581,7 @@ do
         if GetTime() - LastTasksRunTime > 60 then
             HHTD:Undertaker();
             HHTD:UpdateHealThreshold();
+            LastTasksRunTime = GetTime();
         end
 
     end
@@ -588,15 +610,20 @@ do
     local HOSTILE_OUTSIDER      = bit.bor (COMBATLOG_OBJECT_AFFILIATION_OUTSIDER, COMBATLOG_OBJECT_REACTION_HOSTILE);
 --    local FRIENDLY_TARGET       = bit.bor (COMBATLOG_OBJECT_TARGET, COMBATLOG_OBJECT_REACTION_FRIENDLY);
 
-    local HOSTILE_OUTSIDER_NPC  =  bit.bor (HOSTILE_OUTSIDER, COMBATLOG_OBJECT_TYPE_NPC);
-    local HOSTILE_OUTSIDER_PLAYER = bit.bor (HOSTILE_OUTSIDER, COMBATLOG_OBJECT_TYPE_PLAYER);
+    local HOSTILE_OUTSIDER_NPC      = bit.bor (HOSTILE_OUTSIDER                     , COMBATLOG_OBJECT_TYPE_NPC);
+    local FRIENDLY_NPC              = bit.bor (COMBATLOG_OBJECT_REACTION_FRIENDLY   , COMBATLOG_OBJECT_TYPE_NPC);
+    local HOSTILE_OUTSIDER_PLAYER   = bit.bor (HOSTILE_OUTSIDER                     , COMBATLOG_OBJECT_TYPE_PLAYER);
+    local FRIENDLY_PLAYER           = bit.bor (COMBATLOG_OBJECT_REACTION_FRIENDLY   , COMBATLOG_OBJECT_TYPE_PLAYER);
 
     local ACCEPTABLE_TARGETS = bit.bor (PLAYER, NPC);
 
-    local Source_Is_Hostile_NPC = false;
-    local Source_Is_Hostile_Human = false;
+    local Source_Is_NPC = false;
+    local Source_Is_Human = false;
+    local Source_Is_Friendly = false;
 
     local isHealSpell = false;
+
+    local Healer_Registry = HHTD.Healer_Registry;
 
     -- http://www.wowpedia.org/API_COMBAT_LOG_EVENT
     function HHTD:COMBAT_LOG_EVENT_UNFILTERED(e, timestamp, event, sourceGUID, sourceName, sourceFlags, destGUID, destName, destFlags, arg9, arg10 --[[ spellName --]], arg11, arg12 --[[ amount --]])
@@ -621,13 +648,20 @@ do
             return;
         end -- }}}
 
-        Source_Is_Hostile_NPC = false;
-        Source_Is_Hostile_Human = false;
+        Source_Is_NPC = false;
+        Source_Is_Human = false;
+        Source_Is_Friendly = false;
 
         if band(sourceFlags, HOSTILE_OUTSIDER_NPC) == HOSTILE_OUTSIDER_NPC then
-            Source_Is_Hostile_NPC = true;
+            Source_Is_NPC = true;
         elseif band (sourceFlags, HOSTILE_OUTSIDER_PLAYER) == HOSTILE_OUTSIDER_PLAYER then
-            Source_Is_Hostile_Human = true;
+            Source_Is_Human = true;
+        elseif band (sourceFlags, FRIENDLY_PLAYER) == FRIENDLY_PLAYER then
+            Source_Is_Human = true;
+            Source_Is_Friendly = true;
+        elseif band (sourceFlags, FRIENDLY_NPC) == FRIENDLY_NPC then
+            Source_Is_NPC = true;
+            Source_Is_Friendly = true;
         end
 
 
@@ -635,7 +669,8 @@ do
         -- if the source is not a player and if while pve, the source is not an npc, then we don't care about this event
         -- ie we care if the source is a human player or pve is enaled and the source is an npc.
         --      not (a or (b and c)) ==  !a and (not b or not c)
-        if not ( Source_Is_Hostile_Human or (configRef.Pve and Source_Is_Hostile_NPC)) then
+        if not ( Source_Is_Human or (configRef.Pve and Source_Is_NPC)) then
+        --if not ( Source_Is_Hostile_Human or (configRef.Pve and Source_Is_Hostile_NPC)) then
 
 
             --@debug@
@@ -657,10 +692,10 @@ do
             return;
         end -- }}}
 
-        -- Escape if Source_Is_Hostile_Human and scanning for pure healing specs and the spell doesn't match {{{
-        if Source_Is_Hostile_Human and configRef.PvpHSpecsOnly and not HHTD_C.Healers_Only_Spells_ByName[arg10] then
+        -- Escape if Source_Is_Human and scanning for pure healing specs and the spell doesn't match {{{
+        if Source_Is_Human and configRef.PvpHSpecsOnly and not HHTD_C.Healers_Only_Spells_ByName[arg10] then
             --@debug@
-            self:Debug(INFO2, "Spell", arg10, "is not a healer' spell");
+            --self:Debug(INFO2, "Spell", arg10, "is not a healer' spell");
             --@end-debug@
             return;
         end -- }}}
@@ -673,7 +708,7 @@ do
 
          -- Escape if not a heal spell and (not checking for spec's spells or source is a NPC) {{{
          -- we look for healing spells directed to others
-         if not isHealSpell and (not configRef.PvpHSpecsOnly or Source_Is_Hostile_NPC) then
+         if not isHealSpell and (not configRef.PvpHSpecsOnly or Source_Is_NPC) then
              return false;
          end -- }}}
 
@@ -688,9 +723,11 @@ do
              return;
          end
 
-        -- Escape if player got blacklisted has not a healer {{{
+
+-- ]7C+Y*Jo
+        -- Escape if player got blacklisted has not healer {{{
         -- Only if the unit class can heal - not post-blacklisted
-        if self.Enemy_Healers_By_Name_Blacklist[FirstName] then
+        if Healer_Registry[Source_Is_Friendly].Healers_By_Name_Blacklist[FirstName] then
             self:Debug(INFO2, FirstName, " was blacklisted");
             return;
         end -- }}}
@@ -698,14 +735,14 @@ do
          -- If checking for minimum heal amount
          if isHealSpell and configRef.UHMHAP then
              -- store Heal score
-             if not self.Total_Heal_By_Name[FirstName] then
-                 self.Total_Heal_By_Name[FirstName] = 0;
+             if not Healer_Registry[Source_Is_Friendly].Total_Heal_By_Name[FirstName] then
+                 Healer_Registry[Source_Is_Friendly].Total_Heal_By_Name[FirstName] = 0;
              end
-             self.Total_Heal_By_Name[FirstName] = self.Total_Heal_By_Name[FirstName] + arg12;
+             Healer_Registry[Source_Is_Friendly].Total_Heal_By_Name[FirstName] = Healer_Registry[Source_Is_Friendly].Total_Heal_By_Name[FirstName] + arg12;
 
              -- Escape if below minimum healing {{{
-             if self.Total_Heal_By_Name[FirstName] < HHTD.HealThreshold then
-                 self:Debug(INFO2, FirstName, "is below minimum healing amount:", self.Total_Heal_By_Name[FirstName]);
+             if Healer_Registry[Source_Is_Friendly].Total_Heal_By_Name[FirstName] < HHTD.HealThreshold then
+                 self:Debug(INFO2, FirstName, "is below minimum healing amount:", Healer_Registry[Source_Is_Friendly].Total_Heal_By_Name[FirstName]);
                  return;
              end -- }}}
          end
@@ -713,18 +750,18 @@ do
          time = GetTime();
 
          -- useless to continue past this point if we just saw the healer
-         if self.Enemy_Healers[sourceGUID] and time - self.Enemy_Healers[sourceGUID] < 5 then
-             self:Debug(INFO2, "Throtelling heal events for", FirstName);
+         if Healer_Registry[Source_Is_Friendly].Healers[sourceGUID] and time - Healer_Registry[Source_Is_Friendly].Healers[sourceGUID] < 5 then
+             --self:Debug(INFO2, "Throtelling heal events for", FirstName);
              return
          end
 
          -- by GUID
-         self.Enemy_Healers[sourceGUID] = time
+         Healer_Registry[Source_Is_Friendly].Healers[sourceGUID] = time;
          -- by Name
-         self.Enemy_Healers_By_Name[FirstName] = self.Enemy_Healers[sourceGUID];
+         Healer_Registry[Source_Is_Friendly].Healers_By_Name[FirstName] = Healer_Registry[Source_Is_Friendly].Healers[sourceGUID];
          -- update plate
          self:Debug(INFO, "Healer detected:", FirstName);
-         self:SendMessage("HHTD_HEALER_DETECTED", FirstName, sourceGUID);
+         self:SendMessage("HHTD_HEALER_DETECTED", FirstName, sourceGUID, Source_Is_Friendly);
 
          self:Undertaker();
          -- TODO for GEHR: make activity light blink
@@ -742,26 +779,32 @@ do
      Time = GetTime();
      -- if (Time - LastCleaned) < 60 then return end -- no need to run this cleaning more than once per minute
 
+     local Healer_Registry = HHTD.Healer_Registry;
      self:Debug(INFO2, "cleaning...");
 
-     -- clean enemy healers GUID
-     for guid, lastHeal in pairs(self.Enemy_Healers) do
-         if (Time - lastHeal) > self.db.global.HFT then
-             self.Enemy_Healers[guid] = nil;
+     -- XXX also clean friendly tables
 
-             self:Debug(INFO2, guid, "removed");
+     for i, Friendly in ipairs({true, false}) do
+         self:Debug(INFO2, "cleaning " .. (Friendly and "|cff00ff00friends|c..." or "|cffff0000enemies|c..."));
+         -- clean enemy healers GUID
+         for guid, lastHeal in pairs(Healer_Registry[Friendly].Healers) do
+             if (Time - lastHeal) > self.db.global.HFT then
+                 Healer_Registry[Friendly].Healers[guid] = nil;
+
+                 self:Debug(INFO2, guid, "removed");
+             end
          end
-     end
 
-     -- clean enemy healers Name
-     for healerName, lastHeal in pairs(self.Enemy_Healers_By_Name) do
-         if (Time - lastHeal) > self.db.global.HFT then
-             self.Enemy_Healers_By_Name[healerName] = nil;
-             self.Total_Heal_By_Name[healerName] = nil;
+         -- clean enemy healers Name
+         for healerName, lastHeal in pairs(Healer_Registry[Friendly].Healers_By_Name) do
+             if (Time - lastHeal) > self.db.global.HFT then
+                 Healer_Registry[Friendly].Healers_By_Name[healerName] = nil;
+                 Healer_Registry[Friendly].Total_Heal_By_Name[healerName] = nil;
 
-             self:SendMessage("HHTD_DROP_HEALER", healerName)
+                 self:SendMessage("HHTD_DROP_HEALER", healerName, nil, Friendly)
 
-             self:Debug(INFO2, healerName, "removed");
+                 self:Debug(INFO2, healerName, "removed");
+             end
          end
      end
 
@@ -770,12 +813,15 @@ do
      -- clean player class blacklist
      if (Time - LastBlackListCleaned) < 3600 then return end
 
-     for Name, LastSeen in pairs(self.Enemy_Healers_By_Name_Blacklist) do
+     for i, Friendly in ipairs({true, false}) do
+         self:Debug(INFO2, "cleaning blacklisted " .. (Friendly and "|cff00ff00friends|c..." or "|cffff0000enemies|c..."));
+         for Name, LastSeen in pairs(Healer_Registry[Friendly].Healers_By_Name_Blacklist) do
 
-         if (Time - LastSeen) > self.db.global.HFT then
-             self.Enemy_Healers_By_Name_Blacklist[Name] = nil;
+             if (Time - LastSeen) > self.db.global.HFT then
+                 Healer_Registry[Friendly].Healers_By_Name_Blacklist[Name] = nil;
 
-             self:Debug(INFO2, Name, "removed from class blacklist");
+                 self:Debug(INFO2, Name, "removed from class blacklist");
+             end
          end
      end
 
