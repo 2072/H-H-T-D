@@ -174,7 +174,6 @@ local UnitIsUnit        = _G.UnitIsUnit;
 local UnitSex           = _G.UnitSex;
 local UnitClass         = _G.UnitClass;
 local UnitName          = _G.UnitName;
-local UnitFactionGroup  = _G.UnitFactionGroup;
 local GetTime           = _G.GetTime;
 local PlaySoundFile     = _G.PlaySoundFile;
 local pairs             = _G.pairs;
@@ -624,9 +623,27 @@ do
     local isHealSpell = false;
 
     local Healer_Registry = HHTD.Healer_Registry;
+    local HideCaster -- (new 4.1 HHTD killer variable)
+
+    local type = _G.type;
+
 
     -- http://www.wowpedia.org/API_COMBAT_LOG_EVENT
-    function HHTD:COMBAT_LOG_EVENT_UNFILTERED(e, timestamp, event, sourceGUID, sourceName, sourceFlags, destGUID, destName, destFlags, arg9, arg10 --[[ spellName --]], arg11, arg12 --[[ amount --]])
+    function HHTD:COMBAT_LOG_EVENT_UNFILTERED(e, timestamp, event, sourceGUID, sourceName, sourceFlags, destGUID, destName, destFlags, arg9, arg10 --[[ spellName --]], arg11, arg12, ... --[[ amount --]])
+
+
+        if type(sourceGUID) == "boolean" then
+            HideCaster = true;
+            if sourceGUID then
+                self:Debug(event, sourceGUID, sourceName, sourceFlags, destGUID, destName, destFlags, arg9, arg10, arg11, arg12, ...);
+            end
+
+            -- call again skipping sourceGUID
+            self:COMBAT_LOG_EVENT_UNFILTERED(e, timestamp, event, sourceName, sourceFlags, destGUID, destName, destFlags, arg9, arg10, arg11, arg12, ...)
+            return;
+        else
+            HideCaster = false;
+        end
 
         -- escape if no source {{{
         -- untraceable events are useless
@@ -785,7 +802,7 @@ do
      -- XXX also clean friendly tables
 
      for i, Friendly in ipairs({true, false}) do
-         self:Debug(INFO2, "cleaning " .. (Friendly and "|cff00ff00friends|c..." or "|cffff0000enemies|c..."));
+         self:Debug(INFO2, "cleaning " .. (Friendly and "|cff00ff00friends|r..." or "|cffff0000enemies|r..."));
          -- clean enemy healers GUID
          for guid, lastHeal in pairs(Healer_Registry[Friendly].Healers) do
              if (Time - lastHeal) > self.db.global.HFT then
@@ -814,7 +831,7 @@ do
      if (Time - LastBlackListCleaned) < 3600 then return end
 
      for i, Friendly in ipairs({true, false}) do
-         self:Debug(INFO2, "cleaning blacklisted " .. (Friendly and "|cff00ff00friends|c..." or "|cffff0000enemies|c..."));
+         self:Debug(INFO2, "cleaning blacklisted " .. (Friendly and "|cff00ff00friends|r..." or "|cffff0000enemies|r..."));
          for Name, LastSeen in pairs(Healer_Registry[Friendly].Healers_By_Name_Blacklist) do
 
              if (Time - LastSeen) > self.db.global.HFT then
