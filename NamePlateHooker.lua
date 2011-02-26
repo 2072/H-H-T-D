@@ -183,7 +183,7 @@ function NPH:HHTD_DROP_HEALER(selfevent, healerName, unitGuid, isFriend) -- XXX 
 
     if plate then
         -- if the name is not unique we cannot hide just any frame...
-        if not NPC_Is_Not_Unique[isFriend][healerName] then
+        if not NPC_Is_Not_Unique[isFriend][healerName] then -- XXX will crash if isFriend is nil
             --self:Debug("Must drop", healerName);
             self:HideCrossFromPlate(plate);
         elseif unitGuid and LNP:GetNameplateByGUID(unitGuid) then

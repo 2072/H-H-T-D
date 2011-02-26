@@ -476,7 +476,7 @@ end
 
 HHTD.HealThreshold = 0;
 function HHTD:UpdateHealThreshold()
-    if not self.db.global.UHMHAP then return end
+    if not self.db.global.UHMHAP then return 0 end
 
     HHTD.HealThreshold = math.ceil(self.db.global.HMHAP * UnitHealthMax('player'));
 
