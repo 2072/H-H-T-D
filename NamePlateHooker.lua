@@ -168,7 +168,11 @@ end
 -- }}}
 
 -- Internal CallBacks (HHTD_DROP_HEALER -- HHTD_HEALER_DETECTED -- ON_HEALER_PLATE_TOUCH -- HHTD_MOUSE_OVER_OR_TARGET) {{{
-function NPH:HHTD_DROP_HEALER(selfevent, healerName, unitGuid, isFriend) -- XXX add guid and test with it if not unique unit
+function NPH:HHTD_DROP_HEALER(selfevent, healerName, unitGuid, isFriend)
+
+    if isFriend == nil then
+        isFriend = false;
+    end
 
     if not isFriend and not GetCVarBool("nameplateShowEnemies") or isFriend and not GetCVarBool("nameplateShowFriends") then
         return;
@@ -281,7 +285,7 @@ function NPH:LibNameplate_NewNameplate(selfevent, plate)
         else
             Plate_Name_Count[isFriend][plateName] = Plate_Name_Count[isFriend][plateName] + 1;
             NPC_Is_Not_Unique[isFriend][plateName] = true;
-            self:Debug(INFO, plateName, "is not unique");
+            self:Debug(INFO, plateName, "is not unique:", Plate_Name_Count[isFriend][plateName]);
         end
     end
 
@@ -303,6 +307,7 @@ end
 
 function NPH:LibNameplate_RecycleNameplate(selfevent, plate)
     local plateName = LNP:GetName(plate);
+
 
     -- We've modified the plate
     if plate.HHTD_EnemyHealer and plate.HHTD_EnemyHealer.IsShown then
