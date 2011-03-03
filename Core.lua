@@ -633,10 +633,13 @@ do
 
 
         if type(sourceGUID) == "boolean" then
-            HideCaster = true;
+            HideCaster = sourceGUID;
+
+            --@debug@
             if sourceGUID then
                 self:Debug(event, sourceGUID, sourceName, sourceFlags, destGUID, destName, destFlags, arg9, arg10, arg11, arg12, ...);
             end
+            --@end-debug@
 
             -- call again skipping sourceGUID
             self:COMBAT_LOG_EVENT_UNFILTERED(e, timestamp, event, sourceName, sourceFlags, destGUID, destName, destFlags, arg9, arg10, arg11, arg12, ...)
@@ -647,7 +650,7 @@ do
 
         -- escape if no source {{{
         -- untraceable events are useless
-        if not sourceGUID then return end
+        if not sourceGUID or HideCaster then return end
         -- }}}
 
         local configRef = self.db.global; -- config shortcut
@@ -736,7 +739,7 @@ do
          if sourceName then
              FirstName = str_match(sourceName, "^[^-]+"); -- sourceName may be nil??
          else
-             self:Print("|cFFFF0000NO NAME for GUID:", sourceGUID);
+             self:Debug(WARNING, "NO NAME for GUID:", sourceGUID);
              return;
          end
 
