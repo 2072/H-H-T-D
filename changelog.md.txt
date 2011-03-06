@@ -4,21 +4,12 @@ Healers Have To Die
 *Change log*
 ------------
 
-**version 1.8.0 beta 2 (2011-02-26):**
+**version 1.8.0 (2011-03-06):**
 
-- Added compatibility layer with WoW 4.1 to handle the new
-  COMBAT_LOG_EVENT_UNFILTERED parameter inserted between 'event' and
- 'sourceGUID' called 'hideCaster'. HHTD needs to be tested in PVP situations on
-  4.1 PTR.
+ - New feature: HHTD now adds the healer role symbol on friendly Healers if allies' name-plates are shown so you can protect your beloved healers and prevent them from being slaughtered!!
 
-- Fix Lua error when disabling the "Use minimum heal amount filter" option
+ - Changed minimum heal amount to be a percentage of the player maximum health.
 
-- Fix Lua error: NamePlateHooker.lua line 186:attempt to index field '?' (a nil value)
-
-
-**version 1.8.0 beta 1 (2011-02-18):**
-
- - New feature: HHTD now adds a special symbol on friendly Healers if allies' name-plates are shown so you can protect your beloved healers and prevent them from being slaughtered!!
 
 **version 1.7.0.1 (2011-02-06):**
 
