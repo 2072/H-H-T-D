@@ -7,7 +7,7 @@ Healers Have To Die
 
 HHTD adds a **red cross** over *enemy* healer's name plates. *You can't miss them!* (see the [screen-shot][redcross]).
 
-HHTD adds a **healer role symbol** above*friendly* healers' name plates (since HHTD 1.8.0 only). *Stop the slaughter!!*
+HHTD adds a **healer role symbol** above*friendly* healers' name plates. *Stop the slaughter!!*
 
 **IMPORTANT NOTE: You have to enable name-plates, else you won't see the healer symbol!**
 
@@ -15,6 +15,19 @@ It also rings when you hover or target a hostile unit who healed
 someone else during the last 60 seconds (*can be configured*).
 
 HHTD is PVP and PVE compatible.
+
+**HHTD uses the combat log events to detect friendly and enemy healers.
+By default HHTD will detect specialized healers spells only (for PvP) another
+option lets you choose a specified amount of healing ennemies have to reach
+before being marked as healers. (this is the setting used for PVE)**
+
+Self-Heals and pets are filtered out.
+
+Remember to check out available options (/HHTDG)
+
+An interesting debate about this add-on is happening on the official Blizzard's forum:
+[http://us.battle.net/wow/en/forum/topic/2191131447][debate]
+Sadly, as a European I cannot participate but I'm reading this thread with great interest.
 
 ******************************************
 
@@ -33,5 +46,6 @@ To report issues or ask for new features, use the [ticket system][tickets].
 [dev]: http://www.2072productions.com/to/hhtd_dev
 [forum]: http://www.wowace.com/addons/healers-have-to-die/forum/
 [redcross]: http://www.wowace.com/addons/healers-have-to-die/images/1-red-cross/
+[debate]: http://us.battle.net/wow/en/forum/topic/2191131447
 
 
