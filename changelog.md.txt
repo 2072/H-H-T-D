@@ -4,6 +4,12 @@ Healers Have To Die
 *Change log*
 ------------
 
+**version 1.8.1 (2011-03-13):**
+
+ - Updated version of LibNamePlate-1.0 (this should fix a Lua error some users experienced)
+
+ - Updated description with links to the official forum threads about HHTD (someone should tell them that only 12,000 people are using HHTD...)
+
 **version 1.8.0 (2011-03-06):**
 
  - New feature: HHTD now adds the healer role symbol on friendly Healers if allies' name-plates are shown so you can protect your beloved healers and prevent them from being slaughtered!!

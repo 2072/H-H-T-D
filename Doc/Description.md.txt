@@ -26,8 +26,16 @@ Self-Heals and pets are filtered out.
 Remember to check out available options (/HHTDG)
 
 An interesting debate about this add-on is happening on the official Blizzard's forum:
-[http://us.battle.net/wow/en/forum/topic/2191131447][debate]
-Sadly, as a European I cannot participate but I'm reading this thread with great interest.
+[Break the HHTD mod already. (UI and Macro forum)][debate4] (full),
+[Healers Have To Die, part I (UI and Macro forum)][debate1] (full),
+[Healers Have to Die, part II (General discussion)][debate2] (full),
+[Healers Have to Die, part III (General discussion)][debate3],
+[Healers Have to Die (Class Roles - Healing forum)][debate5]
+
+Sadly, as a European I cannot participate but I'm reading those threads with great interest.
+
+The funniest part about all those 26 pages discussions is that only about **12,000 people are actually using HHTD** (from the Curse Client popularity statistics)...
+In those discussion it's also rarely noted that HHTD is also very helpful to protect healers on your side.
 
 ******************************************
 
@@ -46,6 +54,20 @@ To report issues or ask for new features, use the [ticket system][tickets].
 [dev]: http://www.2072productions.com/to/hhtd_dev
 [forum]: http://www.wowace.com/addons/healers-have-to-die/forum/
 [redcross]: http://www.wowace.com/addons/healers-have-to-die/images/1-red-cross/
-[debate]: http://us.battle.net/wow/en/forum/topic/2191131447
+
+
+[debate1]: http://us.battle.net/wow/en/forum/topic/2211922815
+
+[debate2]: http://us.battle.net/wow/en/forum/topic/2228173234
+
+[debate3]: http://us.battle.net/wow/en/forum/topic/2228224992
+
+[debate4]: http://us.battle.net/wow/en/forum/topic/2191131447
+
+
+[debate5]: http://us.battle.net/wow/en/forum/topic/2228223941
+
+
+
 
 
