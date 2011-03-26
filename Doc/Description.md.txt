@@ -16,26 +16,55 @@ someone else during the last 60 seconds (*can be configured*).
 
 HHTD is PVP and PVE compatible.
 
-**HHTD uses the combat log events to detect friendly and enemy healers.
-By default HHTD will detect specialized healers spells only (for PvP) another
-option lets you choose a specified amount of healing ennemies have to reach
-before being marked as healers. (this is the setting used for PVE)**
-
-Self-Heals and pets are filtered out.
-
 Remember to check out available options (/HHTDG)
 
-An interesting debate about this add-on is happening on the official Blizzard's forum:
-[Break the HHTD mod already. (UI and Macro forum)][debate4] (full),
-[Healers Have To Die, part I (UI and Macro forum)][debate1] (full),
-[Healers Have to Die, part II (General discussion)][debate2] (full),
-[Healers Have to Die, part III (General discussion)][debate3],
-[Healers Have to Die (Class Roles - Healing forum)][debate5]
+Articles and debates
+--------------------
+
+Here is a excellent article about HHTD (**A must read if you have some doubts about the fairness of this add-on!**) :
+
+ [http://cynwise.wordpress.com/2011/03/22/healers-have-to-die-and-the-pvp-addons-arms-race/][article1].
+
+
+An interesting debate about this add-on is also happening on Blizzard's official forum:
+
+- [Break the HHTD mod already. (UI and Macro forum)][debate4] (full),
+
+- [Healers Have To Die, part I (UI and Macro forum)][debate1] (full),
+
+- [Healers Have to Die, part II (General discussion)][debate2] (full),
+
+- [Healers Have to Die, part III (General discussion)][debate3] (full),
+
+- [Healers Have to Die (Class Roles - Healing forum)][debate5]
 
 Sadly, as a European I cannot participate but I'm reading those threads with great interest.
 
-The funniest part about all those 26 pages discussions is that only about **12,000 people are actually using HHTD** (from the Curse Client popularity statistics)...
-In those discussion it's also rarely noted that HHTD is also very helpful to protect healers on your side.
+The funniest part about all those 26 pages discussions is that only about **16,000 people are actually using HHTD** (from the Curse Client popularity statistics)...
+*Note that with all the publicity made about HHTD, this number is increasing a lot faster than it used to.*
+
+In those discussions it's also rarely noted that HHTD is also very helpful to protect healers on your side.
+This debate is leading nowhere though... I won't post any more links to those endless threads.
+
+How it works
+------------
+
+HHTD uses the combat log events to detect friendly and enemy healers.
+By default, HHTD will detect specialized healers spells only (for PvP).
+
+Another option lets you choose a specified amount of healing enemies have to
+reach before being marked as healers. (this is the setting used for PvE)
+
+Self-Heals and pets are filtered out.
+
+Planned features
+----------------
+
+- Announce module for both friendly and enemy healers.
+        For now I'm thinking to force it both ways at the same time ("focus XXX, protect XXX").
+- Detection when a friendly healer is being attacked and alert others through /yell or /say (I would like to make it work for nearby healers only)
+
+- Announce options will be disabled by default and users will have to write the announce text themselves. *there will be no default* 
 
 ******************************************
 
@@ -43,8 +72,6 @@ In those discussion it's also rarely noted that HHTD is also very helpful to pro
 
 
 **Comments and suggestions are welcome** :-)
-
-A [forum][forum] is also available.
 
 To report issues or ask for new features, use the [ticket system][tickets].
 
@@ -66,6 +93,8 @@ To report issues or ask for new features, use the [ticket system][tickets].
 
 
 [debate5]: http://us.battle.net/wow/en/forum/topic/2228223941
+
+[article1]: http://cynwise.wordpress.com/2011/03/22/healers-have-to-die-and-the-pvp-addons-arms-race/
 
 
 
