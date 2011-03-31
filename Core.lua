@@ -73,6 +73,10 @@ HHTD.Friendly_Healers_By_Name = {};
 HHTD.Friendly_Healers_By_Name_Blacklist = {}; -- nothing to fill it for now
 HHTD.Friendly_Total_Heal_By_Name = {};
 
+HHTD.LOG = {};
+HHTD.LOG.Healers_Accusation_Proofs = {};
+HHTD.LOG.Healers_Details = {};
+
 HHTD.Healer_Registry = {
     [true] = {
         ["Healers"] = HHTD.Friendly_Healers,
@@ -240,13 +244,21 @@ do
                 disabled = false,
                 order = -2,
             },
+            Log = {
+                type = 'toggle',
+                name = L["OPT_DEBUG"],
+                desc = L["OPT_DEBUG_DESC"],
+                guiHidden = true,
+                disabled = false,
+                order = -3,
+            },
             Version = {
                 type = 'execute',
                 name = L["OPT_VERSION"],
                 desc = L["OPT_VERSION_DESC"],
                 guiHidden = true,
                 func = function () HHTD:Print(L["VERSION"], '@project-version@,', L["RELEASE_DATE"], '@project-date-iso@') end,
-                order = -3,
+                order = -5,
             },
             core = {
                 type = 'group',
@@ -349,6 +361,52 @@ do
                     },
                 },
             },
+            Logs = {
+                type = 'group',
+                name =  "Logs",
+                order = -1,
+                hidden = function() return not HHTD.db.global.Log end,
+                args = {
+                    AccusationFacts = { -- {{{
+                        type = 'description',
+                        name = function() 
+                            local tmp = {};
+                            local i = 1;
+
+                            for healer, spells in pairs(HHTD.LOG.Healers_Accusation_Proofs) do
+
+                                local isFriend = HHTD.LOG.Healers_Details[healer].isFriend;
+                                local totalHeal = false;
+                                if HHTD.db.global.UHMHAP then
+                                    totalHeal = HHTD.Healer_Registry[isFriend].Total_Heal_By_Name[healer];
+                                end
+
+                                local spellsStats = {}
+                                local j = 1;
+
+                                for spell, spellcount in pairs(spells) do
+                                    spellsStats[j] = ("    %s (%d)"):format(spell, spellcount);
+                                    j = j + 1;
+                                end
+
+                                tmp[i] = ("%s (|cff00dd00%s|r) [%s]:\n%s\n"):format(
+                                    (HHTD:ColorText("[%s]", isFriend and "FF00FF00" or "FFFF0000")):format(HHTD:ColorText(healer,  HHTD.LOG.Healers_Details[healer].class and HHTD:GetClassHexColor(  HHTD.LOG.Healers_Details[healer].class) or "FFAAAAAA" )),
+                                    tostring(totalHeal and totalHeal or "UHMHAP false"),
+                                    HHTD.LOG.Healers_Details[healer].isHuman and "Human" or "NPC",
+                                    table.concat(spellsStats, '\n')
+                                );
+
+                                i = i + 1;
+
+                            end
+
+                            return table.concat(tmp, '\n');
+                        
+                        end,
+                        order = 1,
+                    }, -- }}}
+                },
+            },
         },
     };
     end -- }}}
@@ -415,6 +473,7 @@ local DEFAULT__CONFIGURATION = {
         HFT = 60,
         Enabled = true,
         Debug = false,
+        Log = false,
         Pve = true,
         PvpHSpecsOnly = true,
         UHMHAP = true,
@@ -565,6 +624,9 @@ do
                     self:SendMessage("HHTD_HEALER_UNDER_MOUSE", unit, unitGuid, unitFirstName, LastDetectedGUID);
                     --self:Debug("HHTD_HEALER_UNDER_MOUSE"); -- XXX
                     LastDetectedGUID = unitGuid;
+                    if HHTD.db.global.Log then
+                        HHTD.LOG.Healers_Details[unitFirstName].class = unitClass;
+                    end
                 end
             else
                 --self:Debug(INFO2, "did not heal");
@@ -769,11 +831,30 @@ do
 
          time = GetTime();
 
+
+         -- if logging and specs only
+         if configRef.Log and HHTD_C.Healers_Only_Spells_ByName[arg10] then
+             if not HHTD.LOG.Healers_Accusation_Proofs[FirstName] then
+                 HHTD.LOG.Healers_Accusation_Proofs[FirstName] = {};
+                 HHTD.LOG.Healers_Details[FirstName] = {};
+                 HHTD.LOG.Healers_Details[FirstName].isFriend = Source_Is_Friendly;
+                 HHTD.LOG.Healers_Details[FirstName].isHuman = Source_Is_Human;
+             end
+
+             if not HHTD.LOG.Healers_Accusation_Proofs[FirstName][arg10] then
+                 HHTD.LOG.Healers_Accusation_Proofs[FirstName][arg10] = 1;
+             else
+                 HHTD.LOG.Healers_Accusation_Proofs[FirstName][arg10] = HHTD.LOG.Healers_Accusation_Proofs[FirstName][arg10] + 1;
+             end
+         end
+
+
          -- useless to continue past this point if we just saw the healer
          if Healer_Registry[Source_Is_Friendly].Healers[sourceGUID] and time - Healer_Registry[Source_Is_Friendly].Healers[sourceGUID] < 5 then
              --self:Debug(INFO2, "Throtelling heal events for", FirstName);
              return
          end
+
 
          -- by GUID
          Healer_Registry[Source_Is_Friendly].Healers[sourceGUID] = time;
