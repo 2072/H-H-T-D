@@ -99,51 +99,54 @@ local function REGISTER_HEALERS_ONLY_SPELLS_ONCE ()
         return;
     end
 
-    local Healers_Only_Spells = {
+    local Healers_Only_Spells_ByID = {
 
         -- Priests
-        47540, -- Penance
-        88625, -- Holy Word: Chastise
-        88684, -- Holy Word: Serenity
-        88685, -- Holy Word: Sanctuary
-        89485, -- Inner Focus
-        10060, -- Power Infusion
-        33206, -- Pain Suppression
-        62618, -- Power Word: Barrier
-        724,   -- Lightwell
-        14751, -- Chakra
-        34861, -- Circle of Healing
-        47788, -- Guardian Spirit
+        [47540] = "PRIEST", -- Penance
+        [88625] = "PRIEST", -- Holy Word: Chastise
+        [88684] = "PRIEST", -- Holy Word: Serenity
+        [88685] = "PRIEST", -- Holy Word: Sanctuary
+        [89485] = "PRIEST", -- Inner Focus
+        [10060] = "PRIEST", -- Power Infusion
+        [33206] = "PRIEST", -- Pain Suppression
+        [62618] = "PRIEST", -- Power Word: Barrier
+        [724]   = "PRIEST",   -- Lightwell
+        [14751] = "PRIEST", -- Chakra
+        [34861] = "PRIEST", -- Circle of Healing
+        [47788] = "PRIEST", -- Guardian Spirit
 
         -- Druids
-        18562, -- Swiftmend
-        17116, -- Nature's Swiftness
-        48438, -- Wild Growth
-        33891, -- Tree of Life
+        [18562] = "DRUID", -- Swiftmend
+        [17116] = "DRUID", -- Nature's Swiftness
+        [48438] = "DRUID", -- Wild Growth
+        [33891] = "DRUID", -- Tree of Life
 
         -- Shamans
-        974, -- Earth Shield
-        17116, -- Nature's Swiftness
-        16190, -- Mana Tide Totem
-        61295, -- Riptide
+        [974]   = "SHAMAN", -- Earth Shield
+        [17116] = "SHAMAN", -- Nature's Swiftness
+        [16190] = "SHAMAN", -- Mana Tide Totem
+        [61295] = "SHAMAN", -- Riptide
 
         -- Paladins
-        20473, -- Holy Shock
-        31842, -- Divine Favor
-        53563, -- Beacon of Light
-        31821, -- Aura Mastery
-        85222, -- Light of Dawn
+        [20473] = "PALADIN", -- Holy Shock
+        [31842] = "PALADIN", -- Divine Favor
+        [53563] = "PALADIN", -- Beacon of Light
+        [31821] = "PALADIN", -- Aura Mastery
+        [85222] = "PALADIN", -- Light of Dawn
     };
 
     HHTD_C.Healers_Only_Spells_ByName = {};
 
-    for i, spellID in ipairs(Healers_Only_Spells) do
+    for spellID, class in pairs(Healers_Only_Spells_ByID) do
+
         if (GetSpellInfo(spellID)) then
-            HHTD_C.Healers_Only_Spells_ByName[(GetSpellInfo(spellID))] = true;
+            HHTD_C.Healers_Only_Spells_ByName[(GetSpellInfo(spellID))] = class;
         else
             HHTD:Debug(ERROR, "Missing spell:", spellID);
         end
+
     end
+
     HHTD:Debug(INFO, "Spells registered!");
 end -- }}}
 
@@ -244,14 +247,7 @@ do
                 disabled = false,
                 order = -2,
             },
-            Log = {
-                type = 'toggle',
-                name = L["OPT_DEBUG"],
-                desc = L["OPT_DEBUG_DESC"],
-                guiHidden = true,
-                disabled = false,
-                order = -3,
-            },
+            
             Version = {
                 type = 'execute',
                 name = L["OPT_VERSION"],
@@ -354,6 +350,13 @@ do
                             HHTD:UpdateHealThreshold();
                         end,
                     },
+                    Log = {
+                        type = 'toggle',
+                        name = L["OPT_LOG"],
+                        desc = L["OPT_LOG_DESC"],
+                        disabled = false,
+                        order = 700,
+                    },
                     Header1000 = {
                         type = 'header',
                         name = '',
@@ -363,10 +366,23 @@ do
             },
             Logs = {
                 type = 'group',
-                name =  "Logs",
+                name =  L["OPT_LOGS"],
+                desc = L["OPT_LOGS_DESC"],
                 order = -1,
                 hidden = function() return not HHTD.db.global.Log end,
                 args = {
+                    clear = {
+                        type = 'execute',
+                        name = L["OPT_CLEAR_LOGS"],
+                        confirm = true,
+                        func = function () 
+                            HHTD.LOG = {};
+                            HHTD.LOG.Healers_Accusation_Proofs = {};
+                            HHTD.LOG.Healers_Details = {};
+                        end,
+                        order = 0,
+
+                    },
                     AccusationFacts = { -- {{{
                         type = 'description',
                         name = function() 
@@ -376,23 +392,23 @@ do
                             for healer, spells in pairs(HHTD.LOG.Healers_Accusation_Proofs) do
 
                                 local isFriend = HHTD.LOG.Healers_Details[healer].isFriend;
-                                local totalHeal = false;
-                                if HHTD.db.global.UHMHAP then
-                                    totalHeal = HHTD.Healer_Registry[isFriend].Total_Heal_By_Name[healer];
-                                end
+                                local totalHeal = HHTD.LOG.Healers_Details[healer].totalHeal;
+                                local firstName = healer:match("^[^-]+");
+                                local isActive = HHTD.Healer_Registry[isFriend].Healers_By_Name[firstName]
 
                                 local spellsStats = {}
                                 local j = 1;
 
                                 for spell, spellcount in pairs(spells) do
-                                    spellsStats[j] = ("    %s (%d)"):format(spell, spellcount);
+                                    spellsStats[j] = ("    %s (|cFFAA0000%d|r)"):format(spell, spellcount);
                                     j = j + 1;
                                 end
 
-                                tmp[i] = ("%s (|cff00dd00%s|r) [%s]:\n%s\n"):format(
-                                    (HHTD:ColorText("[%s]", isFriend and "FF00FF00" or "FFFF0000")):format(HHTD:ColorText(healer,  HHTD.LOG.Healers_Details[healer].class and HHTD:GetClassHexColor(  HHTD.LOG.Healers_Details[healer].class) or "FFAAAAAA" )),
-                                    tostring(totalHeal and totalHeal or "UHMHAP false"),
-                                    HHTD.LOG.Healers_Details[healer].isHuman and "Human" or "NPC",
+                                tmp[i] = ("%s (|cff00dd00%s|r) [%s]:  %s\n%s\n"):format(
+                                    (HHTD:ColorText("# %s", isFriend and "FF00FF00" or "FFFF0000")):format(HHTD:ColorText(healer, HHTD.LOG.Healers_Details[healer].class and HHTD:GetClassHexColor( HHTD.LOG.Healers_Details[healer].class) or "FFAAAAAA" )),
+                                    tostring(totalHeal > 0 and totalHeal or L["NO_DATA"]),
+                                    HHTD.LOG.Healers_Details[healer].isHuman and L["HUMAN"] or L["NPC"],
+                                    isActive and "|cFF00FF00Active!|r" or "|cFF00FF00Idle|r",
                                     table.concat(spellsStats, '\n')
                                 );
 
@@ -568,7 +584,7 @@ do
             return;
         end
 
-        local unitFirstName =  (UnitName(unit));
+        local unitFirstName, unitRealm =  UnitName(unit);
 
         if not pve and not UnitIsPlayer(unit) or UnitIsDead(unit) then
             self:SendMessage("HHTD_DROP_HEALER", unitFirstName)
@@ -624,9 +640,6 @@ do
                     self:SendMessage("HHTD_HEALER_UNDER_MOUSE", unit, unitGuid, unitFirstName, LastDetectedGUID);
                     --self:Debug("HHTD_HEALER_UNDER_MOUSE"); -- XXX
                     LastDetectedGUID = unitGuid;
-                    if HHTD.db.global.Log then
-                        HHTD.LOG.Healers_Details[unitFirstName].class = unitClass;
-                    end
                 end
             else
                 --self:Debug(INFO2, "did not heal");
@@ -806,13 +819,26 @@ do
          end
 
 
--- ]7C+Y*Jo
         -- Escape if player got blacklisted has not healer {{{
         -- Only if the unit class can heal - not post-blacklisted
         if Healer_Registry[Source_Is_Friendly].Healers_By_Name_Blacklist[FirstName] then
             self:Debug(INFO2, FirstName, " was blacklisted");
             return;
         end -- }}}
+
+
+        -- Create a log entry for this healer
+        if configRef.Log and not HHTD.LOG.Healers_Accusation_Proofs[sourceName] then
+            HHTD.LOG.Healers_Accusation_Proofs[sourceName] = {};
+            HHTD.LOG.Healers_Details[sourceName] = {};
+            HHTD.LOG.Healers_Details[sourceName].isFriend = Source_Is_Friendly;
+            HHTD.LOG.Healers_Details[sourceName].isHuman = Source_Is_Human;
+            HHTD.LOG.Healers_Details[sourceName].totalHeal = 0;
+
+            if HHTD_C.Healers_Only_Spells_ByName[arg10] then
+                HHTD.LOG.Healers_Details[sourceName].class = HHTD_C.Healers_Only_Spells_ByName[arg10];
+            end
+        end
 
          -- If checking for minimum heal amount
          if isHealSpell and configRef.UHMHAP then
@@ -821,6 +847,10 @@ do
                  Healer_Registry[Source_Is_Friendly].Total_Heal_By_Name[FirstName] = 0;
              end
              Healer_Registry[Source_Is_Friendly].Total_Heal_By_Name[FirstName] = Healer_Registry[Source_Is_Friendly].Total_Heal_By_Name[FirstName] + arg12;
+
+             if configRef.Log then
+                 HHTD.LOG.Healers_Details[sourceName].totalHeal = HHTD.LOG.Healers_Details[sourceName].totalHeal + arg12;
+             end
 
              -- Escape if below minimum healing {{{
              if Healer_Registry[Source_Is_Friendly].Total_Heal_By_Name[FirstName] < HHTD.HealThreshold then
@@ -834,17 +864,11 @@ do
 
          -- if logging and specs only
          if configRef.Log and HHTD_C.Healers_Only_Spells_ByName[arg10] then
-             if not HHTD.LOG.Healers_Accusation_Proofs[FirstName] then
-                 HHTD.LOG.Healers_Accusation_Proofs[FirstName] = {};
-                 HHTD.LOG.Healers_Details[FirstName] = {};
-                 HHTD.LOG.Healers_Details[FirstName].isFriend = Source_Is_Friendly;
-                 HHTD.LOG.Healers_Details[FirstName].isHuman = Source_Is_Human;
-             end
 
-             if not HHTD.LOG.Healers_Accusation_Proofs[FirstName][arg10] then
-                 HHTD.LOG.Healers_Accusation_Proofs[FirstName][arg10] = 1;
+             if not HHTD.LOG.Healers_Accusation_Proofs[sourceName][arg10] then
+                 HHTD.LOG.Healers_Accusation_Proofs[sourceName][arg10] = 1;
              else
-                 HHTD.LOG.Healers_Accusation_Proofs[FirstName][arg10] = HHTD.LOG.Healers_Accusation_Proofs[FirstName][arg10] + 1;
+                 HHTD.LOG.Healers_Accusation_Proofs[sourceName][arg10] = HHTD.LOG.Healers_Accusation_Proofs[sourceName][arg10] + 1;
              end
          end
 

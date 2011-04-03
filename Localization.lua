@@ -93,6 +93,16 @@ do
 
     L["OPT_NPH_WARNING1"] = "WARNING: Enemies' name-plates are currently disabled. HHTD cannot add its red cross symbol.\nYou can enable name-plates display through the WoW UI's options or by using the assigned key-stroke."
     L["OPT_NPH_WARNING2"] = "WARNING: Allies' name-plates are currently disabled. HHTD cannot add its green cross symbol.\nYou can enable name-plates display through the WoW UI's options or by using the assigned key-stroke."
+
+    L["OPT_LOG"] = "Logging";
+    L["OPT_LOG_DESC"] = "Enable logging and adds a new 'Logs' tab to HHTD's option panel";
+    L["OPT_LOGS"] = "Logs";
+    L["OPT_LOGS_DESC"] = "Display HHTD detected healers and statistics";
+    L["OPT_CLEAR_LOGS"] = "Clear logs";
+
+    L["NO_DATA"] = "No data";
+    L["HUMAN"] = "Human";
+    L["NPC"] = "NPC";
     --]==]
     --@end-do-not-package@
 
