@@ -4,6 +4,13 @@ Healers Have To Die
 *Change log*
 ------------
 
+**version 1.8.2 beta 1 (2011-04-03):**
+
+- *New feature:* Logs are available in HHTD's option panel with detailed information about each detected healers (specific spell used, heal amount, activity state). You must check the 'Logging' option to enable logging and add the 'Logs' tab.
+
+- *Fix:* The 'Minimum Heal Amount' filter was ignored by non-healing specialized spells (buffing spells and such). Healers were directly marked.
+
+
 **version 1.8.1 (2011-03-13):**
 
  - Updated version of LibNamePlate-1.0 (this should fix a Lua error some users experienced)

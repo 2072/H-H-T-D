@@ -80,7 +80,7 @@ To report issues or ask for new features, use the [ticket system][tickets].
 [tickets]: http://www.wowace.com/addons/healers-have-to-die/tickets/
 [dev]: http://www.2072productions.com/to/hhtd_dev
 [forum]: http://www.wowace.com/addons/healers-have-to-die/forum/
-[redcross]: http://www.wowace.com/addons/healers-have-to-die/images/1-red-cross/
+[redcross]: http://www.wowace.com/addons/healers-have-to-die/images/3-healers-have-to-die-on-the-battlefield-1/
 
 
 [debate1]: http://us.battle.net/wow/en/forum/topic/2211922815
