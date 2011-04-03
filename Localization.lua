@@ -101,8 +101,11 @@ do
     L["OPT_CLEAR_LOGS"] = "Clear logs";
 
     L["NO_DATA"] = "No data";
-    L["HUMAN"] = "Human";
+    L["HUMAN"] = "Human player";
     L["NPC"] = "NPC";
+
+    L["ACTIVE"] = "Active!";
+    L["IDLE"] = "Idle";
     --]==]
     --@end-do-not-package@
 

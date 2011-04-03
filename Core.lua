@@ -404,11 +404,11 @@ do
                                     j = j + 1;
                                 end
 
-                                tmp[i] = ("%s (|cff00dd00%s|r) [%s]:  %s\n%s\n"):format(
-                                    (HHTD:ColorText("# %s", isFriend and "FF00FF00" or "FFFF0000")):format(HHTD:ColorText(healer, HHTD.LOG.Healers_Details[healer].class and HHTD:GetClassHexColor( HHTD.LOG.Healers_Details[healer].class) or "FFAAAAAA" )),
+                                tmp[i] = ("%s (|cff00dd00%s|r) [|cffbbbbbb%s|r]:  %s\n%s\n"):format(
+                                    (HHTD:ColorText("#|r %q", isFriend and "FF00FF00" or "FFFF0000")):format(HHTD:ColorText(healer, HHTD.LOG.Healers_Details[healer].class and HHTD:GetClassHexColor( HHTD.LOG.Healers_Details[healer].class) or "FFAAAAAA" )),
                                     tostring(totalHeal > 0 and totalHeal or L["NO_DATA"]),
                                     HHTD.LOG.Healers_Details[healer].isHuman and L["HUMAN"] or L["NPC"],
-                                    isActive and "|cFF00FF00Active!|r" or "|cFF00FF00Idle|r",
+                                    HHTD:ColorText(isActive and "Active!" or "Idle", isActive and "FF00EE00" or "FFEE0000"),
                                     table.concat(spellsStats, '\n')
                                 );
 
@@ -840,24 +840,29 @@ do
             end
         end
 
-         -- If checking for minimum heal amount
-         if isHealSpell and configRef.UHMHAP then
-             -- store Heal score
-             if not Healer_Registry[Source_Is_Friendly].Total_Heal_By_Name[FirstName] then
-                 Healer_Registry[Source_Is_Friendly].Total_Heal_By_Name[FirstName] = 0;
-             end
-             Healer_Registry[Source_Is_Friendly].Total_Heal_By_Name[FirstName] = Healer_Registry[Source_Is_Friendly].Total_Heal_By_Name[FirstName] + arg12;
+        -- If checking for minimum heal amount
+        if configRef.UHMHAP then
+            if isHealSpell then
+                -- store Heal score
+                if not Healer_Registry[Source_Is_Friendly].Total_Heal_By_Name[FirstName] then
+                    Healer_Registry[Source_Is_Friendly].Total_Heal_By_Name[FirstName] = 0;
+                end
+                Healer_Registry[Source_Is_Friendly].Total_Heal_By_Name[FirstName] = Healer_Registry[Source_Is_Friendly].Total_Heal_By_Name[FirstName] + arg12;
 
-             if configRef.Log then
-                 HHTD.LOG.Healers_Details[sourceName].totalHeal = HHTD.LOG.Healers_Details[sourceName].totalHeal + arg12;
-             end
+                if configRef.Log then
+                    HHTD.LOG.Healers_Details[sourceName].totalHeal = HHTD.LOG.Healers_Details[sourceName].totalHeal + arg12;
+                end
 
-             -- Escape if below minimum healing {{{
-             if Healer_Registry[Source_Is_Friendly].Total_Heal_By_Name[FirstName] < HHTD.HealThreshold then
-                 self:Debug(INFO2, FirstName, "is below minimum healing amount:", Healer_Registry[Source_Is_Friendly].Total_Heal_By_Name[FirstName]);
-                 return;
-             end -- }}}
-         end
+                -- Escape if below minimum healing {{{
+                if Healer_Registry[Source_Is_Friendly].Total_Heal_By_Name[FirstName] < HHTD.HealThreshold then
+                    self:Debug(INFO2, FirstName, "is below minimum healing amount:", Healer_Registry[Source_Is_Friendly].Total_Heal_By_Name[FirstName]);
+                    return;
+                end -- }}}
+            else
+                -- Escape if not a heal spell and using UHMHAP {{{
+                return; -- }}}
+            end
+        end
 
          time = GetTime();
 
