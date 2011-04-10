@@ -7,9 +7,9 @@ Healers Have To Die
 
 HHTD adds a **red cross** over *enemy* healer's name plates. *You can't miss them!* (see the [screen-shot][redcross]).
 
-HHTD adds a **healer role symbol** above*friendly* healers' name plates. *Stop the slaughter!!*
+HHTD also adds a **healer role symbol** above*friendly* healers' name plates. *Stop the slaughter!!*
 
-**IMPORTANT NOTE: You have to enable name-plates, else you won't see the healer symbol!**
+**IMPORTANT NOTE: You have to enable name-plates, else you won't see the healer symbols!**
 
 It also rings when you hover or target a hostile unit who healed
 someone else during the last 60 seconds (*can be configured*).
@@ -54,6 +54,8 @@ By default, HHTD will detect specialized healers spells only (for PvP).
 
 Another option lets you choose a specified amount of healing enemies have to
 reach before being marked as healers. (this is the setting used for PvE)
+
+By default HHTD uses both methods, specialised healers' spells detection AND a minimum cumulative healing to reach by the aforementioned spells.
 
 Self-Heals and pets are filtered out.
 
