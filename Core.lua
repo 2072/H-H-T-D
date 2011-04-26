@@ -41,6 +41,9 @@ local INFO2     = 4;
 
 local ADDON_NAME, T = ...;
 
+local _, _, _, tocversion = GetBuildInfo();
+T._tocversion = tocversion;
+
 -- === Add-on basics and variable declarations {{{
 T.Healers_Have_To_Die = LibStub("AceAddon-3.0"):NewAddon("Healers Have To Die", "AceConsole-3.0", "AceEvent-3.0");
 local HHTD = T.Healers_Have_To_Die;
@@ -698,34 +701,29 @@ do
     local isHealSpell = false;
 
     local Healer_Registry = HHTD.Healer_Registry;
-    local HideCaster -- (new 4.1 HHTD killer variable)
 
-    local type = _G.type;
-
+    local TOC = T._tocversion;
+    local nothing = 'nothing';
 
     -- http://www.wowpedia.org/API_COMBAT_LOG_EVENT
-    function HHTD:COMBAT_LOG_EVENT_UNFILTERED(e, timestamp, event, sourceGUID, sourceName, sourceFlags, destGUID, destName, destFlags, arg9, arg10 --[[ spellName --]], arg11, arg12, ... --[[ amount --]])
-
-
-        if type(sourceGUID) == "boolean" then
-            HideCaster = sourceGUID;
-
-            --@debug@
-            if sourceGUID then
-                self:Debug(event, sourceGUID, sourceName, sourceFlags, destGUID, destName, destFlags, arg9, arg10, arg11, arg12, ...);
-            end
-            --@end-debug@
-
-            -- call again skipping sourceGUID
-            self:COMBAT_LOG_EVENT_UNFILTERED(e, timestamp, event, sourceName, sourceFlags, destGUID, destName, destFlags, arg9, arg10, arg11, arg12, ...)
-            return;
-        else
-            HideCaster = false;
+    function HHTD:COMBAT_LOG_EVENT_UNFILTERED(e, timestamp, event, hideCaster, sourceGUID, sourceName, sourceFlags, destGUID, destName, destFlags, arg9, arg10 --[[ spellName --]], arg11, arg12 --[[ amount --]])
+        
+        
+        -- Pre 4.1 compatibility layer
+        if TOC < 40100 and hideCaster ~= nothing then
+            return self:COMBAT_LOG_EVENT_UNFILTERED(e, timestamp, event, nothing, hideCaster, sourceGUID, sourceName, sourceFlags, destGUID, destName, destFlags, arg9, arg10, arg11, arg12);
         end
+
+        --@debug@
+        if hideCaster then
+            self:Debug(event, hideCaster, sourceGUID, sourceName, sourceFlags, destGUID, destName, destFlags, arg9, arg10, arg11, arg12);
+        end
+        --@end-debug@
+        
 
         -- escape if no source {{{
         -- untraceable events are useless
-        if not sourceGUID or HideCaster then return end
+        if not sourceGUID or hideCaster then return end
         -- }}}
 
         local configRef = self.db.global; -- config shortcut
