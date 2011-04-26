@@ -4,6 +4,10 @@ Healers Have To Die
 *Change log*
 ------------
 
+**version 1.8.3 (2011-04-26):**
+
+- Updated LibNamePlate to be compatible with WoW 4.1
+
 **version 1.8.2 (2011-04-10):**
 
 - *New feature:* Logs are available in HHTD's option panel with detailed information about each detected healers (specific spell used, heal amount, activity state). You must check the 'Logging' option to enable logging and add the 'Logs' tab.
