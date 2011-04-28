@@ -96,6 +96,15 @@ local GetTexCoordsForRole = _G.GetTexCoordsForRole;
 function NPH:OnEnable() -- {{{
     self:Debug(INFO, "OnEnable");
 
+    if LibStub then
+        if (select(2, LibStub:GetLibrary("LibNameplate-1.0"))) < 30 then
+            message("The shared library |cFF00FF00LibNameplate-1.0|r is out-dated, version |cFF0077FF1.0.30 (revision 125)|r at least is required. HHTD won't add its symbols over name plates.|r\n");
+            self:Debug("LibNameplate-1.0",  LibStub:GetLibrary("LibNameplate-1.0"));
+            self:Disable();
+            return;
+        end
+    end
+
     -- Subscribe to callbacks
     LNP.RegisterCallback(self, "LibNameplate_NewNameplate");
     LNP.RegisterCallback(self, "LibNameplate_RecycleNameplate");

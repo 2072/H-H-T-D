@@ -4,6 +4,10 @@ Healers Have To Die
 *Change log*
 ------------
 
+**version 1.8.4 (2011-04-28):**
+
+- Updated LibNamePlate *again* to *actually* be compatible with WoW 4.1
+
 **version 1.8.3 (2011-04-26):**
 
 - Updated LibNamePlate to be compatible with WoW 4.1
