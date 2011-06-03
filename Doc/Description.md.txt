@@ -21,12 +21,16 @@ Remember to check out available options (/HHTDG)
 Articles and debates
 --------------------
 
-Here is a excellent article about HHTD (**A must read if you have some doubts about the fairness of this add-on!**) :
+Here is a excellent article about HHTD by Cynwise (**A must read if you have some doubts about the fairness of this add-on!**) :
 
  [http://cynwise.wordpress.com/2011/03/22/healers-have-to-die-and-the-pvp-addons-arms-race/][article1].
 
 
-An interesting debate about this add-on is also happening on Blizzard's official forum:
+Another one by Gevlon:
+ [http://greedygoblin.blogspot.com/2011/05/healers-have-to-die.html][article2]
+
+
+An 'interesting' debate about this add-on is also happening on Blizzard's official forum:
 
 - [Break the HHTD mod already. (UI and Macro forum)][debate4] (full),
 
@@ -97,6 +101,7 @@ To report issues or ask for new features, use the [ticket system][tickets].
 [debate5]: http://us.battle.net/wow/en/forum/topic/2228223941
 
 [article1]: http://cynwise.wordpress.com/2011/03/22/healers-have-to-die-and-the-pvp-addons-arms-race/
+[article2]: http://greedygoblin.blogspot.com/2011/05/healers-have-to-die.html
 
 
 
