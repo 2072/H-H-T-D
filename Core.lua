@@ -703,21 +703,33 @@ do
     local Healer_Registry = HHTD.Healer_Registry;
 
     local TOC = T._tocversion;
-    local nothing = 'nothing';
+
+    local compatibilityPatchApplyed = false
 
     -- http://www.wowpedia.org/API_COMBAT_LOG_EVENT
-    function HHTD:COMBAT_LOG_EVENT_UNFILTERED(e, timestamp, event, hideCaster, sourceGUID, sourceName, sourceFlags, destGUID, destName, destFlags, arg9, arg10 --[[ spellName --]], arg11, arg12 --[[ amount --]])
+    function HHTD:COMBAT_LOG_EVENT_UNFILTERED(e, timestamp, event, hideCaster, sourceGUID, sourceName, sourceFlags, destGUID, destName, destFlags, arg10, arg11 --[[ spellName --]], arg12, arg13 --[[ amount --]], ...)
         
         
         -- Pre 4.1 compatibility layer
-        if TOC < 40100 and hideCaster ~= nothing then
-            return self:COMBAT_LOG_EVENT_UNFILTERED(e, timestamp, event, nothing, hideCaster, sourceGUID, sourceName, sourceFlags, destGUID, destName, destFlags, arg9, arg10, arg11, arg12);
+        if TOC ~= 40100 then
+            if not compatibilityPatchApplyed then
+                if TOC < 40100 then
+                    -- call again inserting a fake hideCaster event
+                    compatibilityPatchApplyed = true;
+                    return self:COMBAT_LOG_EVENT_UNFILTERED(e, timestamp, event, false, hideCaster, sourceGUID, sourceName, sourceFlags, destGUID, destName, destFlags, arg10, arg11, arg12, arg13, ...);
+                else -- > 40100
+                    compatibilityPatchApplyed = true;
+                    -- call again skipping sourceRaidFlags and destRaidFlags
+                    return self:COMBAT_LOG_EVENT_UNFILTERED(e, timestamp, event, hideCaster, sourceGUID, sourceName, sourceFlags, --[[destGUID,--]] destName, destFlags, arg10, --[[arg11,--]] arg12, arg13, ...);
+                end
+            end
+            compatibilityPatchApplyed = false;
         end
 
         --@debug@
         if hideCaster then
-            self:Debug(event, hideCaster, sourceGUID, sourceName, sourceFlags, destGUID, destName, destFlags, arg9, arg10, arg11, arg12);
         end
+        self:Debug(event, hideCaster, sourceGUID, sourceName, sourceFlags, type(sourceFlags), destGUID, destName, destFlags, type(destFlags), arg10, arg11, arg12, arg13, ...);
         --@end-debug@
         
 
@@ -786,9 +798,9 @@ do
         end -- }}}
 
         -- Escape if Source_Is_Human and scanning for pure healing specs and the spell doesn't match {{{
-        if Source_Is_Human and configRef.PvpHSpecsOnly and not HHTD_C.Healers_Only_Spells_ByName[arg10] then
+        if Source_Is_Human and configRef.PvpHSpecsOnly and not HHTD_C.Healers_Only_Spells_ByName[arg11] then
             --@debug@
-            --self:Debug(INFO2, "Spell", arg10, "is not a healer' spell");
+            --self:Debug(INFO2, "Spell", arg11, "is not a healer' spell");
             --@end-debug@
             return;
         end -- }}}
@@ -833,8 +845,8 @@ do
             HHTD.LOG.Healers_Details[sourceName].isHuman = Source_Is_Human;
             HHTD.LOG.Healers_Details[sourceName].totalHeal = 0;
 
-            if HHTD_C.Healers_Only_Spells_ByName[arg10] then
-                HHTD.LOG.Healers_Details[sourceName].class = HHTD_C.Healers_Only_Spells_ByName[arg10];
+            if HHTD_C.Healers_Only_Spells_ByName[arg11] then
+                HHTD.LOG.Healers_Details[sourceName].class = HHTD_C.Healers_Only_Spells_ByName[arg11];
             end
         end
 
@@ -845,10 +857,10 @@ do
                 if not Healer_Registry[Source_Is_Friendly].Total_Heal_By_Name[FirstName] then
                     Healer_Registry[Source_Is_Friendly].Total_Heal_By_Name[FirstName] = 0;
                 end
-                Healer_Registry[Source_Is_Friendly].Total_Heal_By_Name[FirstName] = Healer_Registry[Source_Is_Friendly].Total_Heal_By_Name[FirstName] + arg12;
+                Healer_Registry[Source_Is_Friendly].Total_Heal_By_Name[FirstName] = Healer_Registry[Source_Is_Friendly].Total_Heal_By_Name[FirstName] + arg13;
 
                 if configRef.Log then
-                    HHTD.LOG.Healers_Details[sourceName].totalHeal = HHTD.LOG.Healers_Details[sourceName].totalHeal + arg12;
+                    HHTD.LOG.Healers_Details[sourceName].totalHeal = HHTD.LOG.Healers_Details[sourceName].totalHeal + arg13;
                 end
 
                 -- Escape if below minimum healing {{{
@@ -866,12 +878,12 @@ do
 
 
          -- if logging and specs only
-         if configRef.Log and HHTD_C.Healers_Only_Spells_ByName[arg10] then
+         if configRef.Log and HHTD_C.Healers_Only_Spells_ByName[arg11] then
 
-             if not HHTD.LOG.Healers_Accusation_Proofs[sourceName][arg10] then
-                 HHTD.LOG.Healers_Accusation_Proofs[sourceName][arg10] = 1;
+             if not HHTD.LOG.Healers_Accusation_Proofs[sourceName][arg11] then
+                 HHTD.LOG.Healers_Accusation_Proofs[sourceName][arg11] = 1;
              else
-                 HHTD.LOG.Healers_Accusation_Proofs[sourceName][arg10] = HHTD.LOG.Healers_Accusation_Proofs[sourceName][arg10] + 1;
+                 HHTD.LOG.Healers_Accusation_Proofs[sourceName][arg11] = HHTD.LOG.Healers_Accusation_Proofs[sourceName][arg11] + 1;
              end
          end
 
