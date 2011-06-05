@@ -66,11 +66,17 @@ Self-Heals and pets are filtered out.
 Planned features
 ----------------
 
-- Announce module for both friendly and enemy healers.
-        For now I'm thinking to force it both ways at the same time ("focus XXX, protect XXX").
 - Detection when a friendly healer is being attacked and alert others through /yell or /say (I would like to make it work for nearby healers only)
 
-- Announce options will be disabled by default and users will have to write the announce text themselves. *there will be no default* 
+Special commands
+----------------
+
+**(HHTD alpha and beta versions from June only)**
+
+- /HHTDP (or /hhtdp) : Post healers name to the raid channel for all to see. (You need to configure the messages in the announce module options first).
+
+**You can bind this command to a key (WoW key-bindings interface)**
+
 
 ******************************************
 

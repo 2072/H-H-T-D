@@ -34,7 +34,7 @@ local HHTD = T.Healers_Have_To_Die;
 local L = HHTD.Localized_Text;
 
 -- Create module
-HHTD.Announcer = HHTD:NewModule("Announcer")
+HHTD.Announcer = HHTD:NewModule("Announcer", "AceConsole-3.0"); --, "AceTimer-3.0");
 local Announcer = HHTD.Announcer;
 
 -- Up Values
@@ -51,11 +51,45 @@ function Announcer:OnInitialize() -- {{{
         global = {
             ChatMessages = false,
             Sounds = true,
+
+            PostToChat = false,
+            PostToChatThrottle = 2 * 60,
+            PostHealersNumber = 4,
+            PostHumansOnly = true,
+            ProtectMessage = false,
+            KillMessage = false,
         },
-    })
+    });
+
+    
+
 end -- }}}
 
 function Announcer:GetOptions () -- {{{
+
+
+    local validatePostChatMessage = function (info, v)
+        local error = function (m) Announcer:Print(HHTD:ColorText(m, 'FFFF3030')); return m; end;
+
+        local counterpartMessage = info[#info] == 'ProtectMessage' and 'KillMessage' or 'ProtectMessage';
+        Announcer:Debug('counterpartMessage:', counterpartMessage);
+      
+        if not v:find('%[HEALERS%]') then
+            return error(L["OPT_POST_ANNOUNCE_MISSING_KEYWORD"]);
+        end
+
+        if v:len() < ("%[HEALERS%]"):len() + 10 then
+            return error(L["OPT_POST_ANNOUNCE_MESSAGE_TOO_SHORT"]);
+        end
+
+        if v == Announcer.db.global[counterpartMessage] then
+            return error(L["OPT_POST_ANNOUNCE_MESSAGES_EQUAL"]);
+        end
+
+        return 0, v;
+
+    end
+
     return {
         [Announcer:GetName()] = {
             name = L[Announcer:GetName()],
@@ -75,6 +109,97 @@ function Announcer:GetOptions () -- {{{
                     desc = L["OPT_SOUNDS_DESC"],
                     order = 10,
                 },
+                -- enable
+                PostToChat = {
+                    type = 'toggle',
+                    name = L["OPT_POST_ANNOUNCE_ENABLE"],
+                    desc = L["OPT_POST_ANNOUNCE_ENABLE_DESC"],
+                    set = function (info, v)
+                        Announcer.db.global.PostToChat = v;
+                        if v then
+                            HHTD.db.global.Log = true;
+                        end
+                    end,
+                    order = 30,
+                },
+                PostToChatOptions = {
+                    type = 'group',
+                    inline = true,
+                    name = L['OPT_POST_ANNOUNCE_SETTINGS'],
+                    hidden = function() return Announcer.db.global.PostToChat == false end,
+                    order = 40,
+                    args = {
+                        Description = {
+                            type = 'description',
+                            order = 0,
+                            name = L["OPT_POST_ANNOUNCE_DESCRIPTION"],
+                        },
+                        -- throttle
+                        PostToChatThrottle = {
+                            type = 'range',
+                            min = 60,
+                            max = 10 * 60,
+                            step = 1,
+                            bigStep = 5,
+                            name = L["OPT_POST_ANNOUNCE_THROTTLE"],
+                            desc = L["OPT_POST_ANNOUNCE_THROTTLE_DESC"],
+                            order = 40,
+                        },
+                        PostHealersNumber = {
+                            type = 'range',
+                            min = 2,
+                            max = 10,
+                            step = 1,
+                            name = L["OPT_POST_ANNOUNCE_NUMBER"],
+                            desc = L["OPT_POST_ANNOUNCE_NUMBER_DESC"],
+                            order = 42,
+                        },
+                        PostHumansOnly = {
+                            type = 'toggle',
+                            order = 43,
+                            name = L["OPT_POST_ANNOUNCE_HUMAMNS_ONLY"],
+                            desc = L["OPT_POST_ANNOUNCE_HUMAMNS_ONLY_DESC"],
+
+                        },
+                        ValidityCheck = {
+                            type = 'description',
+                            order = 45,
+                            name = HHTD:ColorText(L["OPT_POST_ANNOUNCE_POST_MESSAGE_ISSUE"],'FFFF4040'),
+                            hidden = function ()
+                                if Announcer.db.global.PostToChat == false
+                                    or (Announcer.db.global.ProtectMessage and Announcer.db.global.KillMessage) then
+
+                                    return true;
+                                else
+                                    return false;
+                                end
+                            end
+                        },
+                        ProtectMessage = {
+                            type = 'input',
+                            width = 'full',
+                            name = L["OPT_POST_ANNOUNCE_PROTECT_MESSAGE"],
+                            desc = L["OPT_POST_ANNOUNCE_PROTECT_MESSAGE_DESC"],
+                            get = function (info)
+                                return Announcer.db.global[info[#info]] or '[HEALERS] tt';
+                            end,
+                            validate = validatePostChatMessage,
+                            order = 50,
+                        },
+                        KillMessage = {
+                            type = 'input',
+                            width = 'full',
+                            name = L["OPT_POST_ANNOUNCE_KILL_MESSAGE"],
+                            desc = L["OPT_POST_ANNOUNCE_KILL_MESSAGE_DESC"],
+                            get = function (info)
+                                return Announcer.db.global[info[#info]] or '[HEALERS] tt';
+                            end,
+                            validate = validatePostChatMessage,
+                            order = 60,
+                        },
+                    },
+                },
+                -- auto raid mark friendly healers
             },
         },
     };
@@ -88,10 +213,13 @@ function Announcer:OnEnable() -- {{{
     self:RegisterMessage("HHTD_HEALER_UNDER_MOUSE");
     self:RegisterMessage("HHTD_TARGET_LOCKED");
 
+    self:RegisterChatCommand("hhtdp", function() self:ChatPlacard() end);
+
 end -- }}}
 
 function Announcer:OnDisable() -- {{{
     self:Debug(INFO2, "OnDisable");
+    self:UnregisterChatCommand("hhtdp");
 end -- }}}
 
 
@@ -138,6 +266,116 @@ function Announcer:Announce(...) -- {{{
         HHTD:Print(...);
     end
 end -- }}}
+
+do
+    local function SortHealers(a, b)
+        if HHTD.LOG.Healers_Details[a].totalHeal > HHTD.LOG.Healers_Details[b].totalHeal then
+            return true;
+        else
+            return false;
+        end
+    end
+
+    local function GetDistributionChanel()
+        local inInstance, InstanceType = IsInInstance();
+
+        if InstanceType == "pvp" then
+            return "BATTLEGROUND";
+        end
+
+        if GetNumRaidMembers() ~= 0 then
+            return "RAID";
+        elseif GetNumPartyMembers() ~= 0 then
+            return "PARTY";
+        end
+
+        return "WHISPER";
+    end
+
+    local function Post(text)
+        local channelType = GetDistributionChanel();
+
+        --  SendChatMessage("msg" [,"type" [,"lang" [,"channel"] ] ]).
+        SendChatMessage("HHTD: " .. text, channelType, nil, channelType == 'WHISPER' and (UnitName('player')) or nil);
+    end
+
+    local LastAnnounce = 0;
+    local Friends = {};
+    local Foes = {};
+    function Announcer:ChatPlacard()
+        -- first check config
+        if not (self.db.global.PostToChat and self.db.global.ProtectMessage and self.db.global.KillMessage) then
+            self:Print(HHTD:ColorText(L["CHAT_POST_ANNOUNCE_FEATURE_NOT_CONFIGURED"], 'FFFF4040'));
+            return false;
+        end
+        local config = self.db.global;
+
+        -- then check throttle
+        if GetTime() - LastAnnounce < config.PostToChatThrottle then
+            self:Print(HHTD:ColorText(L["CHAT_POST_ANNOUNCE_TOO_SOON_WAIT"], 'FFFF4040'));
+            return false;
+        end
+
+        table.wipe(Friends);
+        table.wipe(Foes);
+
+
+        -- make the lists
+        for healer, spells in pairs(HHTD.LOG.Healers_Accusation_Proofs) do
+            local firstName = healer:match("^[^-]+");
+
+            -- check for humans if required to
+            if not (config.PostHumansOnly and not HHTD.LOG.Healers_Details[healer].isHuman) then
+                if  HHTD.LOG.Healers_Details[healer].isFriend then
+                    -- check for count and activity
+                    if #Friends <= config.PostHealersNumber and HHTD.Healer_Registry[true].Healers_By_Name[firstName] then
+                        table.insert(Friends, healer);
+                    end
+                else
+                    -- check for count and activity
+                    if #Foes <= config.PostHealersNumber and HHTD.Healer_Registry[false].Healers_By_Name[firstName] then
+                        table.insert(Foes, healer);
+                    end
+                end
+            end
+        end
+        -- we need to sort those before display...
+        table.sort(Friends, SortHealers);
+        table.sort(Foes, SortHealers);
+
+        -- remove the server from healears' name
+        for i, healer in ipairs(Friends) do
+            -- also add raidmarkers for friends
+            Friends[i] = ("(%d) %s"):format(i, healer:match("^[^-]+"));
+        end
+
+        for i, Foe in ipairs(Foes) do
+            Foes[i] = ("(%d) _%s_"):format(i, Foe:match("^[^-]+"));
+        end
+
+        local FriendsText = ( config.ProtectMessage:gsub('%[HEALERS%]', table.concat(Friends, ' - ')) );
+        local FoesText    = (    config.KillMessage:gsub('%[HEALERS%]', table.concat(Foes,    ' - ')) );
+
+        -- send to chat
+        if #Friends > 0 then
+            self:Debug("HHTD:", FriendsText);
+            Post(FriendsText);
+        end
+        if #Foes > 0 then
+            self:Debug("HHTD:", FoesText);
+            Post(FoesText);
+        end
+
+        if #Friends > 0 or #Foes > 0 then
+            -- log the time to prevent spam
+            LastAnnounce = GetTime();
+        else
+            self:Print(HHTD:ColorText(L["CHAT_POST_NO_HEALERS"], 'FFFF4040'));
+        end
+
+        return true;
+    end
+end
 
 function Announcer:PlaySoundFile(...) -- {{{
     if self.db.global.Sounds then

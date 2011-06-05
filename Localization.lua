@@ -106,6 +106,41 @@ do
 
     L["ACTIVE"] = "Active!";
     L["IDLE"] = "Idle";
+
+
+    L['OPT_POST_ANNOUNCE_SETTINGS'] = "Announce to chat settings";
+
+    L["OPT_POST_ANNOUNCE_DESCRIPTION"] = "\nType |cff40ff40/hhtdp|r or bind a key to announce friendly healers to protect and enemy healers to focus.\n\n(see World of Warcraft escape menu binding interface to bind a key)";
+
+    L["OPT_POST_ANNOUNCE_MISSING_KEYWORD"] = "The [HEALERS] keyword is missing!";
+    L["OPT_POST_ANNOUNCE_MESSAGE_TOO_SHORT"] = "Your message is too short!";
+    L["OPT_POST_ANNOUNCE_MESSAGES_EQUAL"] = "There is one message for friends and one for foes, they cannot be the same.";
+
+    L["OPT_POST_ANNOUNCE_ENABLE"] = "Announce to chat";
+    L["OPT_POST_ANNOUNCE_ENABLE_DESC"] = "Enable announce to chat features.";
+
+    L["OPT_POST_ANNOUNCE_THROTTLE"] = "Announce throttle";
+    L["OPT_POST_ANNOUNCE_THROTTLE_DESC"] = "Set the minimum time in seconds between each possible announce.";
+
+    L["OPT_POST_ANNOUNCE_NUMBER"] = "Healers number";
+    L["OPT_POST_ANNOUNCE_NUMBER_DESC"] = "Set how many healers to include in each announce.";
+
+    L["OPT_POST_ANNOUNCE_HUMAMNS_ONLY"] = "Humans only";
+    L["OPT_POST_ANNOUNCE_HUMAMNS_ONLY_DESC"] = "Do not include NPCs in the announce.";
+
+    L["OPT_POST_ANNOUNCE_POST_MESSAGE_ISSUE"] = "There is something wrong with one of the announce text.";
+
+    L["OPT_POST_ANNOUNCE_PROTECT_MESSAGE"] = "Text for friendly healers";
+    L["OPT_POST_ANNOUNCE_PROTECT_MESSAGE_DESC"] = "Type a message inciting your team to protect their healers.\n\nYou must use the [HEALERS] keyword somewhere which will be replaced by the names of the currently active healers.";
+
+    L["OPT_POST_ANNOUNCE_KILL_MESSAGE"] = "Text for enemy healers";
+    L["OPT_POST_ANNOUNCE_KILL_MESSAGE_DESC"] = "Type a message inciting your team to focus enemy healers.\n\nYou must use the [HEALERS] keyword somewhere which will be replaced by the names of the currently active healers.";
+
+    L["CHAT_POST_ANNOUNCE_FEATURE_NOT_CONFIGURED"] = "The announce to chat messages are not configured. Type /HHTDG";
+    L["CHAT_POST_ANNOUNCE_TOO_SOON_WAIT"] = "It's too soon (see the announce throttle setting).";
+
+    L["CHAT_POST_NO_HEALERS"] = "No healers on either sides :/ (yet)";
+
     --]==]
     --@end-do-not-package@
 

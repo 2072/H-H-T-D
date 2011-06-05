@@ -66,6 +66,11 @@ HHTD_C.Healing_Classes = {
     ["SHAMAN"]  = true,
 };
 
+-- The header for HHTD key bindings
+BINDING_HEADER_HHTD = "Healers Have To Die";
+BINDING_NAME_HHTDP = L["OPT_POST_ANNOUNCE_ENABLE"];
+
+
 HHTD.Enemy_Healers = {};
 HHTD.Enemy_Healers_By_Name = {};
 HHTD.Enemy_Healers_By_Name_Blacklist = {};
@@ -359,6 +364,9 @@ do
                         desc = L["OPT_LOG_DESC"],
                         disabled = false,
                         order = 700,
+                        disabled = function()
+                            return HHTD.Announcer and HHTD.Announcer.db.global.PostToChat or false;
+                        end,
                     },
                     Header1000 = {
                         type = 'header',
@@ -728,8 +736,8 @@ do
 
         --@debug@
         if hideCaster then
+            --self:Debug(event, hideCaster, sourceGUID, sourceName, sourceFlags, type(sourceFlags), destGUID, destName, destFlags, type(destFlags), arg10, arg11, arg12, arg13, ...);
         end
-        self:Debug(event, hideCaster, sourceGUID, sourceName, sourceFlags, type(sourceFlags), destGUID, destName, destFlags, type(destFlags), arg10, arg11, arg12, arg13, ...);
         --@end-debug@
         
 
@@ -822,7 +830,7 @@ do
 
          -- get source name
          if sourceName then
-             FirstName = str_match(sourceName, "^[^-]+"); -- sourceName may be nil??
+             FirstName = str_match(sourceName, "^[^-]+"); -- sourceName may be nil?? -- we need to use FirstName because of the name plates...
          else
              self:Debug(WARNING, "NO NAME for GUID:", sourceGUID);
              return;
