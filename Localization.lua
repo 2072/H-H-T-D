@@ -141,6 +141,8 @@ do
 
     L["CHAT_POST_NO_HEALERS"] = "No healers on either sides :/ (yet)";
 
+    L["OPT_SET_FRIENDLY_HEALERS_ROLE"] = "Set friendly healers role";
+    L["OPT_SET_FRIENDLY_HEALERS_ROLE_DESC"] = "Will automatically set the raid HEALER role to friendly healers upon detection (if possible)";
     --]==]
     --@end-do-not-package@
 

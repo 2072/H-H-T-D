@@ -69,21 +69,20 @@ function Announcer:GetOptions () -- {{{
 
 
     local validatePostChatMessage = function (info, v)
-        local error = function (m) Announcer:Print(HHTD:ColorText(m, 'FFFF3030')); return m; end;
 
         local counterpartMessage = info[#info] == 'ProtectMessage' and 'KillMessage' or 'ProtectMessage';
         Announcer:Debug('counterpartMessage:', counterpartMessage);
       
         if not v:find('%[HEALERS%]') then
-            return error(L["OPT_POST_ANNOUNCE_MISSING_KEYWORD"]);
+            return self:Error(L["OPT_POST_ANNOUNCE_MISSING_KEYWORD"]);
         end
 
         if v:len() < ("%[HEALERS%]"):len() + 10 then
-            return error(L["OPT_POST_ANNOUNCE_MESSAGE_TOO_SHORT"]);
+            return self:Error(L["OPT_POST_ANNOUNCE_MESSAGE_TOO_SHORT"]);
         end
 
         if v == Announcer.db.global[counterpartMessage] then
-            return error(L["OPT_POST_ANNOUNCE_MESSAGES_EQUAL"]);
+            return self:Error(L["OPT_POST_ANNOUNCE_MESSAGES_EQUAL"]);
         end
 
         return 0, v;
@@ -181,7 +180,7 @@ function Announcer:GetOptions () -- {{{
                             name = L["OPT_POST_ANNOUNCE_PROTECT_MESSAGE"],
                             desc = L["OPT_POST_ANNOUNCE_PROTECT_MESSAGE_DESC"],
                             get = function (info)
-                                return Announcer.db.global[info[#info]] or '[HEALERS] tt';
+                                return Announcer.db.global[info[#info]] or '[HEALERS]';
                             end,
                             validate = validatePostChatMessage,
                             order = 50,
@@ -192,7 +191,7 @@ function Announcer:GetOptions () -- {{{
                             name = L["OPT_POST_ANNOUNCE_KILL_MESSAGE"],
                             desc = L["OPT_POST_ANNOUNCE_KILL_MESSAGE_DESC"],
                             get = function (info)
-                                return Announcer.db.global[info[#info]] or '[HEALERS] tt';
+                                return Announcer.db.global[info[#info]] or '[HEALERS]';
                             end,
                             validate = validatePostChatMessage,
                             order = 60,
@@ -212,6 +211,7 @@ function Announcer:OnEnable() -- {{{
     -- Subscribe to HHTD callbacks
     self:RegisterMessage("HHTD_HEALER_UNDER_MOUSE");
     self:RegisterMessage("HHTD_TARGET_LOCKED");
+    self:RegisterMessage("HHTD_HEALER_UNDER_ATTACK");
 
     self:RegisterChatCommand("hhtdp", function() self:ChatPlacard() end);
 
@@ -258,6 +258,11 @@ function Announcer:HHTD_TARGET_LOCKED (selfevent, unit)
     self:Announce(what:format("|c" .. subjectColor));
 
 end
+
+function Announcer:HHTD_HEALER_UNDER_ATTACK (selfevent, sourceName, sourceGUID, destName, destGUID)
+    RaidNotice_AddMessage( RaidWarningFrame, ("Healer friend %s is being attacked by %s"):format(destName, sourceName), ChatTypeInfo["RAID_WARNING"] );
+end
+
 -- }}}
 
 
@@ -305,14 +310,14 @@ do
     function Announcer:ChatPlacard()
         -- first check config
         if not (self.db.global.PostToChat and self.db.global.ProtectMessage and self.db.global.KillMessage) then
-            self:Print(HHTD:ColorText(L["CHAT_POST_ANNOUNCE_FEATURE_NOT_CONFIGURED"], 'FFFF4040'));
+            self:Error(L["CHAT_POST_ANNOUNCE_FEATURE_NOT_CONFIGURED"]);
             return false;
         end
         local config = self.db.global;
 
         -- then check throttle
         if GetTime() - LastAnnounce < config.PostToChatThrottle then
-            self:Print(HHTD:ColorText(L["CHAT_POST_ANNOUNCE_TOO_SOON_WAIT"], 'FFFF4040'));
+            self:Error(L["CHAT_POST_ANNOUNCE_TOO_SOON_WAIT"]);
             return false;
         end
 
@@ -370,7 +375,7 @@ do
             -- log the time to prevent spam
             LastAnnounce = GetTime();
         else
-            self:Print(HHTD:ColorText(L["CHAT_POST_NO_HEALERS"], 'FFFF4040'));
+            self:Error(L["CHAT_POST_NO_HEALERS"]);
         end
 
         return true;

@@ -45,7 +45,7 @@ local _, _, _, tocversion = GetBuildInfo();
 T._tocversion = tocversion;
 
 -- === Add-on basics and variable declarations {{{
-T.Healers_Have_To_Die = LibStub("AceAddon-3.0"):NewAddon("Healers Have To Die", "AceConsole-3.0", "AceEvent-3.0");
+T.Healers_Have_To_Die = LibStub("AceAddon-3.0"):NewAddon("Healers Have To Die", "AceConsole-3.0", "AceEvent-3.0", "AceTimer-3.0");
 local HHTD = T.Healers_Have_To_Die;
 
 --@debug@
@@ -80,6 +80,8 @@ HHTD.Friendly_Healers = {};
 HHTD.Friendly_Healers_By_Name = {};
 HHTD.Friendly_Healers_By_Name_Blacklist = {}; -- nothing to fill it for now
 HHTD.Friendly_Total_Heal_By_Name = {};
+
+HHTD.Friendly_Healers_Attacked_by_GUID = {};
 
 HHTD.LOG = {};
 HHTD.LOG.Healers_Accusation_Proofs = {};
@@ -174,6 +176,9 @@ HHTD:SetDefaultModulePrototype( {
     end,
 
     Debug = function(self, ...) HHTD.Debug(self, ...) end,
+
+    Error = function(self, m) HHTD.Error (self, m) end,
+
 } )
 
 -- Set modules' default state to "false"
@@ -358,6 +363,12 @@ do
                             HHTD:UpdateHealThreshold();
                         end,
                     },
+                    SetFriendlyHealersRole = {
+                        type = 'toggle',
+                        name = L["OPT_SET_FRIENDLY_HEALERS_ROLE"],
+                        desc = L["OPT_SET_FRIENDLY_HEALERS_ROLE_DESC"],
+                        order = 660,
+                    },
                     Log = {
                         type = 'toggle',
                         name = L["OPT_LOG"],
@@ -505,6 +516,7 @@ local DEFAULT__CONFIGURATION = {
         PvpHSpecsOnly = true,
         UHMHAP = true,
         HMHAP = 0.05,
+        SetFriendlyHealersRole = true,
     },
 };
 -- }}}
@@ -535,6 +547,7 @@ function HHTD:OnEnable()
     self:RegisterEvent("UPDATE_MOUSEOVER_UNIT", "TestUnit");
     self:RegisterEvent("PLAYER_TARGET_CHANGED", "TestUnit");
     self:RegisterEvent("PLAYER_ALIVE"); -- talents SHOULD be available
+    -- self:RegisterEvent("PARTY_MEMBER_DISABLE"); -- useless event, no argument...
     
 
     self:Print(L["ENABLED"]);
@@ -542,6 +555,9 @@ function HHTD:OnEnable()
     self:SetModulesStates();
 
     PLAYER_FACTION = UnitFactionGroup("player");
+
+    self:ScheduleRepeatingTimer(self.Undertaker,          10, self);
+    self:ScheduleRepeatingTimer(self.UpdateHealThreshold, 50, self);
 
 end
 
@@ -551,6 +567,10 @@ function HHTD:PLAYER_ALIVE()
     PLAYER_FACTION = UnitFactionGroup("player");
 
     self:UnregisterEvent("PLAYER_ALIVE");
+end
+
+function HHTD:PARTY_MEMBER_DISABLE(e, unit)
+    self:Debug(INFO2, "PARTY_MEMBER_DISABLE:", unit);
 end
 
 function HHTD:OnDisable()
@@ -564,16 +584,15 @@ HHTD.HealThreshold = 0;
 function HHTD:UpdateHealThreshold()
     if not self.db.global.UHMHAP then return 0 end
 
-    HHTD.HealThreshold = math.ceil(self.db.global.HMHAP * UnitHealthMax('player'));
+    self.HealThreshold = math.ceil(self.db.global.HMHAP * UnitHealthMax('player'));
 
-    return HHTD.HealThreshold;
+    return self.HealThreshold;
 end
 
 
 -- MouseOver and Target trigger {{{
 do
     local LastDetectedGUID = "";
-    local LastTasksRunTime = 0;
     function HHTD:TestUnit(eventName)
 
         local unit="";
@@ -661,14 +680,6 @@ do
             self:SendMessage("HHTD_DROP_HEALER", unitFirstName, unitGuid);
             HHTD.Enemy_Healers_By_Name_Blacklist[unitFirstName] = GetTime();
         end
-
-
-        if GetTime() - LastTasksRunTime > 60 then
-            HHTD:Undertaker();
-            HHTD:UpdateHealThreshold();
-            LastTasksRunTime = GetTime();
-        end
-
     end
 end -- }}}
 
@@ -676,13 +687,18 @@ end -- }}}
 -- Combat Event Listener (Main Healer Detection) {{{
 do
 
-    local bit       = _G.bit;
-    local band      = _G.bit.band;
-    local bor       = _G.bit.bor;
-    local UnitGUID  = _G.UnitGUID;
-    local sub       = _G.string.sub;
-    local GetTime   = _G.GetTime;
-    local str_match = _G.string.match;
+    local bit           = _G.bit;
+    local band          = _G.bit.band;
+    local bor           = _G.bit.bor;
+    local UnitGUID      = _G.UnitGUID;
+    local UnitInRaid    = _G.UnitInRaid;
+    local UnitInParty   = _G.UnitInParty;
+    local UnitSetRole   = _G.UnitSetRole;
+    local UnitGroupRolesAssigned   = _G.UnitGroupRolesAssigned;
+    local CheckInteractDistance    = _G.CheckInteractDistance;
+    local sub           = _G.string.sub;
+    local GetTime       = _G.GetTime;
+    local str_match     = _G.string.match;
 
     local FirstName = "";
     local time = 0;
@@ -718,7 +734,7 @@ do
     function HHTD:COMBAT_LOG_EVENT_UNFILTERED(e, timestamp, event, hideCaster, sourceGUID, sourceName, sourceFlags, destGUID, destName, destFlags, arg10, arg11 --[[ spellName --]], arg12, arg13 --[[ amount --]], ...)
         
         
-        -- Pre 4.1 compatibility layer
+        -- Pre 4.1 compatibility layer {{{
         if TOC ~= 40100 then
             if not compatibilityPatchApplyed then
                 if TOC < 40100 then
@@ -732,7 +748,7 @@ do
                 end
             end
             compatibilityPatchApplyed = false;
-        end
+        end -- }}}
 
         --@debug@
         if hideCaster then
@@ -748,7 +764,7 @@ do
 
         local configRef = self.db.global; -- config shortcut
 
-        -- Escape if bad target {{{
+        -- Escape if bad target (not human nor npc) {{{
         -- Healers are only those caring for other players or NPC
         if band(destFlags, ACCEPTABLE_TARGETS) == 0 then
             --@debug@
@@ -777,6 +793,28 @@ do
             Source_Is_Friendly = true;
         end
 
+        --@debug@
+        --@end-debug@
+
+        -- check if a healer is under attack - broadcast the event and return {{{
+        -- if the source is hostile AND if its target is a registered friendly healer
+        if (not Source_Is_Friendly) and Healer_Registry[true].Healers[destGUID] then
+
+            if not self.Friendly_Healers_Attacked_by_GUID[destGUID] then
+                if ( CheckInteractDistance(destName, 1)) then
+
+                    self:SendMessage("HHTD_HEALER_UNDER_ATTACK", sourceName, sourceGUID, destName, destGUID);
+
+                    self.Friendly_Healers_Attacked_by_GUID[destGUID] = GetTime();
+
+                else
+                    self:Error("Healer too far" .. tostring(CheckInteractDistance(destName, 1)));
+                end
+            end
+
+            -- it's certainly not a heal so no use to continue past this point.
+            return;
+        end -- }}}
 
         -- Escape if bad source {{{
         -- if the source is not a player and if while pve, the source is not an npc, then we don't care about this event
@@ -907,11 +945,19 @@ do
          Healer_Registry[Source_Is_Friendly].Healers[sourceGUID] = time;
          -- by Name
          Healer_Registry[Source_Is_Friendly].Healers_By_Name[FirstName] = Healer_Registry[Source_Is_Friendly].Healers[sourceGUID];
-         -- update plate
+         -- if the player is human and friendly and is part of our group, set his/her role to HEALER
+         if configRef.SetFriendlyHealersRole and Source_Is_Friendly and Source_Is_Human and (UnitInRaid(sourceName) or UnitInParty(sourceName)) and UnitGroupRolesAssigned(sourceName) == 'NONE' then
+             if (select(2, GetRaidRosterInfo(UnitInRaid("player")))) > 0 then
+                 self:Debug(INFO, "Setting role to HEALER for", sourceName);
+                 UnitSetRole(sourceName, 'HEALER');
+             end
+         end
+
+
+         -- Dispatch the news
          self:Debug(INFO, "Healer detected:", FirstName);
          self:SendMessage("HHTD_HEALER_DETECTED", FirstName, sourceGUID, Source_Is_Friendly);
 
-         self:Undertaker();
          -- TODO for GEHR: make activity light blink
 
      end
@@ -925,16 +971,18 @@ do
  function HHTD:Undertaker()
 
      Time = GetTime();
-     -- if (Time - LastCleaned) < 60 then return end -- no need to run this cleaning more than once per minute
 
      local Healer_Registry = HHTD.Healer_Registry;
-     self:Debug(INFO2, "cleaning...");
+     --@debug@
+     --self:Debug(INFO2, "cleaning...");
+     --@end-debug@
 
-     -- XXX also clean friendly tables
-
+     -- clean Healer_Registry table {{{
      for i, Friendly in ipairs({true, false}) do
-         self:Debug(INFO2, "cleaning " .. (Friendly and "|cff00ff00friends|r..." or "|cffff0000enemies|r..."));
-         -- clean enemy healers GUID
+         --@debug@
+         --self:Debug(INFO2, "cleaning " .. (Friendly and "|cff00ff00friends|r..." or "|cffff0000enemies|r..."));
+         --@end-debug@
+         -- clean healers GUID
          for guid, lastHeal in pairs(Healer_Registry[Friendly].Healers) do
              if (Time - lastHeal) > self.db.global.HFT then
                  Healer_Registry[Friendly].Healers[guid] = nil;
@@ -943,7 +991,7 @@ do
              end
          end
 
-         -- clean enemy healers Name
+         -- clean healers Name
          for healerName, lastHeal in pairs(Healer_Registry[Friendly].Healers_By_Name) do
              if (Time - lastHeal) > self.db.global.HFT then
                  Healer_Registry[Friendly].Healers_By_Name[healerName] = nil;
@@ -955,26 +1003,35 @@ do
              end
          end
      end
+     -- }}}
 
      LastCleaned = Time;
 
-     -- clean player class blacklist
-     if (Time - LastBlackListCleaned) < 3600 then return end
+     -- clean player class blacklist {{{
+     if (Time - LastBlackListCleaned) > 3600 then
+         for i, Friendly in ipairs({true, false}) do
+             --self:Debug(INFO2, "cleaning blacklisted " .. (Friendly and "|cff00ff00friends|r..." or "|cffff0000enemies|r..."));
+             for Name, LastSeen in pairs(Healer_Registry[Friendly].Healers_By_Name_Blacklist) do
 
-     for i, Friendly in ipairs({true, false}) do
-         self:Debug(INFO2, "cleaning blacklisted " .. (Friendly and "|cff00ff00friends|r..." or "|cffff0000enemies|r..."));
-         for Name, LastSeen in pairs(Healer_Registry[Friendly].Healers_By_Name_Blacklist) do
+                 if (Time - LastSeen) > self.db.global.HFT then
+                     Healer_Registry[Friendly].Healers_By_Name_Blacklist[Name] = nil;
+                     self:Debug(INFO2, Name, "removed from class blacklist");
+                 end
 
-             if (Time - LastSeen) > self.db.global.HFT then
-                 Healer_Registry[Friendly].Healers_By_Name_Blacklist[Name] = nil;
-
-                 self:Debug(INFO2, Name, "removed from class blacklist");
              end
          end
-     end
+         LastBlackListCleaned = Time;
+     end -- }}}
 
-
-     LastBlackListCleaned = Time;
+     -- clean attacked healers {{{
+     -- also cleaned when such healer dies or leave combat XXX
+     for guid, lastAttack in pairs(self.Friendly_Healers_Attacked_by_GUID) do
+         -- if more than 30s elapsed since the last attack or if it's no longer a registered healer
+         if Time - lastAttack > 30 or not Healer_Registry[true].Healers[guid] then
+             self.Friendly_Healers_Attacked_by_GUID[guid] = nil;
+             self:Debug(INFO2, "removed healer from attack table", guid);
+         end
+     end -- }}}
 
  end -- }}}
 
