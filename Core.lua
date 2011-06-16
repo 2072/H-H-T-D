@@ -807,8 +807,6 @@ do
 
                     self.Friendly_Healers_Attacked_by_GUID[destGUID] = GetTime();
 
-                else
-                    self:Error("Healer too far" .. tostring(CheckInteractDistance(destName, 1)));
                 end
             end
 

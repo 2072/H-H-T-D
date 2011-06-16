@@ -95,7 +95,7 @@ end -- }}}
 -- }}}
 
 function HHTD:Error(message)
-    UIErrorsFrame:AddMessage(message, 1, 0, 0, 1, UIERRORS_HOLD_TIME);
+    UIErrorsFrame:AddMessage("HHTD: " .. message, 1, 0, 0, 1, UIERRORS_HOLD_TIME);
     self:Print(HHTD:ColorText(message, 'FFFF3030'));
     return message;
 end
