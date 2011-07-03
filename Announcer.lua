@@ -58,6 +58,7 @@ function Announcer:OnInitialize() -- {{{
             PostHumansOnly = true,
             ProtectMessage = false,
             KillMessage = false,
+            PostChannel = 'AUTO',
         },
     });
 
@@ -132,6 +133,13 @@ function Announcer:GetOptions () -- {{{
                             type = 'description',
                             order = 0,
                             name = L["OPT_POST_ANNOUNCE_DESCRIPTION"],
+                        },
+                        PostChannel = {
+                            type = 'select',
+                            name = L['OPT_POST_ANNOUNCE_CHANNEL'],
+                            desc = L['OPT_POST_ANNOUNCE_CHANNEL_DESC'],
+                            values = { ['AUTO'] = L['RAID_OR_BATTLEGROUND'], ['PARTY'] = L['PARTY'], ['SAY'] = L['SAY'], ['YELL'] = L['YELL'] },
+                            order = 30,
                         },
                         -- throttle
                         PostToChatThrottle = {
@@ -260,7 +268,11 @@ function Announcer:HHTD_TARGET_LOCKED (selfevent, unit)
 end
 
 function Announcer:HHTD_HEALER_UNDER_ATTACK (selfevent, sourceName, sourceGUID, destName, destGUID)
-    RaidNotice_AddMessage( RaidWarningFrame, ("Healer friend %s is being attacked by %s"):format(destName, sourceName), ChatTypeInfo["RAID_WARNING"] );
+    local message = HHTD:ColorText("HHTD: ", '88555555') .. (L["HEALER_UNDER_ATTACK"]):format(HHTD:ColorText(HHTD:MakePlayerName(destName), 'FF00DD00'), HHTD:ColorText(HHTD:MakePlayerName(sourceName), 'FFDD0000'));
+
+    RaidNotice_AddMessage( RaidWarningFrame, message, ChatTypeInfo["RAID_WARNING"] );
+
+    self:Print(message);
 end
 
 -- }}}
@@ -283,6 +295,15 @@ do
 
     local function GetDistributionChanel()
         local inInstance, InstanceType = IsInInstance();
+        local chanel = Announcer.db.global.PostChannel;
+
+        if chanel ~= 'AUTO' then
+            return chanel;
+        end
+
+        if (select(2, GetRaidRosterInfo(UnitInRaid("player")))) > 0 then
+            return "RAID_WARNING";
+        end
 
         if InstanceType == "pvp" then
             return "BATTLEGROUND";
@@ -376,6 +397,10 @@ do
             LastAnnounce = GetTime();
         else
             self:Error(L["CHAT_POST_NO_HEALERS"]);
+            --@debug@
+            Post(L["CHAT_POST_NO_HEALERS"]);
+            LastAnnounce = GetTime();
+            --@end-debug@
         end
 
         return true;

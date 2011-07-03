@@ -18,8 +18,23 @@ HHTD is PVP and PVE compatible.
 
 Remember to check out available options (/HHTDG)
 
-Articles and debates
---------------------
+Special commands
+----------------
+
+- /HHTDP (or /hhtdp) : Post healers name to the raid channel for all to see. (You need to configure the messages in the announce module options first).
+
+**You can bind this command to a key (WoW key-bindings interface)**
+
+
+Videos
+------
+
+Here is a video by Hybridpanda featuring HHTD in the Eye of the Storm battleground:
+
+[YouTube - This makes me a sad Panda][video1]
+
+Articles
+--------
 
 Here is a excellent article about HHTD by Cynwise (**A must read if you have some doubts about the fairness of this add-on!**) :
 
@@ -29,6 +44,8 @@ Here is a excellent article about HHTD by Cynwise (**A must read if you have som
 Another one by Gevlon:
  [http://greedygoblin.blogspot.com/2011/05/healers-have-to-die.html][article2]
 
+Debates
+-------
 
 An 'interesting' debate about this add-on is also happening on Blizzard's official forum:
 
@@ -68,15 +85,6 @@ Planned features
 
 - Detection when a friendly healer is being attacked and alert others through /yell or /say (I would like to make it work for nearby healers only)
 
-Special commands
-----------------
-
-**(HHTD alpha and beta versions from June only)**
-
-- /HHTDP (or /hhtdp) : Post healers name to the raid channel for all to see. (You need to configure the messages in the announce module options first).
-
-**You can bind this command to a key (WoW key-bindings interface)**
-
 
 ******************************************
 
@@ -109,7 +117,4 @@ To report issues or ask for new features, use the [ticket system][tickets].
 [article1]: http://cynwise.wordpress.com/2011/03/22/healers-have-to-die-and-the-pvp-addons-arms-race/
 [article2]: http://greedygoblin.blogspot.com/2011/05/healers-have-to-die.html
 
-
-
-
-
+[video1]: http://www.youtube.com/watch?v=bDdmD6Lx87g

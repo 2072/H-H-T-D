@@ -32,7 +32,10 @@ local HHTD = T.Healers_Have_To_Die;
 
 local HHTD_C = T.Healers_Have_To_Die.Constants;
 
-
+function HHTD:MakePlayerName (name) --{{{
+    if not name then name = "NONAME" end
+    return "|Hplayer:" .. name .. "|h" .. (name):upper() .. "|h";
+end --}}}
 
 function HHTD:ColorText (text, color) --{{{
 

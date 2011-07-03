@@ -4,6 +4,21 @@ Healers Have To Die
 *Change log*
 ------------
 
+**version 1.9.0 (2011-07-03):**
+
+- **New feature:** It's now possible to announce friendly and enemy healers to chat
+  for other players to see, you have to enable and configure the messages in
+  the 'Announcer' options.
+
+- **New feature:** HHTD will display an alert when a nearby friendly healer is
+  being attacked.
+
+- **New feature:** HHTD will automatically apply the HEALER role to detected
+  friendly healers (if possible).
+
+- Compatible with WoW 4.2
+
+
 **version 1.8.4 (2011-04-28):**
 
 - Updated LibNamePlate *again* to *actually* be compatible with WoW 4.1

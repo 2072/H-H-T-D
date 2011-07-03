@@ -369,6 +369,12 @@ do
                         desc = L["OPT_SET_FRIENDLY_HEALERS_ROLE_DESC"],
                         order = 660,
                     },
+                    HealerUnderAttackAlerts = {
+                        type = 'toggle',
+                        name = L["OPT_HEALER_UNDER_ATTACK_ALERTS"],
+                        desc = L["OPT_HEALER_UNDER_ATTACK_ALERTS_DESC"],
+                        order = 670,
+                    },
                     Log = {
                         type = 'toggle',
                         name = L["OPT_LOG"],
@@ -517,6 +523,7 @@ local DEFAULT__CONFIGURATION = {
         UHMHAP = true,
         HMHAP = 0.05,
         SetFriendlyHealersRole = true,
+        HealerUnderAttackAlerts = true,
     },
 };
 -- }}}
@@ -728,34 +735,22 @@ do
 
     local TOC = T._tocversion;
 
-    local compatibilityPatchApplyed = false
+
+    --@debug@
+    local profiling1 = 0;
+    tempProfiling = {};
+    local tempProfiling = tempProfiling;
+    --@end-debug@
 
     -- http://www.wowpedia.org/API_COMBAT_LOG_EVENT
-    function HHTD:COMBAT_LOG_EVENT_UNFILTERED(e, timestamp, event, hideCaster, sourceGUID, sourceName, sourceFlags, destGUID, destName, destFlags, arg10, arg11 --[[ spellName --]], arg12, arg13 --[[ amount --]], ...)
+    function HHTD:COMBAT_LOG_EVENT_UNFILTERED(e, timestamp, event, hideCaster, sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags, _spellID, spellNAME, _spellSCHOOL, healAMOUNT)
         
-        
-        -- Pre 4.1 compatibility layer {{{
-        if TOC ~= 40100 then
-            if not compatibilityPatchApplyed then
-                if TOC < 40100 then
-                    -- call again inserting a fake hideCaster event
-                    compatibilityPatchApplyed = true;
-                    return self:COMBAT_LOG_EVENT_UNFILTERED(e, timestamp, event, false, hideCaster, sourceGUID, sourceName, sourceFlags, destGUID, destName, destFlags, arg10, arg11, arg12, arg13, ...);
-                else -- > 40100
-                    compatibilityPatchApplyed = true;
-                    -- call again skipping sourceRaidFlags and destRaidFlags
-                    return self:COMBAT_LOG_EVENT_UNFILTERED(e, timestamp, event, hideCaster, sourceGUID, sourceName, sourceFlags, --[[destGUID,--]] destName, destFlags, arg10, --[[arg11,--]] arg12, arg13, ...);
-                end
-            end
-            compatibilityPatchApplyed = false;
-        end -- }}}
-
         --@debug@
         if hideCaster then
-            --self:Debug(event, hideCaster, sourceGUID, sourceName, sourceFlags, type(sourceFlags), destGUID, destName, destFlags, type(destFlags), arg10, arg11, arg12, arg13, ...);
+            --self:Debug(e, timestamp, event, hideCaster, sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags, _spellID, spellNAME, _spellSCHOOL, healAMOUNT);
         end
         --@end-debug@
-        
+
 
         -- escape if no source {{{
         -- untraceable events are useless
@@ -793,21 +788,25 @@ do
             Source_Is_Friendly = true;
         end
 
-        --@debug@
-        --@end-debug@
 
         -- check if a healer is under attack - broadcast the event and return {{{
         -- if the source is hostile AND if its target is a registered friendly healer
-        if (not Source_Is_Friendly) and Healer_Registry[true].Healers[destGUID] then
+        if configRef.HealerUnderAttackAlerts and (not Source_Is_Friendly) and Healer_Registry[true].Healers[destGUID] then
 
             if not self.Friendly_Healers_Attacked_by_GUID[destGUID] then
-                if ( CheckInteractDistance(destName, 1)) then
+                --@debug@
+                profiling1 = GetTime();
+                --@end-debug@
+                if ( CheckInteractDistance(destName, 1) ) then
 
                     self:SendMessage("HHTD_HEALER_UNDER_ATTACK", sourceName, sourceGUID, destName, destGUID);
 
                     self.Friendly_Healers_Attacked_by_GUID[destGUID] = GetTime();
 
                 end
+                --@debug@
+                table.insert(tempProfiling, GetTime() - profiling1);
+                --@end-debug@
             end
 
             -- it's certainly not a heal so no use to continue past this point.
@@ -842,9 +841,9 @@ do
         end -- }}}
 
         -- Escape if Source_Is_Human and scanning for pure healing specs and the spell doesn't match {{{
-        if Source_Is_Human and configRef.PvpHSpecsOnly and not HHTD_C.Healers_Only_Spells_ByName[arg11] then
+        if Source_Is_Human and configRef.PvpHSpecsOnly and not HHTD_C.Healers_Only_Spells_ByName[spellNAME] then
             --@debug@
-            --self:Debug(INFO2, "Spell", arg11, "is not a healer' spell");
+            --self:Debug(INFO2, "Spell", spellNAME, "is not a healer' spell");
             --@end-debug@
             return;
         end -- }}}
@@ -889,8 +888,8 @@ do
             HHTD.LOG.Healers_Details[sourceName].isHuman = Source_Is_Human;
             HHTD.LOG.Healers_Details[sourceName].totalHeal = 0;
 
-            if HHTD_C.Healers_Only_Spells_ByName[arg11] then
-                HHTD.LOG.Healers_Details[sourceName].class = HHTD_C.Healers_Only_Spells_ByName[arg11];
+            if HHTD_C.Healers_Only_Spells_ByName[spellNAME] then
+                HHTD.LOG.Healers_Details[sourceName].class = HHTD_C.Healers_Only_Spells_ByName[spellNAME];
             end
         end
 
@@ -901,10 +900,10 @@ do
                 if not Healer_Registry[Source_Is_Friendly].Total_Heal_By_Name[FirstName] then
                     Healer_Registry[Source_Is_Friendly].Total_Heal_By_Name[FirstName] = 0;
                 end
-                Healer_Registry[Source_Is_Friendly].Total_Heal_By_Name[FirstName] = Healer_Registry[Source_Is_Friendly].Total_Heal_By_Name[FirstName] + arg13;
+                Healer_Registry[Source_Is_Friendly].Total_Heal_By_Name[FirstName] = Healer_Registry[Source_Is_Friendly].Total_Heal_By_Name[FirstName] + healAMOUNT;
 
                 if configRef.Log then
-                    HHTD.LOG.Healers_Details[sourceName].totalHeal = HHTD.LOG.Healers_Details[sourceName].totalHeal + arg13;
+                    HHTD.LOG.Healers_Details[sourceName].totalHeal = HHTD.LOG.Healers_Details[sourceName].totalHeal + healAMOUNT;
                 end
 
                 -- Escape if below minimum healing {{{
@@ -922,12 +921,12 @@ do
 
 
          -- if logging and specs only
-         if configRef.Log and HHTD_C.Healers_Only_Spells_ByName[arg11] then
+         if configRef.Log and HHTD_C.Healers_Only_Spells_ByName[spellNAME] then
 
-             if not HHTD.LOG.Healers_Accusation_Proofs[sourceName][arg11] then
-                 HHTD.LOG.Healers_Accusation_Proofs[sourceName][arg11] = 1;
+             if not HHTD.LOG.Healers_Accusation_Proofs[sourceName][spellNAME] then
+                 HHTD.LOG.Healers_Accusation_Proofs[sourceName][spellNAME] = 1;
              else
-                 HHTD.LOG.Healers_Accusation_Proofs[sourceName][arg11] = HHTD.LOG.Healers_Accusation_Proofs[sourceName][arg11] + 1;
+                 HHTD.LOG.Healers_Accusation_Proofs[sourceName][spellNAME] = HHTD.LOG.Healers_Accusation_Proofs[sourceName][spellNAME] + 1;
              end
          end
 
@@ -1022,7 +1021,7 @@ do
      end -- }}}
 
      -- clean attacked healers {{{
-     -- also cleaned when such healer dies or leave combat XXX
+     -- should also be cleaned when such healer dies or leave combat XXX -- no event for those...
      for guid, lastAttack in pairs(self.Friendly_Healers_Attacked_by_GUID) do
          -- if more than 30s elapsed since the last attack or if it's no longer a registered healer
          if Time - lastAttack > 30 or not Healer_Registry[true].Healers[guid] then

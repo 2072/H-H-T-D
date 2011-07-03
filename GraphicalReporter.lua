@@ -25,6 +25,8 @@ This component displays a list of known healers with a proximity sensor, the lis
 
 --]=]
 
+--@debug@
+
 local ERROR     = 1;
 local WARNING   = 2;
 local INFO      = 3;
@@ -122,6 +124,7 @@ function GRObject.Prototype:Init(healerName)
 -- targetable indicator
 
 end
+--@end-debug@
 
 -- === ROADMAP === --
 
