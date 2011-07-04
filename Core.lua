@@ -944,7 +944,7 @@ do
          Healer_Registry[Source_Is_Friendly].Healers_By_Name[FirstName] = Healer_Registry[Source_Is_Friendly].Healers[sourceGUID];
          -- if the player is human and friendly and is part of our group, set his/her role to HEALER
          if configRef.SetFriendlyHealersRole and Source_Is_Friendly and Source_Is_Human and (UnitInRaid(sourceName) or UnitInParty(sourceName)) and UnitGroupRolesAssigned(sourceName) == 'NONE' then
-             if (select(2, GetRaidRosterInfo(UnitInRaid("player")))) > 0 then
+             if (select(2, GetRaidRosterInfo(UnitInRaid("player") or 1))) > 0 then
                  self:Debug(INFO, "Setting role to HEALER for", sourceName);
                  UnitSetRole(sourceName, 'HEALER');
              end

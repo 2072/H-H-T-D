@@ -294,19 +294,20 @@ do
     end
 
     local function GetDistributionChanel()
+        local channel = Announcer.db.global.PostChannel;
+
+        if channel ~= 'AUTO' then
+            return channel;
+        end
+
         local inInstance, InstanceType = IsInInstance();
-        local chanel = Announcer.db.global.PostChannel;
-
-        if chanel ~= 'AUTO' then
-            return chanel;
-        end
-
-        if (select(2, GetRaidRosterInfo(UnitInRaid("player")))) > 0 then
-            return "RAID_WARNING";
-        end
 
         if InstanceType == "pvp" then
             return "BATTLEGROUND";
+        end
+
+        if (select(2, GetRaidRosterInfo(UnitInRaid("player") or 1))) > 0 then
+            return "RAID_WARNING";
         end
 
         if GetNumRaidMembers() ~= 0 then
