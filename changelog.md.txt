@@ -3,6 +3,14 @@ Healers Have To Die
 
 *Change log*
 ------------
+**version 1.9.1 (2011-07-04):**
+
+- FIX: Friendly healers were reportedly attacked by their own pets or
+  objects...
+
+- Fix: In battleground there is no raid warning channel, HHTD now falls back to raid
+  channel in this situation.
+
 
 **version 1.9.0 (2011-07-03):**
 
