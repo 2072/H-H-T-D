@@ -791,7 +791,7 @@ do
 
         -- check if a healer is under attack - broadcast the event and return {{{
         -- if the source is hostile AND if its target is a registered friendly healer
-        if configRef.HealerUnderAttackAlerts and (not Source_Is_Friendly) and Healer_Registry[true].Healers[destGUID] then
+        if configRef.HealerUnderAttackAlerts and (not Source_Is_Friendly) and (Source_Is_NPC or Source_Is_Human) and Healer_Registry[true].Healers[destGUID] then
 
             if not self.Friendly_Healers_Attacked_by_GUID[destGUID] then
                 --@debug@
