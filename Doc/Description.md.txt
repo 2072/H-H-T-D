@@ -36,9 +36,10 @@ Here is a video by Hybridpanda featuring HHTD in the Eye of the Storm battlegrou
 Articles
 --------
 
-Here is a excellent article about HHTD by Cynwise (**A must read if you have some doubts about the fairness of this add-on!**) :
+Here are two excellent articles about HHTD by Cynwise (**A must read if you have some doubts about the fairness of this add-on!**) :
 
- [http://cynwise.wordpress.com/2011/03/22/healers-have-to-die-and-the-pvp-addons-arms-race/][article1].
+ [Healers Have To Die and the PvP Addons Arms Race][article1].
+ [Using Healers Have To Die to Protect Friendly Healers][article3]
 
 
 Another one by Gevlon:
@@ -116,5 +117,6 @@ To report issues or ask for new features, use the [ticket system][tickets].
 
 [article1]: http://cynwise.wordpress.com/2011/03/22/healers-have-to-die-and-the-pvp-addons-arms-race/
 [article2]: http://greedygoblin.blogspot.com/2011/05/healers-have-to-die.html
+[article3]: http://cynwise.wordpress.com/2011/09/16/using-healers-have-to-die-to-protect-friendly-healers/
 
 [video1]: http://www.youtube.com/watch?v=bDdmD6Lx87g

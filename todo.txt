@@ -1,0 +1,3 @@
+add number to symbols
+make friendly healers symbol glow when under attack
+add an option when for Healers running the addon to make them /say under attack by xx
