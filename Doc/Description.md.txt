@@ -38,35 +38,14 @@ Articles
 
 Here are two excellent articles about HHTD by Cynwise (**A must read if you have some doubts about the fairness of this add-on!**) :
 
- [Healers Have To Die and the PvP Addons Arms Race][article1].
+ [Healers Have To Die and the PvP Addons Arms Race][article1]
+
  [Using Healers Have To Die to Protect Friendly Healers][article3]
 
 
 Another one by Gevlon:
  [http://greedygoblin.blogspot.com/2011/05/healers-have-to-die.html][article2]
 
-Debates
--------
-
-An 'interesting' debate about this add-on is also happening on Blizzard's official forum:
-
-- [Break the HHTD mod already. (UI and Macro forum)][debate4] (full),
-
-- [Healers Have To Die, part I (UI and Macro forum)][debate1] (full),
-
-- [Healers Have to Die, part II (General discussion)][debate2] (full),
-
-- [Healers Have to Die, part III (General discussion)][debate3] (full),
-
-- [Healers Have to Die (Class Roles - Healing forum)][debate5]
-
-Sadly, as a European I cannot participate but I'm reading those threads with great interest.
-
-The funniest part about all those 26 pages discussions is that only about **16,000 people are actually using HHTD** (from the Curse Client popularity statistics)...
-*Note that with all the publicity made about HHTD, this number is increasing a lot faster than it used to.*
-
-In those discussions it's also rarely noted that HHTD is also very helpful to protect healers on your side.
-This debate is leading nowhere though... I won't post any more links to those endless threads.
 
 How it works
 ------------
@@ -85,6 +64,25 @@ Planned features
 ----------------
 
 - Detection when a friendly healer is being attacked and alert others through /yell or /say (I would like to make it work for nearby healers only)
+
+Debates
+-------
+
+An 'interesting' debate about this add-on is also happening on Blizzard's official forum:
+
+- [Break the HHTD mod already. (UI and Macro forum)][debate4] (full),
+
+- [Healers Have To Die, part I (UI and Macro forum)][debate1] (full),
+
+- [Healers Have to Die, part III (General discussion)][debate3] (full),
+
+
+Sadly, as a European I cannot participate but I'm reading those threads with great interest.
+
+The funniest part about all those 26 pages discussions is that only about **16,000 people were actually using HHTD at the time** (from the Curse Client popularity statistics)... Now over **80,000** players have it installed!
+
+In those discussions it's also rarely noted that HHTD is also very helpful to protect healers on your side.
+This debate is leading nowhere though... I won't post any additional links to those endless threads.
 
 
 ******************************************
@@ -106,14 +104,11 @@ To report issues or ask for new features, use the [ticket system][tickets].
 
 [debate1]: http://us.battle.net/wow/en/forum/topic/2211922815
 
-[debate2]: http://us.battle.net/wow/en/forum/topic/2228173234
-
 [debate3]: http://us.battle.net/wow/en/forum/topic/2228224992
 
 [debate4]: http://us.battle.net/wow/en/forum/topic/2191131447
 
 
-[debate5]: http://us.battle.net/wow/en/forum/topic/2228223941
 
 [article1]: http://cynwise.wordpress.com/2011/03/22/healers-have-to-die-and-the-pvp-addons-arms-race/
 [article2]: http://greedygoblin.blogspot.com/2011/05/healers-have-to-die.html
