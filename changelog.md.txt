@@ -3,6 +3,11 @@ Healers Have To Die
 
 *Change log*
 ------------
+
+**version 1.9.1.1 (2011-11-29):**
+
+- Updated TOC to be compatible with WoW 4.3
+
 **version 1.9.1 (2011-07-04):**
 
 - FIX: Friendly healers were reportedly attacked by their own pets or
