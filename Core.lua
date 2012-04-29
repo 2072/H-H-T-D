@@ -724,7 +724,8 @@ do
     local FirstName = "";
     local time = 0;
 
-    local NPC                   = COMBATLOG_OBJECT_CONTROL_NPC; -- XXX why CONTROL??
+    -- local NPC                   = COMBATLOG_OBJECT_CONTROL_NPC; -- XXX why CONTROL??
+    local NPC                   = COMBATLOG_OBJECT_TYPE_NPC; -- changed to TYPE on 2012-04-29
     local PET                   = COMBATLOG_OBJECT_TYPE_PET;
     local PLAYER                = COMBATLOG_OBJECT_TYPE_PLAYER;
 
