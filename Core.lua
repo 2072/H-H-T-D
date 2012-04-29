@@ -672,35 +672,40 @@ do
             return;
         end
 
+        --[=[
         -- Is the unit class able to heal?
         if HHTD_C.Healing_Classes[unitClass] then
+        --]=]
 
-            -- Has the unit healed recently?
-            if HHTD.Enemy_Healers[unitGuid] then
-                -- Is this sitill true?
-                if (GetTime() - HHTD.Enemy_Healers[unitGuid]) > HHTD.db.global.HFT then
-                    -- else CLEANING
+        -- Has the unit healed recently?
+        if HHTD.Enemy_Healers[unitGuid] then
+            -- Is this sitill true?
+            if (GetTime() - HHTD.Enemy_Healers[unitGuid]) > HHTD.db.global.HFT then
+                -- else CLEANING
 
-                    self:Debug(INFO2, self:UnitName(unit), " did not heal for more than", HHTD.db.global.HFT, ", removed.");
+                self:Debug(INFO2, self:UnitName(unit), " did not heal for more than", HHTD.db.global.HFT, ", removed.");
 
-                    HHTD.Enemy_Healers[unitGuid] = nil;
-                    HHTD.Enemy_Healers_By_Name[unitFirstName] = nil;
+                HHTD.Enemy_Healers[unitGuid] = nil;
+                HHTD.Enemy_Healers_By_Name[unitFirstName] = nil;
 
-                    self:SendMessage("HHTD_DROP_HEALER", unitFirstName, unitGuid);
-                else
-                    self:SendMessage("HHTD_HEALER_UNDER_MOUSE", unit, unitGuid, unitFirstName, LastDetectedGUID);
-                    --self:Debug("HHTD_HEALER_UNDER_MOUSE"); -- XXX
-                    LastDetectedGUID = unitGuid;
-                end
+                self:SendMessage("HHTD_DROP_HEALER", unitFirstName, unitGuid);
             else
-                --self:Debug(INFO2, "did not heal");
-                self:SendMessage("HHTD_MOUSE_OVER_OR_TARGET", unit, unitGuid, unitFirstName);
+                self:SendMessage("HHTD_HEALER_UNDER_MOUSE", unit, unitGuid, unitFirstName, LastDetectedGUID);
+                --self:Debug("HHTD_HEALER_UNDER_MOUSE"); -- XXX
+                LastDetectedGUID = unitGuid;
             end
         else
-            -- self:Debug(WARNING, "Bad unit Class"); -- XXX
-            self:SendMessage("HHTD_DROP_HEALER", unitFirstName, unitGuid);
-            HHTD.Enemy_Healers_By_Name_Blacklist[unitFirstName] = GetTime();
+            --self:Debug(INFO2, "did not heal");
+            self:SendMessage("HHTD_MOUSE_OVER_OR_TARGET", unit, unitGuid, unitFirstName);
         end
+
+        --[=[
+        else
+        -- self:Debug(WARNING, "Bad unit Class"); -- XXX
+        self:SendMessage("HHTD_DROP_HEALER", unitFirstName, unitGuid);
+        HHTD.Enemy_Healers_By_Name_Blacklist[unitFirstName] = GetTime();
+        end
+        --]=]
     end
 end -- }}}
 
