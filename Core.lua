@@ -291,6 +291,20 @@ do
                         desc = L["OPT_PVPHEALERSSPECSONLY_DESC"],
                         order = 300,
                     },
+                    testOnTarget = {
+                        type = 'execute',
+                        name = L["OPT_TESTONTARGET"],
+                        desc = L["OPT_TESTONTARGET_DESC"],
+                        func = function ()
+                            if (UnitGUID("target")) then
+                                HHTD:MakeDummyEvent("target");
+                            else
+                                HHTD:Print( L["OPT_TESTONTARGET_ENOTARGET"]);
+                            end
+
+                        end,
+                        order = 350,
+                    },
                     Modules = {
                         type = 'group',
                         name = L["OPT_MODULES"],
@@ -710,7 +724,7 @@ do
     local FirstName = "";
     local time = 0;
 
-    local NPC                   = COMBATLOG_OBJECT_CONTROL_NPC;
+    local NPC                   = COMBATLOG_OBJECT_CONTROL_NPC; -- XXX why CONTROL??
     local PET                   = COMBATLOG_OBJECT_TYPE_PET;
     local PLAYER                = COMBATLOG_OBJECT_TYPE_PLAYER;
 
@@ -742,6 +756,34 @@ do
     local tempProfiling = tempProfiling;
     --@end-debug@
 
+    function HHTD:MakeDummyEvent(unit)
+        --local flags = 0, destName = 'TestUnit', destGUID = 'TestGuid', destFlags = 0;
+        local flags, destName, destGUID  = 0, 'TestUnit', 'TestGuid';
+
+        if UnitIsPlayer(unit) then
+            if UnitIsFriend(unit, 'player') then
+                self:Debug(INFO, "target is a friendly player");
+                flags = FRIENDLY_PLAYER;
+                --destName = (UnitName('player'));
+                --destGUID = UnitGUID('player');
+                --destFlags = FRIENDLY_PLAYER;
+            else
+                flags = HOSTILE_OUTSIDER_PLAYER;
+                self:Debug(INFO, "target is a hostile player");
+            end
+        else
+            if UnitIsFriend(unit, 'player') then
+                self:Debug(INFO, "target is a friendly NPC");
+                flags = FRIENDLY_NPC;
+            else
+                flags = HOSTILE_OUTSIDER_NPC;
+                self:Debug(INFO, "target is a hostile NPC");
+            end
+        end
+
+        self:COMBAT_LOG_EVENT_UNFILTERED(nil, 0, "DUMMY_HEAL", false, UnitGUID(unit), (UnitName(unit)), flags, 0, destGUID, destName, flags, 0, 0, (GetSpellInfo(33891)), "", HHTD.HealThreshold + 1);
+    end
+
     -- http://www.wowpedia.org/API_COMBAT_LOG_EVENT
     function HHTD:COMBAT_LOG_EVENT_UNFILTERED(e, timestamp, event, hideCaster, sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags, _spellID, spellNAME, _spellSCHOOL, healAMOUNT)
         
@@ -763,7 +805,7 @@ do
         -- Healers are only those caring for other players or NPC
         if band(destFlags, ACCEPTABLE_TARGETS) == 0 then
             --@debug@
-            --[[
+            ---[[
             if self.db.global.Debug and event:sub(-5) == "_HEAL" and sourceGUID ~= destGUID then
                 self:Debug(INFO2, "Bad target", sourceName, destName);
             end
@@ -822,7 +864,7 @@ do
 
 
             --@debug@
-            --[[
+            ---[[
             if  self.db.global.Debug then
                 if  event:sub(-5) == "_HEAL" and sourceGUID ~= destGUID then
                     self:Debug(INFO2, "Bad heal source:", sourceName, "Dest:", destName, "pve:", configRef.Pve,
