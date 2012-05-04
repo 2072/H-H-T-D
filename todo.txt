@@ -1,3 +1,13 @@
+
+- Treat same-named units as a single global unit (will reove the use of sPVE option)
+
+
 add number to symbols
-make friendly healers symbol glow when under attack
-add an option when for Healers running the addon to make them /say under attack by xx
+
+create a timer that cycles through all the sisplayed textures and updates them
+or better: just run it on demand when there is something to update, else just use teh onshow events...
+use a lastupdateOn variable with the time it was last updaed.
+
+-- allow resizing
+    -+ moving of the sympbol
+

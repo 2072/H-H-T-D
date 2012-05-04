@@ -143,6 +143,10 @@ do
         L["YOU_GOT_HER"] = "You got %sher|r!"
         L["YOU_GOT_HIM"] = "You got %shim|r!"
         L["YOU_GOT_IT"] = "You got %sit|r!"
+        
+        L["OPT_TESTONTARGET"] = "Test HHTD's behavior on current target"
+        L["OPT_TESTONTARGET_DESC"] = "Will mark your current target as a healer so you can test what happens."
+        L["OPT_TESTONTARGET_ENOTARGET"] = "You need to target something"
 
         --]==]
         --@end-do-not-package@

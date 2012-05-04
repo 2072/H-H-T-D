@@ -217,7 +217,7 @@ function Announcer:OnEnable() -- {{{
     self:Debug(INFO, "OnEnable");
 
     -- Subscribe to HHTD callbacks
-    self:RegisterMessage("HHTD_HEALER_UNDER_MOUSE");
+    self:RegisterMessage("HHTD_HEALER_MOUSE_OVER");
     self:RegisterMessage("HHTD_TARGET_LOCKED");
     self:RegisterMessage("HHTD_HEALER_UNDER_ATTACK");
 
@@ -231,35 +231,46 @@ function Announcer:OnDisable() -- {{{
 end -- }}}
 
 
--- Internal CallBacks (HHTD_DROP_HEALER -- HHTD_HEALER_DETECTED) {{{
-function Announcer:HHTD_HEALER_UNDER_MOUSE(selfevent, unit, unitGuid, unitFirstName, previousUnitGuid)
+-- Internal CallBacks (HHTD_HEALER_MOUSE_OVER - HHTD_TARGET_LOCKED - HHTD_HEALER_UNDER_ATTACK) {{{
+local previousUnitGuid;
+function Announcer:HHTD_HEALER_MOUSE_OVER(selfevent, isFriend, healerProfile)
 
-    if previousUnitGuid ~= UnitGUID(unit) then
+    if isFriend then
+        --return; -- XXX
+    end
+
+    if previousUnitGuid ~= healerProfile.guid then
         self:Announce(
             "|cFFFF0000",
             (L["IS_A_HEALER"]):format(
                 HHTD:ColorText(
-                unitFirstName,
-                HHTD:GetClassHexColor(  select(2, UnitClass(unit)) )
+                healerProfile.name,
+                HHTD:GetClassHexColor(  select(2, UnitClass("mouseover")) )
                 ),
             "|r"
             )
         );
+        previousUnitGuid = healerProfile.guid;
     end
 
     self:PlaySoundFile("Sound\\interface\\AlarmClockWarning3.wav");
     -- self:Debug(INFO, "AlarmClockWarning3.wav played");
 end
 
-function Announcer:HHTD_TARGET_LOCKED (selfevent, unit)
+function Announcer:HHTD_TARGET_LOCKED (selfevent, isFriend, healerProfile)
+
+    if isFriend then
+        --return; -- XXX
+    end
+
     self:PlaySoundFile("Sound\\interface\\AuctionWindowOpen.wav");
     --self:Debug(INFO, "AuctionWindowOpen.wav played");
 
-    local sex = UnitSex(unit);
+    local sex = UnitSex("target");
 
     local what = (sex == 1 and L["YOU_GOT_IT"] or sex == 2 and L["YOU_GOT_HIM"] or L["YOU_GOT_HER"]);
 
-    local localizedUnitClass, unitClass = UnitClass(unit);
+    local localizedUnitClass, unitClass = UnitClass("target");
 
     local subjectColor = HHTD:GetClassHexColor(unitClass);
 
@@ -286,7 +297,7 @@ end -- }}}
 
 do
     local function SortHealers(a, b)
-        if HHTD.LOG.Healers_Details[a].totalHeal > HHTD.LOG.Healers_Details[b].totalHeal then
+        if a.healDone > b.healDone then
             return true;
         else
             return false;
@@ -327,8 +338,10 @@ do
     end
 
     local LastAnnounce = 0;
-    local Friends = {};
-    local Foes = {};
+    local FriendsFoes = {
+        [true] = {},
+        [false] = {}
+    };
     function Announcer:ChatPlacard()
         -- first check config
         if not (self.db.global.PostToChat and self.db.global.ProtectMessage and self.db.global.KillMessage) then
@@ -343,57 +356,45 @@ do
             return false;
         end
 
-        table.wipe(Friends);
-        table.wipe(Foes);
 
+        for i, isFriend in ipairs({true, false}) do
 
-        -- make the lists
-        for healer, spells in pairs(HHTD.LOG.Healers_Accusation_Proofs) do
-            local firstName = healer:match("^[^-]+");
+            table.wipe(FriendsFoes[isFriend]);
 
-            -- check for humans if required to
-            if not (config.PostHumansOnly and not HHTD.LOG.Healers_Details[healer].isHuman) then
-                if  HHTD.LOG.Healers_Details[healer].isFriend then
-                    -- check for count and activity
-                    if #Friends <= config.PostHealersNumber and HHTD.Healer_Registry[true].Healers_By_Name[firstName] then
-                        table.insert(Friends, healer);
-                    end
+            for healerGUID, healerProfile in pairs(HHTD.Registry_by_GUID[isFriend]) do
+
+                if not (config.PostHumansOnly and not healerProfile.isHuman) and #FriendsFoes[isFriend] <= config.PostHealersNumber then
+                    table.insert(FriendsFoes[isFriend], healer);
                 else
-                    -- check for count and activity
-                    if #Foes <= config.PostHealersNumber and HHTD.Healer_Registry[false].Healers_By_Name[firstName] then
-                        table.insert(Foes, healer);
-                    end
+                    break;
                 end
+
             end
-        end
-        -- we need to sort those before display...
-        table.sort(Friends, SortHealers);
-        table.sort(Foes, SortHealers);
 
-        -- remove the server from healears' name
-        for i, healer in ipairs(Friends) do
-            -- also add raidmarkers for friends
-            Friends[i] = ("(%d) %s"):format(i, healer:match("^[^-]+"));
-        end
+            -- we need to sort those before display...
+            table.sort(FriendsFoes[isFriend], SortHealers);
 
-        for i, Foe in ipairs(Foes) do
-            Foes[i] = ("(%d) _%s_"):format(i, Foe:match("^[^-]+"));
+            for i, healer in ipairs(FriendsFoes[true]) do
+                -- XXX also add raidmarkers for friends
+                FriendsFoes[isFriend][i] = ("(%d) %s"):format(healer.rank, healer.name);
+            end
+
         end
 
-        local FriendsText = ( config.ProtectMessage:gsub('%[HEALERS%]', table.concat(Friends, ' - ')) );
-        local FoesText    = (    config.KillMessage:gsub('%[HEALERS%]', table.concat(Foes,    ' - ')) );
 
         -- send to chat
-        if #Friends > 0 then
+        if #FriendsFoes[true] > 0 then
+            local FriendsText = ( config.ProtectMessage:gsub('%[HEALERS%]', table.concat(FriendsFoes[true],  ' - ')) );
             self:Debug("HHTD:", FriendsText);
             Post(FriendsText);
         end
-        if #Foes > 0 then
+        if #FriendsFoes[false] > 0 then
+            local FoesText    = ( config.KillMessage:gsub('%[HEALERS%]', table.concat(FriendsFoes[false], ' - ')) );
             self:Debug("HHTD:", FoesText);
             Post(FoesText);
         end
 
-        if #Friends > 0 or #Foes > 0 then
+        if #FriendsFoes[true] > 0 or #FriendsFoes[false] > 0 then
             -- log the time to prevent spam
             LastAnnounce = GetTime();
         else

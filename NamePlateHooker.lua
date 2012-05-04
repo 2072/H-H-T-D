@@ -110,32 +110,21 @@ function NPH:OnEnable() -- {{{
     LNP.RegisterCallback(self, "LibNameplate_RecycleNameplate");
     
     -- Subscribe to HHTD callbacks
-    self:RegisterMessage("HHTD_DROP_HEALER");
-    self:RegisterMessage("HHTD_HEALER_DETECTED");
-    self:RegisterMessage("HHTD_TARGET_LOCKED", "ON_HEALER_PLATE_TOUCH");
-    self:RegisterMessage("HHTD_HEALER_UNDER_MOUSE", "ON_HEALER_PLATE_TOUCH");
-    self:RegisterMessage("HHTD_MOUSE_OVER_OR_TARGET");
+    self:RegisterMessage("HHTD_HEALER_GONE");
+    self:RegisterMessage("HHTD_HEALER_BORN");
 
     self:RegisterEvent("PLAYER_ENTERING_WORLD");
 
-    -- Add nameplates to known healers by GUID
-    for healerGUID, lastHeal in pairs(HHTD.Enemy_Healers) do
-        self:AddCrossToPlate (LNP:GetNameplateByGUID(healerGUID));
-    end
+    for i, isFriend in ipairs({true,false}) do
+        -- Add nameplates to known healers by GUID
+        for healerGUID, data in pairs(HHTD.Registry_by_GUID[isFriend]) do
+            self:AddCrossToPlate (LNP:GetNameplateByGUID(healerGUID));
+        end
 
-    -- Add nameplates to known healers by NAME -- XXX
-    for healerName, lastHeal in pairs(HHTD.Enemy_Healers_By_Name) do
-        self:AddCrossToPlate (LNP:GetNameplateByName(healerName));
-    end
-
-    -- Add nameplates to known healers by GUID
-    for healerGUID, lastHeal in pairs(HHTD.Friendly_Healers) do
-        self:AddCrossToPlate (LNP:GetNameplateByGUID(healerGUID));
-    end
-
-    -- Add nameplates to known healers by NAME -- XXX
-    for healerName, lastHeal in pairs(HHTD.Friendly_Healers_By_Name) do
-        self:AddCrossToPlate (LNP:GetNameplateByName(healerName));
+        -- Add nameplates to known healers by NAME -- XXX
+        for healerName, lastHeal in pairs(HHTD.Registry_by_Name[isFriend]) do
+            self:AddCrossToPlate (LNP:GetNameplateByName(healerName));
+        end
     end
 
 end -- }}}
@@ -147,14 +136,15 @@ function NPH:OnDisable() -- {{{
     LNP.UnregisterCallback(self, "LibNameplate_RecycleNameplate");
 
     -- clean all nameplates
-    for plateName, plate in pairs(self.Enemy_Healers_Plates_byName) do
+    for plateName, plate in pairs(self.Enemy_Healers_Plates_byName) do -- XXX and what about friends?
         self:HideCrossFromPlate(plate);
     end
 end -- }}}
 -- }}}
 
-NPH.Enemy_Healers_Plates_byName = {};
-NPH.Friendly_Healers_Plates_byName = {};
+NPH.Enemy_Healers_Plates_byName     = {};
+NPH.Friendly_Healers_Plates_byName  = {};
+NPH.DisplayedPlates_byFrameTID      = {}; -- used for updating plates dipslay attributes
 
 local Plate_Name_Count = { -- array by name so we have to make the difference between friends and foes
     [true] = {}, -- for Friendly healers
@@ -176,107 +166,67 @@ end
 
 -- }}}
 
--- Internal CallBacks (HHTD_DROP_HEALER -- HHTD_HEALER_DETECTED -- ON_HEALER_PLATE_TOUCH -- HHTD_MOUSE_OVER_OR_TARGET) {{{
-function NPH:HHTD_DROP_HEALER(selfevent, healerName, unitGuid, isFriend)
-
-    if isFriend == nil then
-        isFriend = false;
-    end
+-- Internal CallBacks (HHTD_HEALER_GONE -- HHTD_HEALER_BORN -- ON_HEALER_PLATE_TOUCH -- HHTD_MOUSE_OVER_OR_TARGET) {{{
+function NPH:HHTD_HEALER_GONE(selfevent, isFriend, healer)
+    self:Debug(INFO2, "NPH:HHTD_HEALER_GONE", healer.name, healer.guid, isFriend);
 
     if not isFriend and not GetCVarBool("nameplateShowEnemies") or isFriend and not GetCVarBool("nameplateShowFriends") then
+        self:Debug(INFO2, "NPH:HHTD_HEALER_GONE(): bad state, nameplates disabled",  healer.name, healer.guid, isFriend);
         return;
     end
 
     local plate = false;
-    if not isFriend then
-        plate = self.Enemy_Healers_Plates_byName[healerName]
+    if not isFriend then -- XXX optimise... could be one line
+        plate = self.Enemy_Healers_Plates_byName[healer.name]
     else
-        plate = self.Friendly_Healers_Plates_byName[healerName]
+        plate = self.Friendly_Healers_Plates_byName[healer.name]
     end
 
     if plate then
         -- if the name is not unique we cannot hide just any frame...
-        if not NPC_Is_Not_Unique[isFriend][healerName] then -- XXX will crash if isFriend is nil
-            --self:Debug("Must drop", healerName);
+        if not NPC_Is_Not_Unique[isFriend][healer.name] then -- XXX hide from all nameplates with that name
+            --self:Debug("Must drop", healer.name);
             self:HideCrossFromPlate(plate);
-        elseif unitGuid and LNP:GetNameplateByGUID(unitGuid) then
+            self:Debug(INFO2, "Dropping healer using its name");
+        elseif healer.guid and LNP:GetNameplateByGUID(healer.guid) then
             self:Debug(WARNING, "Dropping healer using its guid"); -- XXX
-            self:HideCrossFromPlate(LNP:GetNameplateByGUID(unitGuid));
+            self:HideCrossFromPlate(LNP:GetNameplateByGUID(healer.guid));
         end
+    else
+        self:Debug(INFO2, "no plate found for", healer.name);
     end
 end
 
-function NPH:HHTD_HEALER_DETECTED (selfevent, healerName, healerGuid, isFriend)
+function NPH:HHTD_HEALER_BORN (selfevent, isFriend, healer)
 
     if not isFriend and not GetCVarBool("nameplateShowEnemies") or isFriend and not GetCVarBool("nameplateShowFriends") then
         return;
     end
 
-    if not isFriend and not self.Enemy_Healers_Plates_byName[healerName] or isFriend and not self.Friendly_Healers_Plates_byName[healerName] then
-        local plateByName = LNP:GetNameplateByName(healerName);
-        local plateByGuid = LNP:GetNameplateByGUID(healerGuid)
+    if not isFriend and not self.Enemy_Healers_Plates_byName[healer.name] or isFriend and not self.Friendly_Healers_Plates_byName[healer.name] then -- XXX can be improved (true|false index)
+        local plateByName = LNP:GetNameplateByName(healer.name);
+        local plateByGuid = LNP:GetNameplateByGUID(healer.guid)
 
         local plate = plateByGuid or plateByName;
 
         -- local plateType = LNP:GetType(plate);
 
         -- we have have access to the correct plate through the unit's GUID or it's uniquely named.
-        if plateByGuid or not NPC_Is_Not_Unique[isFriend][healerName] then
-            self:Debug(INFO, "HHTD_HEALER_DETECTED(): GUID available or unique", NPC_Is_Not_Unique[isFriend][healerName]); -- XXX
-            self:Debug(WARNING, healerName, NPC_Is_Not_Unique[isFriend][healerName]); -- XXX
+        if plateByGuid or not NPC_Is_Not_Unique[isFriend][healer.name] then
+            self:Debug(INFO, "HHTD_HEALER_BORN(): GUID available or unique", NPC_Is_Not_Unique[isFriend][healer.name]); -- XXX
+            self:Debug(WARNING, healer.name, NPC_Is_Not_Unique[isFriend][healer.name]); -- XXX
             self:AddCrossToPlate (plate, isFriend);
         elseif plateByName and not self.db.global.sPve then -- we can only access through its name and we are not in strict pve mode -- when multi pop, it will add the cross on the first name plate...
-            self:Debug(INFO, "HHTD_HEALER_DETECTED(): Using name only", healerName); -- XXX
+            self:Debug(INFO, "HHTD_HEALER_BORN(): Using name only", healer.name); -- XXX
             self:AddCrossToPlate (plate, isFriend);
         else
             -- if spve we won't do anything since thee is no way to know the right plate.
             self:Debug(WARNING, "not unique NPC and sPve!");
             return;
         end
-    end
-end
-
-function NPH:ON_HEALER_PLATE_TOUCH(selfevent, unit, unitGuid, unitFirstName) -- mouseover or target (_known_ enemy healers only)
-
-    if not GetCVarBool("nameplateShowEnemies") then
-        return;
-    end
-
-    local plate = LNP:GetNameplateByGUID(unitGuid);
-
-    if plate then
-        self:AddCrossToPlate(plate);
     else
-        self:Debug(ERROR, "ON_HEALER_PLATE_TOUCH(): LNP:GetNameplateByGUID(unitGuid)==nil", unitGuid);
+        self:Debug(WARNING, 'plate is said to be still here');
     end
-
-end
-
-function NPH:HHTD_MOUSE_OVER_OR_TARGET(selfevent, unit, unitGuid, unitFirstName) -- last chance update, we have the GUID at this moment (Enemy healers only) XXX
-    
-    if not GetCVarBool("nameplateShowEnemies") then
-        return;
-    end
-
-    local plate = LNP:GetNameplateByGUID(unitGuid);
-
-    if not HHTD.Enemy_Healers[unitGuid] then
-        --self:Debug("HHTD_MOUSE_OVER_OR_TARGET():", unitGuid);
-
-        if plate then
-            local isFriend = (LNP:GetReaction(plate) == "FRIENDLY") and true or false;
-            -- only hide it if it's the only one or if we are in strict mode
-            if not NPC_Is_Not_Unique[isFriend][unitFirstName] or self.db.global.sPve then
-                self:HideCrossFromPlate(plate); -- The name plate should be identifiable by the unit guid
-            end
-        --else
-          --  self:Debug(ERROR, "HHTD_MOUSE_OVER_OR_TARGET(): LNP:GetNameplateByGUID(unitGuid)==nil", unitGuid);
-        end
-
-    elseif GetTime() - HHTD.Enemy_Healers[unitGuid] < HHTD.db.global.HFT then
-        self:AddCrossToPlate(plate);
-    end
-
 end
 
 -- }}}
@@ -299,7 +249,7 @@ function NPH:LibNameplate_NewNameplate(selfevent, plate)
     end
 
     -- Check if this name plate is of interest -- XXX
-    if HHTD.Healer_Registry[isFriend].Healers_By_Name[plateName] and GetTime() - HHTD.Healer_Registry[isFriend].Healers_By_Name[plateName] < HHTD.db.global.HFT then
+    if HHTD.Registry_by_Name[isFriend][plateName] then
 
         
         -- If there are several plates with the same name and sPve is set then
@@ -331,7 +281,7 @@ function NPH:LibNameplate_RecycleNameplate(selfevent, plate)
         self:Debug(INFO2, "Hidding |cff00ff00friendly|r texture for", plate.HHTD_FriendHealer.PlateNam);
         plate.HHTD_FriendHealer.texture:Hide()
         plate.HHTD_FriendHealer.IsShown = false;
-        self.Enemy_Healers_Plates_byName[plate.HHTD_FriendHealer.PlateName] = false;
+        self.Friendly_Healers_Plates_byName[plate.HHTD_FriendHealer.PlateName] = false;
     end
 
     local isFriend = (LNP:GetReaction(plate) == "FRIENDLY") and true or false;
@@ -351,22 +301,31 @@ end
 do
 
     local function MakeTexture(plate)
-        --local f = CreateFrame("Frame", nil, plate)
-        local t = plate:CreateTexture()
+        local t = plate:CreateTexture();
         t:SetWidth(64);
         t:SetHeight(64);
         t:SetPoint("BOTTOM", plate, "TOP", 0, -20);
                 
-        return t
+        return t;
 
+    end
+
+    local SmallFontName = _G.NumberFont_Shadow_Small:GetFont();
+
+    local function MakeFontString(plate, symbol)
+        local f = plate:CreateFontString();
+        f:SetFont(SmallFontName, 12.2, "THICKOUTLINE, MONOCHROME");
+        
+        f:SetTextColor(1, 1, 1, 1);
+        
+        f:SetPoint("CENTER", symbol, "CENTER", 0, 0);
     end
 
     local function RegisterAndShowTexture(where, texture, plateName)
         where.texture = texture;
-        where.texture:Show()
+        where.texture:Show();
         where.IsShown = true;
         where.PlateName = plateName;
-
     end
 
     function NPH:AddCrossToPlate (plate, isFriend) -- {{{
@@ -428,6 +387,8 @@ do
             self.Friendly_Healers_Plates_byName[plateName] = plate;
         end
 
+        self.DisplayedPlates_byFrameTID[plate] = plate;
+
         return true;
 
     end -- }}}
@@ -441,18 +402,19 @@ function NPH:HideCrossFromPlate(plate) -- {{{
         plate.HHTD_EnemyHealer.IsShown = false;
         self.Enemy_Healers_Plates_byName[plate.HHTD_EnemyHealer.PlateName] = nil;
 
-        self:Debug(INFO2, "|cffff0000Enemy|c Cross hidden for", plate.HHTD_EnemyHealer.PlateNam);
+        self:Debug(INFO2, "|cffff0000Enemy|r Cross hidden for", plate.HHTD_EnemyHealer.PlateName);
     end
 
     if plate and plate.HHTD_FriendHealer and plate.HHTD_FriendHealer.IsShown then
 
         plate.HHTD_FriendHealer.texture:Hide();
         plate.HHTD_FriendHealer.IsShown = false;
-        self.Enemy_Healers_Plates_byName[plate.HHTD_FriendHealer.PlateName] = nil;
+        self.Friendly_Healers_Plates_byName[plate.HHTD_FriendHealer.PlateName] = nil;
 
-        self:Debug(INFO2, "|cff00ff00Friendly|c Cross hidden for", plate.HHTD_FriendHealer.PlateNam);
+        self:Debug(INFO2, "|cff00ff00Friendly|r Cross hidden for", plate.HHTD_FriendHealer.PlateName);
     end
 
+    self.DisplayedPlates_byFrameTID[plate] = nil;
 
 
 
