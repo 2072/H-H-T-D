@@ -236,7 +236,7 @@ local previousUnitGuid;
 function Announcer:HHTD_HEALER_MOUSE_OVER(selfevent, isFriend, healerProfile)
 
     if isFriend then
-        --return; -- XXX
+        return; -- XXX
     end
 
     if previousUnitGuid ~= healerProfile.guid then
@@ -260,7 +260,7 @@ end
 function Announcer:HHTD_TARGET_LOCKED (selfevent, isFriend, healerProfile)
 
     if isFriend then
-        --return; -- XXX
+        return; -- XXX
     end
 
     self:PlaySoundFile("Sound\\interface\\AuctionWindowOpen.wav");
@@ -364,7 +364,7 @@ do
             for healerGUID, healerProfile in pairs(HHTD.Registry_by_GUID[isFriend]) do
 
                 if not (config.PostHumansOnly and not healerProfile.isHuman) and #FriendsFoes[isFriend] <= config.PostHealersNumber then
-                    table.insert(FriendsFoes[isFriend], healer);
+                    table.insert(FriendsFoes[isFriend], healerProfile);
                 else
                     break;
                 end
@@ -374,10 +374,12 @@ do
             -- we need to sort those before display...
             table.sort(FriendsFoes[isFriend], SortHealers);
 
-            for i, healer in ipairs(FriendsFoes[true]) do
+            for i, healer in ipairs(FriendsFoes[isFriend]) do
                 -- XXX also add raidmarkers for friends
                 FriendsFoes[isFriend][i] = ("(%d) %s"):format(healer.rank, healer.name);
             end
+
+            --self:Debug(INFO, "Found", #FriendsFoes[isFriend], isFriend and "friends" or "foes");
 
         end
 

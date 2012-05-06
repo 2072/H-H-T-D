@@ -1085,7 +1085,6 @@ do
         -- get a shortcut to the healer profile if it exists
         registered = Private_registry_by_GUID[Source_Is_Friendly][sourceGUID];
 
-        --[[
         -- Escape if Source_Is_Human and scanning for pure healing specs and the spell doesn't match and the healer is not known as a true healer {{{
         if Source_Is_Human and (configRef.PvpHSpecsOnly and not HHTD_C.Healers_Only_Spells_ByName[spellNAME] and (not registered or not registered.isTrueHeal)) then
             --@debug@
@@ -1093,7 +1092,6 @@ do
             --@end-debug@
             return;
         end -- }}}
-        --]]
 
         if sourceGUID ~= destGUID and event:sub(-5) == "_HEAL" then
             isHealSpell = true;
@@ -1116,7 +1114,7 @@ do
              return;
          end
 
-         self:Debug(INFO, "Registering healer ", sourceName);
+         -- self:Debug(INFO, "Registering healer ", sourceName);
          RegisterHealer(GetTime(), Source_Is_Friendly, sourceGUID, sourceName, Source_Is_Human, spellNAME, isHealSpell, healAMOUNT, configRef);
 
          
