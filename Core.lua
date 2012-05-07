@@ -674,13 +674,13 @@ do
 
         local unitFirstName, unitRealm = UnitName(unit);
 
-        -- remove dead units
-        if UnitIsDead(unit) then
-            self:Reap(unitGuid, isFriend); -- XXX shouldn't be here, unit died event...
-            return;
-        end
-
         if HHTD.Registry_by_GUID[isFriend][unitGuid] then
+
+            -- remove dead units
+            if UnitIsDead(unit) then
+                self:Reap(unitGuid, isFriend, true);
+                return;
+            end
 
             if LastDetectedGUID == unitGuid and unit == "target" then
                 self:SendMessage("HHTD_TARGET_LOCKED", isFriend, HHTD.Registry_by_GUID[isFriend][unitGuid]);
@@ -779,6 +779,15 @@ do
     function HHTD:Reap (guid, isFriend, force)
 
         local corpse = Private_registry_by_GUID[isFriend][guid]; -- keep it safe for autopsy
+
+        if not corpse then
+            self:Debug(ERROR, ":Reap() called on non-monitored unit:", guid, isFriend, force);
+            return;
+        end
+
+        if force then
+            HHTD:CancelTimer(ReapSchedulers[guid]);
+        end
 
         if GetTime() - corpse.lastMove > self.db.global.HFT or force then
 
