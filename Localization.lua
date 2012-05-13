@@ -148,6 +148,10 @@ do
         L["OPT_TESTONTARGET_DESC"] = "Will mark your current target as a healer so you can test what happens."
         L["OPT_TESTONTARGET_ENOTARGET"] = "You need to target something"
 
+        L["LOG_BELOW_THRESHOLD"] = " (below threshold)"
+        L["LOG_ACTIVE"] = "Active!"
+        L["LOG_IDLE"] = "Idle"
+
         --]==]
         --@end-do-not-package@
 

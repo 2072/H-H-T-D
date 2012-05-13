@@ -338,9 +338,6 @@ end
 
 do
 
-
-    
-
     local function MakeTexture(plate, isFriend)
         local t = plate:CreateTexture();
         t:SetWidth(64);

@@ -473,15 +473,16 @@ do
                                 local j = 1;
 
                                 for spell, spellcount in pairs(log.spells) do
-                                    spellsStats[j] = ("    %s (|cFFAA0000%d|r)"):format(spell, spellcount);
+                                    spellsStats[j] = ("    %s (|cFFAA0000%d|r)"):format(HHTD:ColorText(spell, HHTD_C.Healers_Only_Spells_ByName[spell] and "FFC000C0" or "C0C0C0"), spellcount);
                                     j = j + 1;
                                 end
 
-                                tmp[i] = ("%s (|cff00dd00%s|r) [|cffbbbbbb%s|r]:  %s\n%s\n"):format(
+                                tmp[i] = ("%s (|cff00dd00%s|r)%s [|cffbbbbbb%s|r]:  %s\n%s\n"):format(
                                     (HHTD:ColorText("#|r %q", log.isFriend and "FF00FF00" or "FFFF0000")):format(HHTD:ColorText(log.name, log.isTrueHeal and HHTD:GetClassHexColor(log.isTrueHeal) or "FFAAAAAA" )),
-                                    tostring(log.healDone > 0 and log.healDone or L["NO_DATA"]), -- TODO add a "below threshold" notice
+                                    tostring(log.healDone > 0 and log.healDone or L["NO_DATA"]),
+                                    log.healDone > HHTD.HealThreshold and "" or L["LOG_BELOW_THRESHOLD"],
                                     log.isHuman and L["HUMAN"] or L["NPC"],
-                                    HHTD:ColorText(isActive and "Active!" or "Idle", isActive and "FF00EE00" or "FFEE0000"),
+                                    HHTD:ColorText(isActive and L["LOG_ACTIVE"] or L["LOG_IDLE"], isActive and "FF00EE00" or "FFEE0000"),
                                     table.concat(spellsStats, '\n')
                                 );
 
@@ -938,6 +939,8 @@ do
     local CheckInteractDistance     = _G.CheckInteractDistance;
 
     local HOSTILE_OUTSIDER          = bit.bor (COMBATLOG_OBJECT_AFFILIATION_OUTSIDER, COMBATLOG_OBJECT_REACTION_HOSTILE);
+    local HOSTILE                   = COMBATLOG_OBJECT_REACTION_HOSTILE;
+    local FRIENDLY                  = COMBATLOG_OBJECT_REACTION_FRIENDLY;
 
     local HOSTILE_OUTSIDER_NPC      = bit.bor (HOSTILE_OUTSIDER                     , COMBATLOG_OBJECT_TYPE_NPC);
     local FRIENDLY_NPC              = bit.bor (COMBATLOG_OBJECT_REACTION_FRIENDLY   , COMBATLOG_OBJECT_TYPE_NPC);
@@ -1065,7 +1068,7 @@ do
 
         -- Escape if bad source {{{
         -- if the source is not a player and if while pve, the source is not an npc, then we don't care about this event
-        -- ie we care if the source is a human player or pve is enaled and the source is an npc.
+        -- ie: we care if the source is a human player or pve is enaled and the source is an npc.
         --      not (a or (b and c)) ==  !a and (not b or not c)
         if not ( Source_Is_Human or (configRef.Pve and Source_Is_NPC)) then
         --if not ( Source_Is_Hostile_Human or (configRef.Pve and Source_Is_Hostile_NPC)) then
@@ -1106,6 +1109,16 @@ do
             isHealSpell = true;
         else
             isHealSpell = false;
+        end
+
+        -- Esacpe if it's a heal spell toward a unit hostile to the source
+        if isHealSpell and ( Source_Is_Friendly and band(destFlags, HOSTILE)~=0 or not Source_Is_Friendly and band(destFlags, FRIENDLY)~=0 ) then
+            --@debug@
+            self:Debug(INFO2, "Spell", spellNAME, "source and destination awkwardness", sourceName, destName, 
+                (Source_Is_Friendly and band(destFlags, HOSTILE)),
+                (not Source_Is_Friendly and band(destFlags, FRIENDLY)));
+            --@end-debug@
+            return;
         end
 
          -- Escape if not a heal spell and (not checking for spec's spells or source is a NPC) {{{
