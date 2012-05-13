@@ -470,7 +470,7 @@ do
                                 local j = 1;
 
                                 for spell, spellcount in pairs(log.spells) do
-                                    spellsStats[j] = ("    %s (|cFFAA0000%d|r)"):format(HHTD:ColorText(spell, HHTD_C.Healers_Only_Spells_ByName[spell] and "FFC000C0" or "C0C0C0"), spellcount);
+                                    spellsStats[j] = ("    %s (|cFFAA0000%d|r)"):format(HHTD:ColorText(spell, HHTD_C.Healers_Only_Spells_ByName[spell] and "FFC000C0" or "FFC0C0C0"), spellcount);
                                     j = j + 1;
                                 end
 

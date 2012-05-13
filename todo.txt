@@ -1,8 +1,1 @@
-
-create a timer that cycles through all the sisplayed textures and updates them
-or better: just run it on demand when there is something to update, else just use teh onshow events...
-use a lastupdateOn variable with the time it was last updaed.
-
--- allow resizing
-    -+ moving of the sympbol
-
+Sort logs and display ranks

@@ -44,6 +44,8 @@ local PLATES__NPH_NAMES = {
     [false] = 'HHTD_EnemyHealer'
 };
 
+local LAST_TEXTURE_UPDATE = 0;
+
 -- upvalues {{{
 local GetCVarBool           = _G.GetCVarBool;
 local GetTime               = _G.GetTime;
@@ -58,6 +60,9 @@ function NPH:OnInitialize() -- {{{
     self.db = HHTD.db:RegisterNamespace('NPH', {
         global = {
             sPve = false,
+            marker_Scale = 1,
+            marker_Xoffset = 0,
+            marker_Yoffset = 0,
         },
     })
 end -- }}}
@@ -89,6 +94,62 @@ function NPH:GetOptions () -- {{{
                     disabled = function() return not HHTD.db.global.Pve or not HHTD:IsEnabled(); end,
                     order = 10,
                 },
+                Header100 = {
+                        type = 'header',
+                        name = L["OPT_NPH_MARKER_SETTINGS"],
+                        order = 15,
+                    },
+                marker_Scale = {
+                        type = "range",
+                        name = L["OPT_NPH_MARKER_SCALE"],
+                        desc = L["OPT_NPH_MARKER_SCALE_DESC"],
+                        min = 0.45,
+                        max = 3,
+                        softMax = 2,
+                        step = 0.01,
+                        bigStep = 0.03,
+                        order = 20,
+                        isPercent = true,
+
+                        set = function (info, value)
+                            HHTD:SetHandler(self, info, value);
+                            NPH:UpdateTextures();
+                        end,
+                    },
+                    marker_Xoffset = {
+                        type = "range",
+                        name = L["OPT_NPH_MARKER_X_OFFSET"],
+                        desc = L["OPT_NPH_MARKER_X_OFFSET_DESC"],
+                        min = -100,
+                        max = 100,
+                        softMin = -60,
+                        softMax = 60,
+                        step = 0.01,
+                        bigStep = 1,
+                        order = 30,
+
+                        set = function (info, value)
+                            HHTD:SetHandler(self, info, value);
+                            NPH:UpdateTextures();
+                        end,
+                    },
+                    marker_Yoffset = {
+                        type = "range",
+                        name = L["OPT_NPH_MARKER_Y_OFFSET"],
+                        desc = L["OPT_NPH_MARKER_Y_OFFSET_DESC"],
+                        min = -100,
+                        max = 100,
+                        softMin = -60,
+                        softMax = 60,
+                        step = 0.01,
+                        bigStep = 1,
+                        order = 30,
+
+                        set = function (info, value)
+                            HHTD:SetHandler(self, info, value);
+                            NPH:UpdateTextures();
+                        end,
+                    },
             },
         },
     };
@@ -142,7 +203,7 @@ function NPH:OnDisable() -- {{{
 
     -- clean all nameplates
     for i, isFriend in ipairs({true,false}) do
-        for plateTID, plate in pairs(self.DisplayedPlates_byFrameTID) do
+        for plateTID, plate in pairs(self.DisplayedPlates_byFrameTID[isFriend]) do
             self:HideCrossFromPlate(plate, isFriend);
         end
     end
@@ -151,7 +212,10 @@ end -- }}}
 
 
 
-NPH.DisplayedPlates_byFrameTID = {}; -- used for updating plates dipslay attributes
+NPH.DisplayedPlates_byFrameTID = { -- used for updating plates dipslay attributes
+    [true] = {}, -- for Friendly healers
+    [false] = {} -- for enemy healers
+};
 
 local Plate_Name_Count = { -- array by name so we have to make the difference between friends and foes
     [true] = {}, -- for Friendly healers
@@ -338,11 +402,17 @@ end
 
 do
 
+    local function SetTextureParams(plate, t)
+        local profile = NPH.db.global;
+
+        t:SetSize(64 * profile.marker_Scale, 64 * profile.marker_Scale);
+        t:SetPoint("BOTTOM", plate, "TOP", 0 + profile.marker_Xoffset, -20 + profile.marker_Yoffset);
+    end
+
     local function MakeTexture(plate, isFriend)
         local t = plate:CreateTexture();
-        t:SetWidth(64);
-        t:SetHeight(64);
-        t:SetPoint("BOTTOM", plate, "TOP", 0, -20);
+
+        SetTextureParams(plate, t);
 
         if isFriend then
             t:SetTexture("Interface\\LFGFrame\\UI-LFG-ICON-RoleS");
@@ -370,7 +440,7 @@ do
         return f;
     end
 
-    local function AddElements(plate, isFriend, plateName)
+    local function AddElements (plate, isFriend, plateName)
         local texture  = MakeTexture(plate, isFriend);
         local rankFont = MakeFontString(plate, texture);
 
@@ -387,6 +457,33 @@ do
 
     end
 
+    local function UpdateTexture (plate, holder)
+
+        if not holder.textureUpdate or holder.textureUpdate < LAST_TEXTURE_UPDATE then
+            --self:Debug('Updating texture');
+
+            SetTextureParams(plate, holder.texture);
+
+            holder.textureUpdate = GetTime();
+        end
+
+    end
+
+    function NPH:UpdateTextures ()
+
+        LAST_TEXTURE_UPDATE = GetTime();
+
+        for i, isFriend in ipairs({true,false}) do
+            -- Add nameplates to known healers by GUID
+            for plate in pairs(self.DisplayedPlates_byFrameTID[isFriend]) do
+
+                UpdateTexture(plate, plate[PLATES__NPH_NAMES[isFriend]]);
+
+            end
+        end
+
+    end
+    
 
     local PlateAdditions;
     function NPH:AddCrossToPlate (plate, isFriend, plateName) -- {{{
@@ -418,17 +515,19 @@ do
 
         elseif not PlateAdditions.IsShown then
 
+            UpdateTexture(plate, PlateAdditions);
             PlateAdditions.texture:Show();
             PlateAdditions.rankFont:SetText(HHTD.Registry_by_Name[isFriend][plateName].rank);
             PlateAdditions.rankFont:Show();
             PlateAdditions.IsShown = true;
+
 
             -- self:Debug(INFO, isFriend and "|cff00ff00friendly|r" or "|cffff0000enemy|r", "texture shown for", plateName);
         end
 
         plate[PLATES__NPH_NAMES[isFriend]].plateName = plateName;
 
-        self.DisplayedPlates_byFrameTID[plate] = plate;
+        self.DisplayedPlates_byFrameTID[isFriend][plate] = plate;
 
         return true;
 
@@ -460,7 +559,7 @@ function NPH:HideCrossFromPlate(plate, isFriend, plateName) -- {{{
         -- self:Debug(INFO2, isFriend and "|cff00ff00Friendly|r" or "|cffff0000Enemy|r", "cross hidden for", plateName);
     end
 
-    self.DisplayedPlates_byFrameTID[plate] = nil;
+    self.DisplayedPlates_byFrameTID[isFriend][plate] = nil;
 
 end -- }}}
 
