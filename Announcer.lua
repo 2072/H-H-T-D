@@ -116,9 +116,6 @@ function Announcer:GetOptions () -- {{{
                     desc = L["OPT_POST_ANNOUNCE_ENABLE_DESC"],
                     set = function (info, v)
                         Announcer.db.global.PostToChat = v;
-                        if v then
-                            HHTD.db.global.Log = true;
-                        end
                     end,
                     order = 30,
                 },

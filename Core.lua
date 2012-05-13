@@ -431,9 +431,6 @@ do
                         desc = L["OPT_LOG_DESC"],
                         disabled = false,
                         order = 700,
-                        disabled = function()
-                            return HHTD.Announcer and HHTD.Announcer.db.global.PostToChat or false;
-                        end,
                     },
                     Header1000 = {
                         type = 'header',
