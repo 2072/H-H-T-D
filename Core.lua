@@ -74,7 +74,10 @@ BINDING_NAME_HHTDP = L["OPT_POST_ANNOUNCE_ENABLE"];
 
 HHTD.Friendly_Healers_Attacked_by_GUID = {};
 
-HHTD.LOGS = {};
+HHTD.LOGS = {
+    [true] = {}, -- [guid] = healer_log_template
+    [false] = {}, -- [guid] = healer_log_template
+};
 
 
 --[=[
@@ -102,9 +105,22 @@ HHTD.Registry_by_Name = {
 
 function HHTD:HHTD_HEALER_GONE(selfevent, isFriend, healer)
 
-    HHTD.Friendly_Healers_Attacked_by_GUID[healer.guid] = nil;
-    HHTD.Registry_by_GUID[isFriend][healer.guid]        = nil;
-    HHTD.Registry_by_Name[isFriend][healer.name]        = nil;
+    self.Friendly_Healers_Attacked_by_GUID[healer.guid] = nil;
+    self.Registry_by_GUID[isFriend][healer.guid]        = nil;
+    self.Registry_by_Name[isFriend][healer.name]        = nil;
+
+    -- test if there are others with the same name... *sigh* this sucks
+    for guid, healerRecord in pairs (self.Registry_by_GUID[isFriend]) do
+
+        if healerRecord.name == healer.name then
+            self.Registry_by_Name[isFriend][healer.name] = healerRecord;
+
+            self:Debug(INFO, "replaced record for", healer.name);
+
+            break;
+        end
+
+    end
 
 end
 
@@ -134,9 +150,6 @@ function HHTD:HHTD_HEALER_BORN(selfevent, isFriend, healer)
 
 end
 
-do
-
-end
 
 -- local function REGISTER_HEALERS_ONLY_SPELLS_ONCE () -- {{{
 local function REGISTER_HEALERS_ONLY_SPELLS_ONCE ()
@@ -233,7 +246,7 @@ local UnitName          = _G.UnitName;
 local GetTime           = _G.GetTime;
 local PlaySoundFile     = _G.PlaySoundFile;
 local pairs             = _G.pairs;
-local ipairs             = _G.ipairs;
+local ipairs            = _G.ipairs;
 -- }}}
 
 -- }}}
@@ -252,6 +265,56 @@ end
 
 -- == Options and defaults {{{
 do
+
+    local AceOptionAntiSupidity = 0;
+    local FormattedLogs = "";
+
+    local function FormatLogs()
+
+        if GetTime() - AceOptionAntiSupidity < 0.1 then
+            HHTD:Debug(INFO, "AceOption is stupid");
+            return FormattedLogs;
+        else
+            AceOptionAntiSupidity = GetTime();
+        end
+
+        local output        = "";
+
+        for _, isFriend in ipairs({false,true}) do
+
+            local tmp           = {};
+
+            for guid, log in HHTD:pairs_ordered(HHTD.LOGS[isFriend], true, 'healDone') do
+
+                local isActive = HHTD.Registry_by_GUID[isFriend][guid];
+
+                local spellsStats = {}
+                local j = 1;
+
+                for spell, spellcount in HHTD:pairs_ordered(log.spells, true) do
+                    spellsStats[j] = ("    %s (|cFFAA0000%d|r)"):format(HHTD:ColorText(spell, HHTD_C.Healers_Only_Spells_ByName[spell] and "FFC000C0" or "FFC0C0C0"), spellcount);
+                    j = j + 1;
+                end
+
+                tmp[#tmp + 1] = ("%s (|cff00dd00%s|r)%s [|cffbbbbbb%s|r]:  %s\n%s\n"):format(
+                (HHTD:ColorText("#(%s)|r %q", log.isFriend and "FF00FF00" or "FFFF0000")):format(isActive and isActive.rank or '-', HHTD:ColorText(log.name, log.isTrueHeal and HHTD:GetClassHexColor(log.isTrueHeal) or "FFAAAAAA" )),
+                tostring(log.healDone > 0 and log.healDone or L["NO_DATA"]),
+                log.healDone > HHTD.HealThreshold and "" or L["LOG_BELOW_THRESHOLD"],
+                log.isHuman and L["HUMAN"] or L["NPC"],
+                HHTD:ColorText(isActive and L["LOG_ACTIVE"] or L["LOG_IDLE"], isActive and "FF00EE00" or "FFEE0000"),
+                table.concat(spellsStats, '\n')
+                );
+
+            end
+
+            output = output .. table.concat(tmp, '\n') .. '\n';
+
+        end
+
+        FormattedLogs = output;
+        return output;
+    end
+
 
     local function GetCoreOptions() -- {{{
     return {
@@ -451,45 +514,15 @@ do
                         name = L["OPT_CLEAR_LOGS"],
                         confirm = true,
                         func = function () 
-                            HHTD.LOGS = {};
+                            HHTD.LOGS[true]  = {};
+                            HHTD.LOGS[false] = {};
                         end,
                         order = 0,
 
                     },
                     AccusationFacts = { -- {{{
                         type = 'description',
-                        name = function() 
-                            local tmp = {};
-                            local i = 1;
-
-                            for guid, log in pairs(HHTD.LOGS) do
-
-                                local isActive = HHTD.Registry_by_GUID[log.isFriend][guid];
-
-                                local spellsStats = {}
-                                local j = 1;
-
-                                for spell, spellcount in pairs(log.spells) do
-                                    spellsStats[j] = ("    %s (|cFFAA0000%d|r)"):format(HHTD:ColorText(spell, HHTD_C.Healers_Only_Spells_ByName[spell] and "FFC000C0" or "FFC0C0C0"), spellcount);
-                                    j = j + 1;
-                                end
-
-                                tmp[i] = ("%s (|cff00dd00%s|r)%s [|cffbbbbbb%s|r]:  %s\n%s\n"):format(
-                                    (HHTD:ColorText("#|r %q", log.isFriend and "FF00FF00" or "FFFF0000")):format(HHTD:ColorText(log.name, log.isTrueHeal and HHTD:GetClassHexColor(log.isTrueHeal) or "FFAAAAAA" )),
-                                    tostring(log.healDone > 0 and log.healDone or L["NO_DATA"]),
-                                    log.healDone > HHTD.HealThreshold and "" or L["LOG_BELOW_THRESHOLD"],
-                                    log.isHuman and L["HUMAN"] or L["NPC"],
-                                    HHTD:ColorText(isActive and L["LOG_ACTIVE"] or L["LOG_IDLE"], isActive and "FF00EE00" or "FFEE0000"),
-                                    table.concat(spellsStats, '\n')
-                                );
-
-                                i = i + 1;
-
-                            end
-
-                            return table.concat(tmp, '\n');
-                        
-                        end,
+                        name = FormatLogs,
                         order = 1,
                     }, -- }}}
                 },
@@ -869,19 +902,20 @@ do
             -- keep in mind that logging can be enabled once a healer has already been registered
             local log;
 
-            if not HHTD.LOGS[guid] then
+            if not HHTD.LOGS[isFriend][guid] then
                 log = {
-                    name = name,
-                    spells = {},
-                    healDone = 0,
-                    isTrueHeal = false,
-                    isFriend = isFriend,
+                    guid        = guid,
+                    name        = name,
+                    spells      = {},
+                    healDone    = 0,
+                    isTrueHeal  = false,
+                    isFriend    = isFriend,
                     isHuman     = isHuman,
                 };
 
-                HHTD.LOGS[guid] = log;
+                HHTD.LOGS[isFriend][guid] = log;
             else
-                log = HHTD.LOGS[guid];
+                log = HHTD.LOGS[isFriend][guid];
             end
 
             if isHealSpell then
@@ -913,14 +947,13 @@ do
             -- update the ranks of this healer's side, good or evil
             UpdateRanks(Private_registry_by_GUID[isFriend]);
 
-
-            HHTD:SendMessage("HHTD_HEALER_GROW", isFriend, record);
-
             if not HHTD.Registry_by_GUID[isFriend][guid] then
                 -- Dispatch the news
                 HHTD:Debug(INFO, "Healer detected:", sourceName);
                 HHTD:SendMessage("HHTD_HEALER_BORN", isFriend, record);
             end
+
+            HHTD:SendMessage("HHTD_HEALER_GROW", isFriend, record);
         end
 
     end -- }}}
