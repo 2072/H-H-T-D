@@ -293,13 +293,6 @@ function Announcer:Announce(...) -- {{{
 end -- }}}
 
 do
-    local function SortHealers(a, b)
-        if a.healDone > b.healDone then
-            return true;
-        else
-            return false;
-        end
-    end
 
     local function GetDistributionChanel()
         local channel = Announcer.db.global.PostChannel;
@@ -353,27 +346,19 @@ do
             return false;
         end
 
-
         for i, isFriend in ipairs({true, false}) do
 
             table.wipe(FriendsFoes[isFriend]);
 
-            for healerGUID, healerProfile in pairs(HHTD.Registry_by_GUID[isFriend]) do
+            for guid, healer in HHTD:pairs_ordered(HHTD.Registry_by_GUID[isFriend], true, 'healDone') do
 
-                if not (config.PostHumansOnly and not healerProfile.isHuman) and #FriendsFoes[isFriend] <= config.PostHealersNumber then
-                    table.insert(FriendsFoes[isFriend], healerProfile);
-                else
+                if #FriendsFoes[isFriend] == config.PostHealersNumber then
                     break;
                 end
 
-            end
-
-            -- we need to sort those before display...
-            table.sort(FriendsFoes[isFriend], SortHealers);
-
-            for i, healer in ipairs(FriendsFoes[isFriend]) do
-                -- XXX also add raidmarkers for friends
-                FriendsFoes[isFriend][i] = ("(%d) %s"):format(healer.rank, healer.name);
+                if not (config.PostHumansOnly and not healer.isHuman) then
+                    table.insert(FriendsFoes[isFriend], ("(%d) %s"):format(#FriendsFoes[isFriend] + 1, healer.name));
+                end
             end
 
             --self:Debug(INFO, "Found", #FriendsFoes[isFriend], isFriend and "friends" or "foes");
@@ -400,7 +385,6 @@ do
             self:Error(L["CHAT_POST_NO_HEALERS"]);
             --@debug@
             Post(L["CHAT_POST_NO_HEALERS"]);
-            LastAnnounce = GetTime();
             --@end-debug@
         end
 
