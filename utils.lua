@@ -32,6 +32,9 @@ local HHTD = T.Healers_Have_To_Die;
 
 local HHTD_C = T.Healers_Have_To_Die.Constants;
 
+local pairs = _G.pairs;
+local table = _G.table;
+
 function HHTD:MakePlayerName (name) --{{{
     if not name then name = "NONAME" end
     return "|Hplayer:" .. name .. "|h" .. (name):upper() .. "|h";
@@ -161,3 +164,61 @@ function HHTD:GetOPtionPath(info)
     return table.concat(info, "->");
 end -- }}}
 
+-- Iterators
+
+function HHTD:pairs_ordered (t, reverse, SortKey) -- Not to be used where performance and memory are important
+
+    if not reverse then
+        reverse = 1;
+    end
+
+    local sortedTable_Keys  = {};
+
+
+    local i = 1;
+    -- store the keys
+    for key, value in pairs(t) do
+
+        if SortKey and not value[SortKey] then
+            self:Debug(ERROR, "listOrderedIter(): invalid SortKey", SortKey, key, value, value.name);
+            error("listOrderedIter(): invalid SortKey");
+
+            return nil;
+        end
+
+        sortedTable_Keys[i] = key;
+        i = i + 1;
+    end
+
+
+    local function sort (a, b)
+        if SortKey then
+            if reverse then
+                return t[a][SortKey] > t[b][SortKey];
+            else
+                return t[a][SortKey] < t[b][SortKey];
+            end
+        else
+            if reverse then
+                return t[a] > t[b];
+            else
+                return t[a] < t[b];
+            end
+        end
+    end
+
+    -- sort the keys according to the given parameters
+    table.sort(sortedTable_Keys, sort);
+
+    i = 0;
+    -- return an iterator
+    return function ()
+        i = i + 1;
+
+        if sortedTable_Keys[i] then
+            return sortedTable_Keys[i], t[sortedTable_Keys[i]];
+        end
+
+    end, t, 0;
+
+end
