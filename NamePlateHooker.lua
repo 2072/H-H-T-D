@@ -175,6 +175,7 @@ function NPH:OnEnable() -- {{{
     -- Subscribe to HHTD callbacks
     self:RegisterMessage("HHTD_HEALER_GONE");
     self:RegisterMessage("HHTD_HEALER_BORN");
+    self:RegisterMessage("HHTD_HEALER_GROW");
 
     self:RegisterEvent("PLAYER_ENTERING_WORLD");
 
@@ -269,7 +270,7 @@ function NPH:HHTD_HEALER_GONE(selfevent, isFriend, healer)
             --self:Debug("Must drop", healer.name);
             self:HideCrossFromPlate(plate, isFriend, healer.name);
 
-        elseif not self.db.global.sPve then -- Just hide all the symbols on the plates with that name
+        elseif not self.db.global.sPve and not HHTD.Registry_by_Name[isFriend][healer.name] then -- Just hide all the symbols on the plates with that name if there is none left
 
             for plate, plate in pairs (Multi_Plates_byName[isFriend][healer.name]) do
                 self:HideCrossFromPlate(plate, isFriend, healer.name);
@@ -278,6 +279,11 @@ function NPH:HHTD_HEALER_GONE(selfevent, isFriend, healer)
     else
         self:Debug(INFO2, "HHTD_HEALER_GONE: no plate for", healer.name);
     end
+end
+
+function NPH:HHTD_HEALER_GROW (selfevent, isFriend, healer)
+    self:Debug(INFO, 'Updating displayed ranks');
+    self:UpdateRanks();
 end
 
 function NPH:HHTD_HEALER_BORN (selfevent, isFriend, healer)
@@ -300,7 +306,7 @@ function NPH:HHTD_HEALER_BORN (selfevent, isFriend, healer)
     if plate then
         -- we have have access to the correct plate through the unit's GUID or it's uniquely named.
         if plateByGuid or not NP_Is_Not_Unique[isFriend][healer.name] then
-            self:AddCrossToPlate (plate, isFriend, healer.name);
+            self:AddCrossToPlate (plate, isFriend, healer.name, healer.guid);
 
             self:Debug(INFO, "HHTD_HEALER_BORN(): GUID available or unique", NP_Is_Not_Unique[isFriend][healer.name]);
             self:Debug(WARNING, healer.name, NP_Is_Not_Unique[isFriend][healer.name]);
@@ -366,8 +372,6 @@ function NPH:LibNameplate_RecycleNameplate(selfevent, plate)
 
     local plateName = LNP:GetName(plate);
 
-    local plateCross;
-
     for i, isFriend in ipairs({true,false}) do
 
         self:HideCrossFromPlate(plate, isFriend, plateName);
@@ -388,11 +392,9 @@ end
 
 function NPH:LibNameplate_FoundGUID(selfevent, plate, guid, unitID)
 
-    if self.db.global.sPve then
-        if HHTD.Registry_by_GUID[true][guid] or HHTD.Registry_by_GUID[false][guid] then
-            self:Debug(INFO, "GUID found");
-            self:AddCrossToPlate(plate, nil, LNP:GetName(plate));
-        end
+    if HHTD.Registry_by_GUID[true][guid] or HHTD.Registry_by_GUID[false][guid] then
+        self:Debug(INFO, "GUID found");
+        self:AddCrossToPlate(plate, nil, LNP:GetName(plate), guid);
     end
 
 end
@@ -401,20 +403,27 @@ end
 
 
 do
+    local SmallFontName = _G.NumberFont_Shadow_Small:GetFont();
 
-    local function SetTextureParams(plate, t)
+    local IsFriend;
+    local Plate;
+    local PlateAdditions;
+    local PlateName;
+    local Guid;
+
+    local function SetTextureParams(t) -- MUL XXX
         local profile = NPH.db.global;
 
         t:SetSize(64 * profile.marker_Scale, 64 * profile.marker_Scale);
-        t:SetPoint("BOTTOM", plate, "TOP", 0 + profile.marker_Xoffset, -20 + profile.marker_Yoffset);
+        t:SetPoint("BOTTOM", Plate, "TOP", 0 + profile.marker_Xoffset, -20 + profile.marker_Yoffset);
     end
 
-    local function MakeTexture(plate, isFriend)
-        local t = plate:CreateTexture();
+    local function MakeTexture() -- ONCE
+        local t = Plate:CreateTexture();
 
-        SetTextureParams(plate, t);
+        SetTextureParams(t);
 
-        if isFriend then
+        if IsFriend then
             t:SetTexture("Interface\\LFGFrame\\UI-LFG-ICON-RoleS");
             t:SetTexCoord(GetTexCoordsForRole("HEALER"));
         else
@@ -427,10 +436,8 @@ do
 
     end
 
-    local SmallFontName = _G.NumberFont_Shadow_Small:GetFont();
-
-    local function MakeFontString(plate, symbol)
-        local f = plate:CreateFontString();
+    local function MakeFontString(symbol) -- ONCE
+        local f = Plate:CreateFontString();
         f:SetFont(SmallFontName, 12.2, "THICKOUTLINE, MONOCHROME");
         
         f:SetTextColor(1, 1, 1, 1);
@@ -440,53 +447,43 @@ do
         return f;
     end
 
-    local function AddElements (plate, isFriend, plateName)
-        local texture  = MakeTexture(plate, isFriend);
-        local rankFont = MakeFontString(plate, texture);
-
-        local holder = plate[PLATES__NPH_NAMES[isFriend]];
-
-        holder.texture = texture;
-        holder.texture:Show();
-
-        holder.rankFont = rankFont;
-        holder.rankFont:SetText(HHTD.Registry_by_Name[isFriend][plateName].rank);
-        holder.rankFont:Show();
-
-        holder.IsShown = true;
-
+    local function SetRank ()  -- ONCE
+         if not Guid then
+            PlateAdditions.rankFont:SetText(NP_Is_Not_Unique[IsFriend][PlateName] and '?' or HHTD.Registry_by_Name[IsFriend][PlateName].rank);
+        else
+            PlateAdditions.rankFont:SetText(HHTD.Registry_by_GUID[IsFriend][Guid].rank);
+        end
     end
 
-    local function UpdateTexture (plate, holder)
+    local function UpdateTexture () -- MUL XXX
 
-        if not holder.textureUpdate or holder.textureUpdate < LAST_TEXTURE_UPDATE then
+        if not PlateAdditions.textureUpdate or PlateAdditions.textureUpdate < LAST_TEXTURE_UPDATE then
             --self:Debug('Updating texture');
 
-            SetTextureParams(plate, holder.texture);
+            SetTextureParams(PlateAdditions.texture);
 
-            holder.textureUpdate = GetTime();
+            PlateAdditions.textureUpdate = GetTime();
         end
 
     end
 
-    function NPH:UpdateTextures ()
+    local function AddElements () -- ONCEx
+        local texture  = MakeTexture();
+        local rankFont = MakeFontString(texture);
 
-        LAST_TEXTURE_UPDATE = GetTime();
+        PlateAdditions.texture = texture;
+        PlateAdditions.texture:Show();
 
-        for i, isFriend in ipairs({true,false}) do
-            -- Add nameplates to known healers by GUID
-            for plate in pairs(self.DisplayedPlates_byFrameTID[isFriend]) do
+        PlateAdditions.rankFont = rankFont;
+        SetRank();
+       
+        PlateAdditions.rankFont:Show();
 
-                UpdateTexture(plate, plate[PLATES__NPH_NAMES[isFriend]]);
-
-            end
-        end
+        PlateAdditions.IsShown = true;
 
     end
-    
 
-    local PlateAdditions;
-    function NPH:AddCrossToPlate (plate, isFriend, plateName) -- {{{
+    function NPH:AddCrossToPlate (plate, isFriend, plateName, guid) -- {{{
 
         if not plate then
             self:Debug(ERROR, "AddCrossToPlate(), plate is not defined");
@@ -503,35 +500,95 @@ do
             self:Debug(ERROR, "AddCrossToPlate(), isFriend was not defined", isFriend);
         end
 
-        PlateAdditions = plate[PLATES__NPH_NAMES[isFriend]];
+        -- export useful data
+        IsFriend        = isFriend;
+        Guid            = guid;
+        Plate           = plate;
+        PlateName       = plateName;
+        PlateAdditions  = plate[PLATES__NPH_NAMES[isFriend]];
 
         if not PlateAdditions then
             plate[PLATES__NPH_NAMES[isFriend]] = {};
             plate[PLATES__NPH_NAMES[isFriend]].isFriend = isFriend;
 
-            AddElements(plate, isFriend, plateName);
+            PlateAdditions  = plate[PLATES__NPH_NAMES[isFriend]];
 
-            -- self:Debug(INFO, isFriend and "|cff00ff00friendly|r" or "|cffff0000enemy|r", "texture created for", plateName);
+            AddElements();
 
         elseif not PlateAdditions.IsShown then
 
-            UpdateTexture(plate, PlateAdditions);
+            UpdateTexture();
             PlateAdditions.texture:Show();
-            PlateAdditions.rankFont:SetText(HHTD.Registry_by_Name[isFriend][plateName].rank);
+
+            SetRank();
+
             PlateAdditions.rankFont:Show();
             PlateAdditions.IsShown = true;
 
-
-            -- self:Debug(INFO, isFriend and "|cff00ff00friendly|r" or "|cffff0000enemy|r", "texture shown for", plateName);
+        elseif guid and NP_Is_Not_Unique[IsFriend][plateName] then
+            SetRank();
         end
 
-        plate[PLATES__NPH_NAMES[isFriend]].plateName = plateName;
+        PlateAdditions.plateName = plateName;
 
         self.DisplayedPlates_byFrameTID[isFriend][plate] = plate;
 
-        return true;
+        --@alpha@
+        IsFriend        = nil;
+        Guid            = nil;
+        Plate           = nil;
+        PlateName       = nil;
+        PlateAdditions  = nil;
+        --@end-alpha@
 
     end -- }}}
+
+    function NPH:UpdateTextures ()
+
+        LAST_TEXTURE_UPDATE = GetTime();
+
+        for i, isFriend in ipairs({true,false}) do
+            for plate in pairs(self.DisplayedPlates_byFrameTID[isFriend]) do
+
+                PlateAdditions  = plate[PLATES__NPH_NAMES[isFriend]];
+                Plate           = plate;
+
+                UpdateTexture();
+
+            end
+        end
+
+        --@alpha@
+        PlateAdditions  = nil;
+        PlateName       = nil;
+        --@end-alpha@
+    end
+
+    function NPH:UpdateRanks ()
+
+        for i, isFriend in ipairs({true,false}) do
+            for plate in pairs(self.DisplayedPlates_byFrameTID[isFriend]) do
+
+                IsFriend        = isFriend;
+                Plate           = plate;
+                PlateAdditions  = plate[PLATES__NPH_NAMES[isFriend]];
+                PlateName       = LNP:GetName(plate);
+                Guid            = LNP:GetGUID(plate);
+                Guid            = HHTD.Registry_by_GUID[IsFriend][Guid] and Guid or nil;
+
+                SetRank();
+
+            end
+        end
+
+        --@alpha@
+        IsFriend        = nil;
+        Plate           = nil;
+        PlateName       = nil;
+        PlateAdditions  = nil;
+        --@end-alpha@
+    end
+
 end
 
 function NPH:HideCrossFromPlate(plate, isFriend, plateName) -- {{{
@@ -541,21 +598,21 @@ function NPH:HideCrossFromPlate(plate, isFriend, plateName) -- {{{
         return;
     end
 
-    local plateCross = plate[PLATES__NPH_NAMES[isFriend]];
+    local plateAdditions = plate[PLATES__NPH_NAMES[isFriend]];
 
-    if plateCross and plateCross.IsShown then
+    if plateAdditions and plateAdditions.IsShown then
 
         --@debug@
-        if plateName and plateName ~= plateCross.plateName then
-            self:Debug(ERROR, "plateCross.plateName ~= plateName:", plateCross.plateName, plateName);
+        if plateName and plateName ~= plateAdditions.plateName then
+            self:Debug(ERROR, "plateAdditions.plateName ~= plateName:", plateAdditions.plateName, plateName);
         end
         --@end-debug@
 
-        plateCross.texture:Hide();
-        plateCross.rankFont:Hide();
-        plateCross.IsShown = false;
+        plateAdditions.texture:Hide();
+        plateAdditions.rankFont:Hide();
+        plateAdditions.IsShown = false;
 
-        plateCross.plateName = nil;
+        plateAdditions.plateName = nil;
         -- self:Debug(INFO2, isFriend and "|cff00ff00Friendly|r" or "|cffff0000Enemy|r", "cross hidden for", plateName);
     end
 
