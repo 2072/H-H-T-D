@@ -1022,7 +1022,7 @@ do
             end
         end
 
-        self:COMBAT_LOG_EVENT_UNFILTERED(nil, 0, "DUMMY_HEAL", false, UnitGUID(unit), (UnitName(unit)), flags, 0, destGUID, destName, flags, 0, 0, (GetSpellInfo(33891)), "", HHTD.HealThreshold/2 + 1);
+        self:COMBAT_LOG_EVENT_UNFILTERED(nil, 0, "DUMMY_HEAL", false, UnitGUID(unit), (UnitName(unit)), flags, 0, destGUID, destName, flags, 0, 0, (GetSpellInfo(33891)), "", HHTD.HealThreshold + 1);
     end
 
     -- http://www.wowpedia.org/API_COMBAT_LOG_EVENT

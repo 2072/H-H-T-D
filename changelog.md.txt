@@ -4,6 +4,37 @@ Healers Have To Die
 *Change log*
 ------------
 
+**version 2.0.0 beta 1 (2012-05-23):**
+
+- Nameplate markers now include the healer's rank (the lower the number, the better
+  the healer).
+
+- Nameplate markers are now resizable and movable (see the 'Name Plate
+  Hooker' module's options).
+
+- It's now possible to test how markers look like using the 'Test HHTD's
+  behavior on current target' button in the general options (along with other
+  HHTD's features).
+
+- HHTD's core has been rewritten and reorganized with all the current features
+  in mind making HHTD more effective and reliable.
+
+- The logs have been improved, they are now sorted and include all healing
+  spells cast by healers with emphasising for specialised healers' spells.
+
+- The logs can now be disabled if the announcer module is enabled (they are no
+  longer linked).
+
+- Improved healer detection for PVP and PVE (faster and more reliable).
+
+- Better handling of multi-instanced units in PVE (especially with nameplate
+  markers), 
+
+- Many small improvements and bug fixes.
+
+- Localization is needed, if you want to contribute [http://www.wowace.com/addons/healers-have-to-die/localization/][you can directlty write your translations using this very link].
+
+
 **version 1.9.1.2 (2012-01-09):**
 
 - Fix LibNamePlate bug during cutscenes.
