@@ -153,13 +153,13 @@ do
         L["LOG_IDLE"] = "Idle"
 
 
-        L["OPT_NPH_MARKER_SETTINGS"]         = "Marker settings"
+        L["OPT_NPH_MARKER_SETTINGS"]         = "Markers' settings"
 
-        L["OPT_NPH_MARKER_SCALE"]           = "Marker scaling"
-        L["OPT_NPH_MARKER_SCALE_DESC"]      = "Change the size of markers"
-        L["OPT_NPH_MARKER_X_OFFSET"]        = "Marker X offset"
+        L["OPT_NPH_MARKER_SCALE"]           = "Markers' scaling"
+        L["OPT_NPH_MARKER_SCALE_DESC"]      = "Change markers' size"
+        L["OPT_NPH_MARKER_X_OFFSET"]        = "Horizontal offset"
         L["OPT_NPH_MARKER_X_OFFSET_DESC"]   = "Move markers horizontally"
-        L["OPT_NPH_MARKER_Y_OFFSET"]        = "Marker Y offset"
+        L["OPT_NPH_MARKER_Y_OFFSET"]        = "Vertical offset"
         L["OPT_NPH_MARKER_Y_OFFSET_DESC"]   = "Move markers vertically"
 
         --]==]

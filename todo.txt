@@ -1,1 +1,0 @@
-Sort logs and display ranks
