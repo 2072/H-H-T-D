@@ -4,7 +4,7 @@ Healers Have To Die
 *Change log*
 ------------
 
-**version 2.0.0 beta 1 (2012-05-23):**
+**version 2.0.0 (2012-06-03):**
 
 - Nameplate markers now include the healer's rank (the lower the number, the better
   the healer).
@@ -32,7 +32,7 @@ Healers Have To Die
 
 - Many small improvements and bug fixes.
 
-- Localization is needed, if you want to contribute [http://www.wowace.com/addons/healers-have-to-die/localization/][you can directlty write your translations using this very link].
+- Localization is needed, if you want to contribute [you can directlty write your translations using this very link][localization].
 
 
 **version 1.9.1.2 (2012-01-09):**
