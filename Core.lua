@@ -991,12 +991,6 @@ do
     local registered;
 
 
-    --@debug@
-    local profiling1 = 0;
-    tempProfiling = {};
-    local tempProfiling = tempProfiling;
-    --@end-debug@
-
     function HHTD:MakeDummyEvent(unit)
         --local flags = 0, destName = 'TestUnit', destGUID = 'TestGuid', destFlags = 0;
         local flags, destName, destGUID  = 0, 'TestUnit', 'TestGuid';
@@ -1040,8 +1034,6 @@ do
         if not sourceGUID or hideCaster then return end
         -- }}}
 
-        local configRef = self.db.global; -- config shortcut
-
         -- Escape if bad target (not human nor npc) {{{
         -- Healers are only those caring for other players or NPC
         if band(destFlags, ACCEPTABLE_TARGETS) == 0 then
@@ -1055,11 +1047,17 @@ do
             return;
         end -- }}}
 
+        local configRef = self.db.global; -- config shortcut
+
         Source_Is_NPC = false;
         Source_Is_Human = false;
         Source_Is_Friendly = false;
 
         if band(sourceFlags, HOSTILE_OUTSIDER_NPC) == HOSTILE_OUTSIDER_NPC then
+            -- leave here if we don't care about pve healers | caveats: if a friendly healear is attacked by an NPC we won't know about it
+            if not configRef.Pve then
+                return;
+            end
             Source_Is_NPC = true;
         elseif band (sourceFlags, HOSTILE_OUTSIDER_PLAYER) == HOSTILE_OUTSIDER_PLAYER then
             Source_Is_Human = true;
@@ -1067,19 +1065,23 @@ do
             Source_Is_Human = true;
             Source_Is_Friendly = true;
         elseif band (sourceFlags, FRIENDLY_NPC) == FRIENDLY_NPC then
+            -- leave here if we don't care about pve healers | caveats: none I can think of
+            if not configRef.Pve then
+                return;
+            end
             Source_Is_NPC = true;
             Source_Is_Friendly = true;
+        else
+            -- not a player or an NPC, why are we even considering this comment?
+            return;
         end
 
 
         -- check if a healer is under attack - broadcast the event and return {{{
         -- if the source is hostile AND if its target is a registered friendly healer
-        if configRef.HealerUnderAttackAlerts and (not Source_Is_Friendly) and (Source_Is_NPC or Source_Is_Human) and Registry_by_GUID[true][destGUID] then
+        if (not Source_Is_Friendly) and (configRef.HealerUnderAttackAlerts and (Source_Is_NPC or Source_Is_Human) and Registry_by_GUID[true][destGUID]) then
 
             if not self.Friendly_Healers_Attacked_by_GUID[destGUID] then
-                --@debug@
-                profiling1 = GetTime();
-                --@end-debug@
                 if ( CheckInteractDistance(destName, 1) ) then
 
                     self:SendMessage("HHTD_HEALER_UNDER_ATTACK", sourceName, sourceGUID, destName, destGUID);
@@ -1087,41 +1089,20 @@ do
                     self.Friendly_Healers_Attacked_by_GUID[destGUID] = GetTime();
 
                 end
-                --@debug@
-                table.insert(tempProfiling, GetTime() - profiling1);
-                --@end-debug@
             end
 
             -- it's certainly not a heal so no use to continue past this point.
             return;
         end -- }}}
 
-        -- Escape if bad source {{{
+        -- Escape if bad source (deprecated) {{{
         -- if the source is not a player and if while pve, the source is not an npc, then we don't care about this event
         -- ie: we care if the source is a human player or pve is enaled and the source is an npc.
         --      not (a or (b and c)) ==  !a and (not b or not c)
-        if not ( Source_Is_Human or (configRef.Pve and Source_Is_NPC)) then
-        --if not ( Source_Is_Hostile_Human or (configRef.Pve and Source_Is_Hostile_NPC)) then
 
-
-            --@debug@
-            --[[
-            if  self.db.global.Debug then
-                if  event:sub(-5) == "_HEAL" and sourceGUID ~= destGUID then
-                    self:Debug(INFO2, "Bad heal source:", sourceName, "Dest:", destName, "pve:", configRef.Pve,
-                    "HOSTILE_OUTSIDER_PLAYER:", band (sourceFlags, HOSTILE_OUTSIDER_PLAYER) == HOSTILE_OUTSIDER_PLAYER,
-                    "HOSTILE_OUTSIDER_NPC:", band(sourceFlags, HOSTILE_OUTSIDER_NPC) == HOSTILE_OUTSIDER_NPC);
-                end
-
-                self:Debug(INFO2, "Bad source", sourceName, "Dest:", destName, "pve:", configRef.Pve,
-                "HOSTILE_OUTSIDER_PLAYER:", band (sourceFlags, HOSTILE_OUTSIDER_PLAYER) == HOSTILE_OUTSIDER_PLAYER,
-                "HOSTILE_OUTSIDER_NPC:", band(sourceFlags, HOSTILE_OUTSIDER_NPC) == HOSTILE_OUTSIDER_NPC);
-            end
-            --]]
-            --@end-debug@
-
-            return;
-        end -- }}}
+        ----------if not ( Source_Is_Human or (Source_Is_NPC and configRef.Pve)) then
+            ---------return;
+        ----------end -- }}}
 
 
         -- get a shortcut to the healer profile if it exists
@@ -1135,6 +1116,7 @@ do
             return;
         end -- }}}
 
+        -- a heal but not a self inflicted one
         if sourceGUID ~= destGUID and event:sub(-5) == "_HEAL" then
             isHealSpell = true;
         else
@@ -1166,11 +1148,7 @@ do
              return;
          end
 
-         -- self:Debug(INFO, "Registering healer ", sourceName);
          RegisterHealer(GetTime(), Source_Is_Friendly, sourceGUID, sourceName, Source_Is_Human, spellNAME, isHealSpell, healAMOUNT, configRef);
-
-         
-         -- TODO for GEHR: make activity light blink
 
      end -- }}}
 
