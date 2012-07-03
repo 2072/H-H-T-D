@@ -294,6 +294,9 @@ end -- }}}
 
 do
 
+    local GetNumRaidMembers     = HHTD.MOP and _G.GetNumGroupMembers or _G.GetNumRaidMembers;
+    local GetNumPartyMembers    = HHTD.MOP and _G.GetNumSubgroupMembers or _G.GetNumPartyMembers;
+
     local function GetDistributionChanel()
         local channel = Announcer.db.global.PostChannel;
 

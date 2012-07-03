@@ -80,6 +80,11 @@ HHTD.LOGS = {
 };
 
 
+do
+    local _, _, _, interface = GetBuildInfo()
+    HHTD.MOP = (interface >= 50000)
+end
+
 --[=[
 local healer_template = {
     guid        = "",
