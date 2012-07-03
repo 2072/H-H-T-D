@@ -21,7 +21,7 @@
 ## X-LoadOn-Slash: /hhtd
 ## X-LoadOn-Always: delayed
 
-## X-Max-Interface: 40300
+## X-Max-Interface: 50000
 ## X-Min-Interface: 40200
 
 ## SavedVariables: Healers_Have_To_Die

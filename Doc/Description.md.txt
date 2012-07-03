@@ -1,8 +1,14 @@
 Healers Have To Die
 ===================
-
-
 *Spot those bloody healers instantly and help them accomplish their destiny! (PVP and PVE)*
+
+
+MoP Beta compatible version
+------------------------------------
+![MoP Panda][mop] 
+For a *Mist of Pandaria* compatible version of HHTD, use the latest alpha releases which can be found [here][dev]
+
+ 
 
 
 HHTD adds a **red cross** over *enemy* healer's name plates. *You can't miss them!* (see the [screen-shot][redcross]).
@@ -29,9 +35,14 @@ Special commands
 Videos
 ------
 
-Here is a video by Hybridpanda featuring HHTD in the Eye of the Storm battleground:
+Here is a video by Hybridpanda featuring HHTD in the *Eye of the Storm* battleground:
 
 [YouTube - This makes me a sad Panda][video1]
+
+Interview
+---------
+
+Curse.com interviewed me for an 'Add-on Spotlight' article focused on the controversy around this add-on, you can find this interview [here][interview1].
 
 Articles
 --------
@@ -114,4 +125,8 @@ To report issues or ask for new features, use the [ticket system][tickets].
 [article2]: http://greedygoblin.blogspot.com/2011/05/healers-have-to-die.html
 [article3]: http://cynwise.wordpress.com/2011/09/16/using-healers-have-to-die-to-protect-friendly-healers/
 
+[interview1]: http://www.curse.com/spotlight/addons/wow/45369-healershavetodie-wow-mod-spotlight
+
 [video1]: http://www.youtube.com/watch?v=bDdmD6Lx87g
+
+[mop]: http://www.2072productions.com/images/ah-mop-75x75-11-4-11.jpg "Mist of Pandaria Beta"

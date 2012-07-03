@@ -81,8 +81,8 @@ HHTD.LOGS = {
 
 
 do
-    local _, _, _, interface = GetBuildInfo()
-    HHTD.MOP = (interface >= 50000)
+    local _, _, _, interface = GetBuildInfo();
+    HHTD.MOP = (interface >= 50000);
 end
 
 --[=[
