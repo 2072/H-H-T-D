@@ -3,8 +3,8 @@ Healers Have To Die
 *Spot those bloody healers instantly and help them accomplish their destiny! (PVP and PVE)*
 
 
-MoP Beta compatible version
-------------------------------------
+MoP Beta compatible version available
+-------------------------------------
 ![MoP Panda][mop] 
 For a *Mist of Pandaria* compatible version of HHTD, use the latest alpha releases which can be found [here][dev]
 

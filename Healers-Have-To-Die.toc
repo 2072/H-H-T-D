@@ -1,4 +1,4 @@
-## Interface: 40300
+## Interface: 50001
 
 ## Title: Healers Have To Die
 
@@ -21,7 +21,7 @@
 ## X-LoadOn-Slash: /hhtd
 ## X-LoadOn-Always: delayed
 
-## X-Max-Interface: 50000
+## X-Max-Interface: 50001
 ## X-Min-Interface: 40200
 
 ## SavedVariables: Healers_Have_To_Die
