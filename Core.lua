@@ -197,6 +197,12 @@ local function REGISTER_HEALERS_ONLY_SPELLS_ONCE ()
         [53563] = "PALADIN", -- Beacon of Light
         [31821] = "PALADIN", -- Aura Mastery
         [85222] = "PALADIN", -- Light of Dawn
+
+        -- Monks
+        [115175] = "MONK", -- Soothing Mist
+        [116995] = "MONK", -- Surging mist
+        [119611] = "MONK", -- Renewing mist
+        [116670] = "MONK", -- Uplift
     };
 
     HHTD_C.Healers_Only_Spells_ByName = {};
