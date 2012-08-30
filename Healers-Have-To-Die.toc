@@ -11,6 +11,7 @@
 ## Notes-ruRU: @localization(locale="ruRU", key="DESCRIPTION")@
 ## Notes-zhCN: @localization(locale="zhCN", key="DESCRIPTION")@
 ## Notes-zhTW: @localization(locale="zhTW", key="DESCRIPTION")@
+## Notes-itIT: @localization(locale="itIT", key="DESCRIPTION")@
 
 
 ## Author: John Wellesz
