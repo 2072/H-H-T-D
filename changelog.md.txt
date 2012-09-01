@@ -4,9 +4,34 @@ Healers Have To Die
 *Change log*
 ------------
 
-**version 2.0.1 Beta 1 (2012-08-01):**
+**version 2.0.1 (2012-09-01):**
 
 - Compatible with Mists of Pandaria
+
+- Updated healers' [spell list][spelllist] (including Monk's): specialized
+  healer detection should be perfectly accurate now. Do not hesitated to leave
+  comments on the [spell list][spelllist] page.
+
+- Fixed bug: 'NamePlateHooker.lua:452: attempt to index field '?' (a nil
+  value)' which was caused by the fact that LibNameplate-1.0 fires twice when
+  plates are hidden if TidyPlates is used.
+
+- Fixed bug: Healers below the healing threshold could be flagged as healers if
+  they were casting spells right after the player had logged in (player's
+  maximum health being null at that specific time).
+
+- Fix wrong description for the 'Heal amount threshold' slider which
+  incorrectly said that it had no effect in PvP if the 'Healer specialization
+  detection' option was checked. This was no longer true since HHTD 2.0.
+
+- Many micro-optimizations in the combat log parser, especially for when the
+  PVE option is disabled. The analyzer leaves even earlier in such cases. Not
+  that it should have any noticeable impact for any user. However, if you take
+  HHTD's user base as a whole, you could probably fry an egg per day with the
+  saved power :-) Is this called green programming?
+
+- Added support for [Italian localization][localization]
+
 
 **version 2.0.0 (2012-06-03):**
 
@@ -142,5 +167,5 @@ Healers Have To Die
 
 
 
-
+[spelllist]: http://www.wowace.com/addons/healers-have-to-die/pages/specialized-healers-spells/
 [localization]: http://www.wowace.com/addons/healers-have-to-die/localization/
