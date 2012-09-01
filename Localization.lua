@@ -77,7 +77,7 @@ do
         L["OPT_HEALER_FORGET_TIMER"] = "Healer Forget Timer"
         L["OPT_HEALER_FORGET_TIMER_DESC"] = "Set the Healer Forget Timer (the time in seconds an enemy will remain considered has a healer)"
         L["OPT_HEALER_MINIMUM_HEAL_AMOUNT"] = "Heal amount (|cff00dd00%u|r) threshold"
-        L["OPT_HEALER_MINIMUM_HEAL_AMOUNT_DESC"] = "Healers won't be detected until they reach this cumulative amount of healing based on a percentage of your own maximum health. (has no effect in PVP when \\\"Healer specialization detection\\\" is checked)"
+        L["OPT_HEALER_MINIMUM_HEAL_AMOUNT_DESC"] = "Healers won't be detected until they reach this cumulative amount of healing based on a percentage of your own maximum health."
         L["OPT_HEALER_UNDER_ATTACK_ALERTS"] = "Protect friendly healers"
         L["OPT_HEALER_UNDER_ATTACK_ALERTS_DESC"] = "Display an alert when a nearby friendly healers is attacked"
         L["OPT_LOG"] = "Logging"
