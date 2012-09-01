@@ -704,7 +704,8 @@ function HHTD:OnDisable()
 end
 -- }}}
 
-HHTD.HealThreshold = 0;
+HHTD.HealThreshold = math.huge;
+local UnitHealthMax = _G.UnitHealthMax;
 function HHTD:UpdateHealThreshold()
     if not self.db.global.UHMHAP then return 0 end
 
@@ -987,7 +988,9 @@ do
 
             if not HHTD.Registry_by_GUID[isFriend][guid] then
                 -- Dispatch the news
-                HHTD:Debug(INFO, "Healer detected:", sourceName);
+                --@debug@
+                HHTD:Debug(INFO, "Healer detected:", sourceName, 'uhmhap:', configRef.UHMHAP, 'healdone:', record.healDone, 'threshold:', HHTD.HealThreshold);
+                --@end-debug@
                 HHTD:SendMessage("HHTD_HEALER_BORN", isFriend, record);
             end
 
