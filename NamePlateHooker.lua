@@ -272,7 +272,7 @@ function NPH:HHTD_HEALER_GONE(selfevent, isFriend, healer)
 
         elseif not self.db.global.sPve and not HHTD.Registry_by_Name[isFriend][healer.name] then -- Just hide all the symbols on the plates with that name if there is none left
 
-            for plate, plate in pairs (Multi_Plates_byName[isFriend][healer.name]) do
+            for plate, plate in pairs (Multi_Plates_byName[isFriend][healer.name]) do -- XXX quite dodgy even if index == value
                 self:HideCrossFromPlate(plate, isFriend, healer.name);
             end
         end
@@ -576,6 +576,12 @@ do
                 Guid            = LNP:GetGUID(plate);
                 Guid            = HHTD.Registry_by_GUID[IsFriend][Guid] and Guid or nil;
 
+                if not HHTD.Registry_by_Name[isFriend][PlateName] then
+                    --@alpha@
+                    error("PlateName: '"..PlateName.."' is no longer defined in registry");
+                    --@end-alpha@
+                end
+
                 SetRank();
 
             end
@@ -595,6 +601,9 @@ function NPH:HideCrossFromPlate(plate, isFriend, plateName) -- {{{
 
     if not plate then
         self:Debug(ERROR, "HideCrossFromPlate(), plate is not defined");
+        --@alpha@
+        error("'Plate' is not defined");
+        --@end-alpha@
         return;
     end
 
