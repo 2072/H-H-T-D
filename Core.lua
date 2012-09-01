@@ -166,43 +166,70 @@ local function REGISTER_HEALERS_ONLY_SPELLS_ONCE ()
     local Healers_Only_Spells_ByID = {
 
         -- Priests
-        [47540] = "PRIEST", -- Penance
-        [88625] = "PRIEST", -- Holy Word: Chastise
-        [88684] = "PRIEST", -- Holy Word: Serenity
-        [88685] = "PRIEST", -- Holy Word: Sanctuary
-        [89485] = "PRIEST", -- Inner Focus
-        [10060] = "PRIEST", -- Power Infusion
-        [33206] = "PRIEST", -- Pain Suppression
-        [62618] = "PRIEST", -- Power Word: Barrier
-        [724]   = "PRIEST",   -- Lightwell
-        [14751] = "PRIEST", -- Chakra
-        [34861] = "PRIEST", -- Circle of Healing
-        [47788] = "PRIEST", -- Guardian Spirit
+        --      Discipline
+        -- [000017] = "PRIEST", -- Power word: Shield -- exists also for shadow priests
+        [047540] = "PRIEST", -- Penance
+        [062618] = "PRIEST", -- Power word: Barrier
+        [109964] = "PRIEST", -- Spirit shell
+        [047515] = "PRIEST", -- Divine Aegis
+        [081700] = "PRIEST", -- Archangel
+        [002060] = "PRIEST", -- Greater Heal
+        [002050] = "PRIEST", -- Heal
+        [014194] = "PRIEST", -- Holy Fire
+        [089485] = "PRIEST", -- Inner Focus
+        [033206] = "PRIEST", -- Pain Suppression
+        [000596] = "PRIEST", -- Prayer of Healing
+        [000527] = "PRIEST", -- Purify
+        --      Holy
+        [034861] = "PRIEST", -- Circle of Healing
+        [064843] = "PRIEST", -- Divine Hymn
+        [047788] = "PRIEST", -- Guardian Spirit
+        [000724] = "PRIEST", -- Lightwell
+        [088684] = "PRIEST", -- Holy Word: Serenity
+        [088685] = "PRIEST", -- Holy Word: Sanctuary
 
         -- Druids
-        [18562] = "DRUID", -- Swiftmend
-        [17116] = "DRUID", -- Nature's Swiftness
-        [48438] = "DRUID", -- Wild Growth
-        [33891] = "DRUID", -- Tree of Life
+        [018562] = "DRUID", -- Swiftmend
+        [102342] = "DRUID", -- Ironbark
+        [033763] = "DRUID", -- Lifebloom
+        [088423] = "DRUID", -- Nature's Cure
+        [050464] = "DRUID", -- Nourish
+        [008936] = "DRUID", -- Regrowth
+        [033891] = "DRUID", -- Incarnation: Tree of Life
+        [048438] = "DRUID", -- Wild Growth
+        [102791] = "DRUID", -- Wild Mushroom Bloom
 
         -- Shamans
-        [974]   = "SHAMAN", -- Earth Shield
-        [17116] = "SHAMAN", -- Nature's Swiftness
-        [16190] = "SHAMAN", -- Mana Tide Totem
+        [00974] = "SHAMAN", -- Earth Shield
         [61295] = "SHAMAN", -- Riptide
+        [77472] = "SHAMAN", -- Greater Healing Wave
+        [98008] = "SHAMAN", -- Spirit link totem
+        [77130] = "SHAMAN", -- Purify Spirit
 
         -- Paladins
         [20473] = "PALADIN", -- Holy Shock
-        [31842] = "PALADIN", -- Divine Favor
+        -- [85673] = "PALADIN", -- Word of Glory (also true for prot paladins)
+        [82327] = "PALADIN", -- Holy radiance
         [53563] = "PALADIN", -- Beacon of Light
-        [31821] = "PALADIN", -- Aura Mastery
+        [02812] = "PALADIN", -- Denounce
+        [31842] = "PALADIN", -- Divine Favor
+        [82326] = "PALADIN", -- Divine Light
+        [54428] = "PALADIN", -- Divine Plea
+        -- [86669] = "PALADIN", -- Guardian of Ancient Kings (also true for ret paladins)
+        [00635] = "PALADIN", -- Holy Light
+        [82327] = "PALADIN", -- Holy Radiance
         [85222] = "PALADIN", -- Light of Dawn
 
         -- Monks
         [115175] = "MONK", -- Soothing Mist
+        [115294] = "MONK", -- Mana Tea
+        [115310] = "MONK", -- Revival
+        [116670] = "MONK", -- Uplift
+        [116680] = "MONK", -- Thunder Focus Tea
+        [116849] = "MONK", -- Life Cocoon
         [116995] = "MONK", -- Surging mist
         [119611] = "MONK", -- Renewing mist
-        [116670] = "MONK", -- Uplift
+        [132120] = "MONK", -- Envelopping Mist
     };
 
     HHTD_C.Healers_Only_Spells_ByName = {};
@@ -1188,43 +1215,4 @@ do
 
  end -- }}}
 
- --[=[
- (post by zalgorr on HHTD curse.com' comments page (2011-01-24)
-
-
- =============For priests:
-
- -Penance : HEAL : http://www.wowhead.com/spell=47540
- -Holy Word: Chastise -- http://www.wowhead.com/spell=88625  (damage spell)
- -Holy Word: Serenity -- HEAL : http://www.wowhead.com/spell=88684
- -Holy Word: Sanctuary -- MASS HEAL : http://www.wowhead.com/spell=88685
- -Inner Focus -- (not heal but increases heal) : http://www.wowhead.com/spell=89485
- -Power Infusion -- target enhancer : http://www.wowhead.com/spell=10060
- -Pain Suppression -- target enhancer : http://www.wowhead.com/spell=33206
- -Power Word: Barrier -- mass target enhancer : http://www.wowhead.com/spell=62618
- -Lightwell -- mass target enhancer : http://www.wowhead.com/spell=724
- -Chakra -- heal increase : http://www.wowhead.com/spell=14751
- -Circle of Healing -- mass heal : http://www.wowhead.com/spell=34861
- -Guardian Spirit -- target heal enhancer : http://www.wowhead.com/spell=47788
-
- =================For a druid:
- -Swiftmend           : HEAL : http://www.wowhead.com/spell=18562
- -Nature's Swiftness  : HEAL : http://www.wowhead.com/spell=17116
- -Wild Growth         : MASS HEAL : http://www.wowhead.com/spell=48438
- -Tree of Life        : not an actual spell (shape shift) : http://www.wowhead.com/spell=33891
-
- ====================Shaman:
- Earth Shield : enhancer, heals on target actions : http://www.wowhead.com/spell=974
- Nature's Swiftness : healer helper : http://www.wowhead.com/spell=17116
- Mana Tide Totem : healer helper (spirit) : http://www.wowhead.com/spell=16190
- Riptide : HEAL : http://www.wowhead.com/spell=61295
-
- ====================Paladin:
- Holy Shock : HEAL/DAMMAGE : http://www.wowhead.com/spell=20473
- Divine Favor : healer helper : http://www.wowhead.com/spell=31842
- Beacon of Light : heal : http://www.wowhead.com/spell=53563
- Aura Mastery : friends enhancer : http://www.wowhead.com/spell=31821
- Light of Dawn : mass heal : http://www.wowhead.com/spell=85222
-
-
- --]=]
+ 
