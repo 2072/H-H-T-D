@@ -370,7 +370,18 @@ end
 
 function NPH:LibNameplate_RecycleNameplate(selfevent, plate)
 
+    if LNP.fakePlate[plate] then
+        --@debug@
+        self:Debug(INFO2, "LibNameplate_RecycleNameplate(): unused frame received for:", LNP:GetName(plate));
+        --@end-debug@
+        return;
+    end
+
     local plateName = LNP:GetName(plate);
+
+    --@debug@
+    self:Debug(INFO, "LibNameplate_RecycleNameplate():", plateName);
+    --@end-debug@
 
     for i, isFriend in ipairs({true,false}) do
 
