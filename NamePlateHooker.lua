@@ -422,6 +422,8 @@ do
     local PlateName;
     local Guid;
 
+    local assert = _G.assert;
+
     local function SetTextureParams(t) -- MUL XXX
         local profile = NPH.db.global;
 
@@ -459,8 +461,13 @@ do
     end
 
     local function SetRank ()  -- ONCE
+        assert(PlateAdditions, 'PlateAdditions is not defined'); -- to diagnose issue repoted on 2012-09-07
+        assert(PlateAdditions.rankFont, "rankFont is invalid"); -- to diagnose issue repoted on 2012-09-07
+        assert(IsFriend == true or IsFriend == false, "IsFriend is invalid"); -- to diagnose issue repoted on 2012-09-07
+
          if not Guid then
-            PlateAdditions.rankFont:SetText(NP_Is_Not_Unique[IsFriend][PlateName] and '?' or HHTD.Registry_by_Name[IsFriend][PlateName].rank);
+             assert(NP_Is_Not_Unique[IsFriend], "NP_Is_Not_Unique[IsFriend] is invalid"); -- to diagnose issue repoted on 2012-09-07
+             PlateAdditions.rankFont:SetText(NP_Is_Not_Unique[IsFriend][PlateName] and '?' or HHTD.Registry_by_Name[IsFriend][PlateName].rank);
         else
             PlateAdditions.rankFont:SetText(HHTD.Registry_by_GUID[IsFriend][Guid].rank);
         end
@@ -481,6 +488,7 @@ do
     local function AddElements () -- ONCEx
         local texture  = MakeTexture();
         local rankFont = MakeFontString(texture);
+        assert(rankFont, "rankFont could not be created"); -- to diagnose issue repoted on 2012-09-07
 
         PlateAdditions.texture = texture;
         PlateAdditions.texture:Show();

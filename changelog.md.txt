@@ -9,7 +9,7 @@ Healers Have To Die
 - Compatible with Mists of Pandaria
 
 - Updated healers' [spell list][spelllist] (including Monk's): specialized
-  healer detection should be perfectly accurate now. Do not hesitated to leave
+  healers detection should be perfectly accurate now. Do not hesitated to leave
   comments on the [spell list][spelllist] page.
 
 - Fixed bug: 'NamePlateHooker.lua:452: attempt to index field '?' (a nil
