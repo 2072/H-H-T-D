@@ -886,7 +886,7 @@ do
         if not Private_registry_by_GUID[isFriend][guid] then
 
             if sourceName then
-                name = str_match(sourceName, "^[^-]+");
+                name = isHuman and str_match(sourceName, "^[^-]+") or sourceName; -- Remove the server's name (plates don't include it)
             else
                 -- XXX fatal error out
                 HHTD:Debug(WARNING, "RegisterHealer(): sourceName is missing and healer is new", guid);
