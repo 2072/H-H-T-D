@@ -4,6 +4,14 @@ Healers Have To Die
 *Change log*
 ------------
 
+**version 2.0.2 (2012-09-25):**
+
+- Fix a bug where HHTD could crash if an NPC with a hyphen in its name healed.
+
+- Replaced AceTimer-3.0 with LibShefkiTimer-1.0 to fix random 'Script ran too
+  long' issues happening with AceTimer's current implementation.
+
+
 **version 2.0.1 (2012-09-01):**
 
 - Compatible with Mists of Pandaria
