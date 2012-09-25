@@ -29,8 +29,8 @@
 
 ## X-License: All Rights Reserved
 
-## OptionalDeps: Ace3, LibNameplate-1.0
-## X-Embeds: Ace3, LibNameplate-1.0
+## OptionalDeps: Ace3, LibNameplate-1.0, LibShefkiTimer-1.0
+## X-Embeds: Ace3, LibNameplate-1.0, LibShefkiTimer-1.0
 
 ## X-ReleaseDate: "@project-date-iso@"
 ## X-Category: PvP
