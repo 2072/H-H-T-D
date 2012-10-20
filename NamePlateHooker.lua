@@ -405,7 +405,7 @@ function NPH:LibNameplate_FoundGUID(selfevent, plate, guid, unitID)
 
     if HHTD.Registry_by_GUID[true][guid] or HHTD.Registry_by_GUID[false][guid] then
         self:Debug(INFO, "GUID found");
-        self:AddCrossToPlate(plate, nil, LNP:GetName(plate), guid);
+        self:AddCrossToPlate(plate, HHTD.Registry_by_GUID[true][guid] and true or false, LNP:GetName(plate), guid);
     else
         self:Debug(INFO2, "GUID found but not a healer");
     end
