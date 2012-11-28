@@ -57,7 +57,7 @@ do
         L["DESCRIPTION"] = "Spot those bloody healers instantly and help them accomplish their destiny! (PVP and PVE)"
         L["DISABLED"] = [=[hhtd has been disabled!
         Type '/hhtd on' to re-enable it.]=]
-        L["ENABLED"] = "enabled! Type /hhtd for a list of options"
+        L["ENABLED"] = "enabled! Type /HHTDG for a list of options"
         L["HEALER_UNDER_ATTACK"] = "Healer friend %s is being attacked by %s"
         L["HUMAN"] = "Human"
         L["IDLE"] = "Idle"

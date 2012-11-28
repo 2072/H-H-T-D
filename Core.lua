@@ -648,7 +648,7 @@ function HHTD:OnInitialize()
     self.db = LibStub("AceDB-3.0"):New("Healers_Have_To_Die", DEFAULT__CONFIGURATION);
 
     LibStub("AceConfig-3.0"):RegisterOptionsTable(tostring(self), self.GetOptions, {"HealersHaveToDie", "hhtd"});
-    LibStub("AceConfigDialog-3.0"):AddToBlizOptions(tostring(self));
+    --LibStub("AceConfigDialog-3.0"):AddToBlizOptions(tostring(self));
     
     self:RegisterChatCommand('hhtdg', function() LibStub("AceConfigDialog-3.0"):Open(tostring(self)) end, true);
 

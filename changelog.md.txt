@@ -4,6 +4,16 @@ Healers Have To Die
 *Change log*
 ------------
 
+**version 2.0.3 (2012-11-28):**
+
+- Compatible with WoW 5.1
+
+- Removed HHTD's options from the WoW Interface panel since [it causes global UI tainting](http://us.battle.net/wow/en/forum/topic/6713012357). (Fear not, Blizzard might fix this in just a few years).
+Until then, just use the command /HHTDG to access HHTD's option panel.
+
+- Fixes a very rare Lua error.
+
+
 **version 2.0.2 (2012-09-25):**
 
 - Fix a bug where HHTD could crash if an NPC with a hyphen in its name healed.
