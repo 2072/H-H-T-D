@@ -135,7 +135,7 @@ do
         L["OPT_VERSION"] = "version"
         L["OPT_VERSION_DESC"] = "Display version and release date"
         L["PARTY"] = "Party"
-        L["RAID_OR_BATTLEGROUND"] = "Raid"
+        L["AUTO_RAID_PARTY_INSTANCE"] = "Auto: Raid/Party/Instance"
         L["RELEASE_DATE"] = "Release Date:"
         L["SAY"] = "Say"
         L["VERSION"] = "version:"
@@ -161,6 +161,8 @@ do
         L["OPT_NPH_MARKER_X_OFFSET_DESC"]   = "Move markers horizontally"
         L["OPT_NPH_MARKER_Y_OFFSET"]        = "Vertical offset"
         L["OPT_NPH_MARKER_Y_OFFSET_DESC"]   = "Move markers vertically"
+
+        L["INSTANCE_CHAT"]                  = "Instance chat"
 
         --]==]
         --@end-do-not-package@

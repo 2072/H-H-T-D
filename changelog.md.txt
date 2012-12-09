@@ -4,6 +4,10 @@ Healers Have To Die
 *Change log*
 ------------
 
+**version 2.0.4 (2012-12-10):**
+
+- Fix: the chat announcer was no longer working in Battlegrounds
+
 **version 2.0.3 (2012-11-28):**
 
 - Compatible with WoW 5.1

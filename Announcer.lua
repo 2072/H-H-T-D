@@ -135,7 +135,7 @@ function Announcer:GetOptions () -- {{{
                             type = 'select',
                             name = L['OPT_POST_ANNOUNCE_CHANNEL'],
                             desc = L['OPT_POST_ANNOUNCE_CHANNEL_DESC'],
-                            values = { ['AUTO'] = L['RAID_OR_BATTLEGROUND'], ['PARTY'] = L['PARTY'], ['SAY'] = L['SAY'], ['YELL'] = L['YELL'] },
+                            values = { ['AUTO'] = L['AUTO_RAID_PARTY_INSTANCE'], ['PARTY'] = L['PARTY'], ['SAY'] = L['SAY'], ['YELL'] = L['YELL'], ['INSTANCE_CHAT'] = L['INSTANCE_CHAT']},
                             order = 30,
                         },
                         -- throttle
@@ -294,9 +294,6 @@ end -- }}}
 
 do
 
-    local GetNumRaidMembers     = HHTD.MOP and _G.GetNumGroupMembers or _G.GetNumRaidMembers;
-    local GetNumPartyMembers    = HHTD.MOP and _G.GetNumSubgroupMembers or _G.GetNumPartyMembers;
-
     local function GetDistributionChanel()
         local channel = Announcer.db.global.PostChannel;
 
@@ -304,19 +301,17 @@ do
             return channel;
         end
 
-        local inInstance, InstanceType = IsInInstance();
-
-        if InstanceType == "pvp" then
-            return "BATTLEGROUND";
+        -- if we are in a battle ground or a LFG/R instance
+        if GetNumGroupMembers(LE_PARTY_CATEGORY_INSTANCE) > 0 then
+            return "INSTANCE_CHAT";
         end
 
-        if (select(2, GetRaidRosterInfo(UnitInRaid("player") or 1))) > 0 then
-            return "RAID_WARNING";
-        end
-
-        if GetNumRaidMembers() ~= 0 then
+        if IsInRaid() then
+            if (select(2, GetRaidRosterInfo(UnitInRaid("player") or 1))) > 0 then
+                return "RAID_WARNING";
+            end
             return "RAID";
-        elseif GetNumPartyMembers() ~= 0 then
+        elseif GetNumGroupMembers(LE_PARTY_CATEGORY_HOME) > 0 then
             return "PARTY";
         end
 
