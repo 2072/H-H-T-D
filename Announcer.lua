@@ -34,7 +34,7 @@ local HHTD = T.Healers_Have_To_Die;
 local L = HHTD.Localized_Text;
 
 -- Create module
-HHTD.Announcer = HHTD:NewModule("Announcer", "AceConsole-3.0");
+HHTD.Announcer = HHTD:NewModule("Announcer", "AceConsole-3.0"); --, "AceTimer-3.0");
 local Announcer = HHTD.Announcer;
 
 -- Up Values

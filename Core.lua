@@ -45,7 +45,7 @@ local _, _, _, tocversion = GetBuildInfo();
 T._tocversion = tocversion;
 
 -- === Add-on basics and variable declarations {{{
-T.Healers_Have_To_Die = LibStub("AceAddon-3.0"):NewAddon("Healers Have To Die", "AceConsole-3.0", "AceEvent-3.0", "LibShefkiTimer-1.0");
+T.Healers_Have_To_Die = LibStub("AceAddon-3.0"):NewAddon("Healers Have To Die", "AceConsole-3.0", "AceEvent-3.0", "AceTimer-3.0");
 local HHTD = T.Healers_Have_To_Die;
 
 --@debug@
