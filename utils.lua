@@ -222,3 +222,26 @@ function HHTD:pairs_ordered (t, reverse, SortKey) -- Not to be used where perfor
     end, t, 0;
 
 end
+
+local function BadLocalTest (localtest)
+        HHTD:Print(HHTD.Localized_Text[localtest]);
+end
+
+function HHTD:MakeError(something)
+
+    local testlocal = "test local";
+    local testbiglocal = HHTD;
+
+    if something == 1 then
+        -- Make something forbidden
+        TargetUnit('player');
+        return;
+    elseif something == 2 then
+        BadLocalTest("Bad local");
+        return;
+    end
+
+    local errorf = function () testErrorCapturing(testlocal); end;
+
+    errorf();
+end

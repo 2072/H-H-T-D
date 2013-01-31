@@ -2,3 +2,5 @@ changelog.txt
 *.swp
 
 /ideas.txt
+/exclude-rsyncptr.txt
+/tags
