@@ -253,7 +253,7 @@ end -- }}}
 HHTD:SetDefaultModuleLibraries( "AceConsole-3.0", "AceEvent-3.0")
 
 -- Set the default prototype for modules
-HHTD:SetDefaultModulePrototype( {
+HHTD.MODULE_PROTOTYPE   = {
     OnEnable = function(self) self:Debug(INFO, "prototype OnEnable called!") end,
 
     OnDisable = function(self) self:Debug(INFO, "prototype OnDisable called!") end,
@@ -266,7 +266,9 @@ HHTD:SetDefaultModulePrototype( {
 
     Error = function(self, m) HHTD.Error (self, m) end,
 
-} )
+}
+
+HHTD:SetDefaultModulePrototype( HHTD.MODULE_PROTOTYPE )
 
 -- Set modules' default state to "false"
 HHTD:SetDefaultModuleState( false )

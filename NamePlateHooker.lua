@@ -37,6 +37,10 @@ local LNP = LibStub("LibNameplate-1.0");
 
 
 HHTD.Name_Plate_Hooker = HHTD:NewModule("NPH")
+
+HHTD.Name_Plate_Hooker:SetDefaultModulePrototype( HHTD.MODULE_PROTOTYPE );
+HHTD.Name_Plate_Hooker:SetDefaultModuleLibraries( "AceConsole-3.0", "AceEvent-3.0");
+
 local NPH = HHTD.Name_Plate_Hooker;
 
 local PLATES__NPH_NAMES = {
@@ -336,6 +340,10 @@ function NPH:LibNameplate_NewNameplate(selfevent, plate)
     local plateName = LNP:GetName(plate);
     local isFriend = (LNP:GetReaction(plate) == "FRIENDLY") and true or false;
 
+    --@debug@
+    self:Debug(INFO2, "new plate LNP:IsTarget()?|cff00ff00", LNP:IsTarget(plate) , "|rname:", plateName, 'isFriend?', isFriend, 'alpha:', plate:GetAlpha(),'plate.alpha:', plate.alpha, "plate.unit.alpha:", plate.unit and plate.unit.alpha or nil);
+    --@end-debug@
+
     -- test for uniqueness of the nameplate
 
     if not Plate_Name_Count[isFriend][plateName] then
@@ -372,7 +380,7 @@ function NPH:LibNameplate_RecycleNameplate(selfevent, plate)
 
     if LNP.fakePlate[plate] then
         --@debug@
-        self:Debug(INFO2, "LibNameplate_RecycleNameplate(): unused frame received for:", LNP:GetName(plate));
+        --self:Debug(INFO2, "LibNameplate_RecycleNameplate(): unused frame received for:", LNP:GetName(plate));
         --@end-debug@
         return;
     end
@@ -601,7 +609,7 @@ do
 
                 if not HHTD.Registry_by_Name[isFriend][PlateName] then
                     --@alpha@
-                    error("PlateName: '"..PlateName.."' is no longer defined in registry");
+                    --error("PlateName: '"..PlateName.."' is no longer defined in registry");
                     --@end-alpha@
                 end
 
