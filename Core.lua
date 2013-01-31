@@ -175,7 +175,7 @@ local function REGISTER_HEALERS_ONLY_SPELLS_ONCE ()
         [081700] = "PRIEST", -- Archangel
         [002060] = "PRIEST", -- Greater Heal
         [002050] = "PRIEST", -- Heal
-        [014194] = "PRIEST", -- Holy Fire
+        [014914] = "PRIEST", -- Holy Fire
         [089485] = "PRIEST", -- Inner Focus
         [033206] = "PRIEST", -- Pain Suppression
         [000596] = "PRIEST", -- Prayer of Healing
