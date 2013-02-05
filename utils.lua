@@ -245,3 +245,16 @@ function HHTD:MakeError(something)
 
     errorf();
 end
+
+--@debug@
+function HHTD:Hickup(mul)
+    if not mul then mul = 1 end
+    local t = 0;
+
+    for i=1, mul * 1000000, 1 do
+        t = t + 1
+    end
+
+    self:Debug(ERROR, 'Hickup ', t);
+end
+--@end-debug@

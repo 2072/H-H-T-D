@@ -976,7 +976,7 @@ do
         end -- }}}
 
         if configRef.UHMHAP and record.healDone < HHTD.HealThreshold then
-            HHTD:Debug(INFO2, sourceName, "is below minimum healed amount:", record.healDone);
+            --HHTD:Debug(INFO2, sourceName, "is below minimum healed amount:", record.healDone);
             return;
         end
 

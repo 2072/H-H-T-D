@@ -29,8 +29,8 @@
 
 ## X-License: All Rights Reserved
 
-## OptionalDeps: Ace3, LibNameplate-1.0
-## X-Embeds: Ace3, LibNameplate-1.0
+## OptionalDeps: Ace3
+## X-Embeds: Ace3
 
 ## X-ReleaseDate: "@project-date-iso@"
 ## X-Category: PvP
@@ -45,6 +45,7 @@ Core.lua
 utils.lua
 
 NamePlateHooker.lua
+NamePlateRegistry.lua
 
 GraphicalReporter.lua
 

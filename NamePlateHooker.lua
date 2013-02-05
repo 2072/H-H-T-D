@@ -33,15 +33,18 @@ local INFO2     = 4;
 local ADDON_NAME, T = ...;
 local HHTD = T.Healers_Have_To_Die;
 local L = HHTD.Localized_Text;
-local LNP = LibStub("LibNameplate-1.0");
+--local LNP = LibStub("LibNameplate-1.0");
+local NPR;
 
 
 HHTD.Name_Plate_Hooker = HHTD:NewModule("NPH")
 
-HHTD.Name_Plate_Hooker:SetDefaultModulePrototype( HHTD.MODULE_PROTOTYPE );
-HHTD.Name_Plate_Hooker:SetDefaultModuleLibraries( "AceConsole-3.0", "AceEvent-3.0");
-
 local NPH = HHTD.Name_Plate_Hooker;
+
+NPH:SetDefaultModulePrototype( HHTD.MODULE_PROTOTYPE );
+NPH:SetDefaultModuleLibraries( "AceConsole-3.0", "AceEvent-3.0");
+NPH:SetDefaultModuleState( false );
+
 
 local PLATES__NPH_NAMES = {
     [true] = 'HHTD_FriendHealer',
@@ -162,20 +165,6 @@ end -- }}}
 function NPH:OnEnable() -- {{{
     self:Debug(INFO, "OnEnable");
 
-    if LibStub then
-        if (select(2, LibStub:GetLibrary("LibNameplate-1.0"))) < 30 then
-            message("The shared library |cFF00FF00LibNameplate-1.0|r is out-dated, version |cFF0077FF1.0.30 (revision 125)|r at least is required. HHTD won't add its symbols over name plates.|r\n");
-            self:Debug("LibNameplate-1.0",  LibStub:GetLibrary("LibNameplate-1.0"));
-            self:Disable();
-            return;
-        end
-    end
-
-    -- Subscribe to callbacks
-    LNP.RegisterCallback(self, "LibNameplate_NewNameplate");
-    LNP.RegisterCallback(self, "LibNameplate_RecycleNameplate");
-    LNP.RegisterCallback(self, "LibNameplate_FoundGUID");
-    
     -- Subscribe to HHTD callbacks
     self:RegisterMessage("HHTD_HEALER_GONE");
     self:RegisterMessage("HHTD_HEALER_BORN");
@@ -183,12 +172,20 @@ function NPH:OnEnable() -- {{{
 
     self:RegisterEvent("PLAYER_ENTERING_WORLD");
 
+    NPR = self:GetModule("NPR");
+    NPR:Enable();
+
+    -- Subscribe to callbacks
+    self:RegisterMessage("NPR_ON_NEW_PLATE");
+    self:RegisterMessage("NPR_ON_RECYCLE_PLATE");
+    self:RegisterMessage("NPR_ON_GUID_FOUND");
+
     local plate;
     for i, isFriend in ipairs({true,false}) do
         -- Add nameplates to known healers by GUID
         for healerGUID, healer in pairs(HHTD.Registry_by_GUID[isFriend]) do
 
-            plate = LNP:GetNameplateByGUID(healerGUID) or LNP:GetNameplateByName(healer.name);
+            plate = NPR:GetByGUID(healerGUID) or NPR:GetByName(healer.name);
 
             if plate then
                 self:AddCrossToPlate (plate, isFriend, healer.name);
@@ -202,9 +199,9 @@ end -- }}}
 function NPH:OnDisable() -- {{{
     self:Debug(INFO2, "OnDisable");
 
-    LNP.UnregisterCallback(self, "LibNameplate_NewNameplate");
-    LNP.UnregisterCallback(self, "LibNameplate_RecycleNameplate");
-    LNP.UnregisterCallback(self, "LibNameplate_FoundGUID");
+    NPR.UnregisterCallback(self, "NPR_ON_NEW_PLATE");
+    NPR.UnregisterCallback(self, "NPR_ON_RECYCLE_PLATE");
+    NPR.UnregisterCallback(self, "NPR_ON_GUID_FOUND");
 
     -- clean all nameplates
     for i, isFriend in ipairs({true,false}) do
@@ -258,10 +255,10 @@ function NPH:HHTD_HEALER_GONE(selfevent, isFriend, healer)
         return;
     end
 
-    local plateByName = LNP:GetNameplateByName(healer.name);
+    local plateByName = NPR:GetByName(healer.name);
     local plateByGuid;
     if self.db.global.sPve then
-        plateByGuid = LNP:GetNameplateByGUID(healer.guid);
+        plateByGuid = NPR:GetByGUID(healer.guid);
     end
 
     local plate = plateByGuid or plateByName;
@@ -297,15 +294,13 @@ function NPH:HHTD_HEALER_BORN (selfevent, isFriend, healer)
     end
 
 
-    local plateByName = LNP:GetNameplateByName(healer.name);
+    local plateByName = NPR:GetByName(healer.name);
     local plateByGuid;
     if self.db.global.sPve then
-        plateByGuid = LNP:GetNameplateByGUID(healer.guid);
+        plateByGuid = NPR:GetByGUID(healer.guid);
     end
 
     local plate = plateByGuid or plateByName;
-
-    -- local plateType = LNP:GetType(plate);
 
     if plate then
         -- we have have access to the correct plate through the unit's GUID or it's uniquely named.
@@ -335,17 +330,16 @@ end
 -- }}}
 
 -- Lib Name Plates CallBacks {{{
-function NPH:LibNameplate_NewNameplate(selfevent, plate)
+function NPH:NPR_ON_NEW_PLATE(selfevent, plate, data)
 
-    local plateName = LNP:GetName(plate);
-    local isFriend = (LNP:GetReaction(plate) == "FRIENDLY") and true or false;
+    local plateName = data.name;
+    local isFriend = (data.reaction == "FRIENDLY") and true or false;
 
     --@debug@
-    self:Debug(INFO2, "new plate LNP:IsTarget()?|cff00ff00", LNP:IsTarget(plate) , "|rname:", plateName, 'isFriend?', isFriend, 'alpha:', plate:GetAlpha(),'plate.alpha:', plate.alpha, "plate.unit.alpha:", plate.unit and plate.unit.alpha or nil);
+    -- self:Debug(INFO2, "new plate LNP:IsTarget()?|cff00ff00", LNP:IsTarget(plate) , "|rname:", plateName, 'isFriend?', isFriend, 'alpha:', plate:GetAlpha(),'plate.alpha:', plate.alpha, "plate.unit.alpha:", plate.unit and plate.unit.alpha or nil);
     --@end-debug@
 
     -- test for uniqueness of the nameplate
-
     if not Plate_Name_Count[isFriend][plateName] then
         Plate_Name_Count[isFriend][plateName] = 1;
     else
@@ -372,23 +366,23 @@ function NPH:LibNameplate_NewNameplate(selfevent, plate)
             return;
         end
 
-        self:AddCrossToPlate(plate, isFriend, plateName);
+        self:AddCrossToPlate(plate, isFriend, plateName, data.guid);
     end
 end
 
-function NPH:LibNameplate_RecycleNameplate(selfevent, plate)
+function NPH:NPR_ON_RECYCLE_PLATE(selfevent, plate, data)
 
-    if LNP.fakePlate[plate] then
+   --x if LNP.fakePlate[plate] then
         --@debug@
-        --self:Debug(INFO2, "LibNameplate_RecycleNameplate(): unused frame received for:", LNP:GetName(plate));
+        --self:Debug(INFO2, "NPR_ON_RECYCLE_PLATE(): unused frame received for:", NPR:GetName(plate));
         --@end-debug@
-        return;
-    end
+      --x  return;
+    --x end
 
-    local plateName = LNP:GetName(plate);
+    local plateName = data.name;
 
     --@debug@
-    self:Debug(INFO, "LibNameplate_RecycleNameplate():", plateName);
+    -- self:Debug(INFO, "NPR_ON_RECYCLE_PLATE():", plateName);
     --@end-debug@
 
     for i, isFriend in ipairs({true,false}) do
@@ -409,11 +403,11 @@ function NPH:LibNameplate_RecycleNameplate(selfevent, plate)
     end
 end
 
-function NPH:LibNameplate_FoundGUID(selfevent, plate, guid, unitID)
+function NPH:NPR_ON_GUID_FOUND(selfevent, plate, guid)
 
     if HHTD.Registry_by_GUID[true][guid] or HHTD.Registry_by_GUID[false][guid] then
         self:Debug(INFO, "GUID found");
-        self:AddCrossToPlate(plate, HHTD.Registry_by_GUID[true][guid] and true or false, LNP:GetName(plate), guid);
+        self:AddCrossToPlate(plate, HHTD.Registry_by_GUID[true][guid] and true or false, NPR:GetName(plate), guid);
     else
         self:Debug(INFO2, "GUID found but not a healer");
     end
@@ -527,13 +521,13 @@ do
         end
 
         if isFriend==nil then
-            isFriend = (LNP:GetReaction(plate) == "FRIENDLY") and true or false;
+            isFriend = (NPR:GetReaction(plate) == "FRIENDLY") and true or false;
             self:Debug(ERROR, "AddCrossToPlate(), isFriend was not defined", isFriend);
         end
 
         -- export useful data
         IsFriend        = isFriend;
-        Guid            = guid;
+        Guid            = guid or NPR:GetGUID(plate);
         Plate           = plate;
         PlateName       = plateName;
         PlateAdditions  = plate[PLATES__NPH_NAMES[isFriend]];
@@ -603,8 +597,8 @@ do
                 IsFriend        = isFriend;
                 Plate           = plate;
                 PlateAdditions  = plate[PLATES__NPH_NAMES[isFriend]];
-                PlateName       = LNP:GetName(plate);
-                Guid            = LNP:GetGUID(plate);
+                PlateName       = NPR:GetName(plate);
+                Guid            = NPR:GetGUID(plate);
                 Guid            = HHTD.Registry_by_GUID[IsFriend][Guid] and Guid or nil;
 
                 if not HHTD.Registry_by_Name[isFriend][PlateName] then
