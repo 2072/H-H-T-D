@@ -164,7 +164,7 @@ function(t, frame)
 });
 
 --Name to GUID cache for players (their GUID are constant)
-local AddUIDToCache, GetGUIDFromCache;
+local AddGUIDToCache, GetGUIDFromCache;
 do
     local NameToGUID = {['FRIENDLY'] = {}, ['HOSTILE'] = {}, ["NEUTRAL"] = {}};
     local KnownNames = {};
@@ -173,7 +173,7 @@ do
     local CurrentCacheIndex = 1;
 
 
-    function AddUIDToCache(data)
+    function AddGUIDToCache(data)
 
         if data.type ~= 'PLAYER' then
             return;
@@ -192,7 +192,7 @@ do
         NameToGUID[data.reaction][data.name] = data.GUID;
 
         CurrentCacheIndex = (CurrentCacheIndex < LIMIT) and (CurrentCacheIndex + 1) or 1;
-        NPR:Debug(INFO, 'AddUIDToCache() CurrentCacheIndex=', CurrentCacheIndex);
+        NPR:Debug(INFO, 'AddGUIDToCache() CurrentCacheIndex=', CurrentCacheIndex);
     end
 
 
@@ -398,7 +398,7 @@ function NPR:UPDATE_MOUSEOVER_UNIT()
             if not data.GUID and FrameRegionsCache[  FrameChildrenCache[frame][1]  ][3]:IsShown() then -- test for highlight among shown plates
 
                 data.GUID = UnitGUID('mouseover');
-                AddUIDToCache(data);
+                AddGUIDToCache(data);
                 self:SendMessage("NPR_ON_GUID_FOUND", frame, data.GUID, 'mouseover');
                 
                 --@debug@
@@ -459,7 +459,9 @@ do
         --@end-debug@
 
         if not PlateRegistry_per_frame[worldChild] and worldChild:IsShown() and IsPlate(worldChild) then
+            --@debug@
             NPR:Debug(INFO, 'New plate frame (fname: ', worldChild:GetName() , ')');
+            --@end-debug@
 
             -- keep a reference
             PlateRegistry_per_frame[worldChild] = {};
@@ -514,7 +516,7 @@ do
         for frame, data in pairs(ActivePlates_per_frame) do
             if not data.GUID and IsPlateTargeted(frame) then
                 data.GUID = UnitGUID('target');
-                AddUIDToCache(data);
+                AddGUIDToCache(data);
                 self:SendMessage("NPR_ON_GUID_FOUND", frame, data.GUID, 'target');
                 --@debug@
                 self:Debug(INFO, 'Guid found for', data.name, 'target');
