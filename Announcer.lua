@@ -34,7 +34,7 @@ local HHTD = T.Healers_Have_To_Die;
 local L = HHTD.Localized_Text;
 
 -- Create module
-HHTD.Announcer = HHTD:NewModule("Announcer", "AceConsole-3.0"); --, "AceTimer-3.0");
+HHTD.Announcer = HHTD:NewModule("Announcer", "AceConsole-3.0");
 local Announcer = HHTD.Announcer;
 
 -- Up Values
@@ -275,7 +275,12 @@ function Announcer:HHTD_TARGET_LOCKED (selfevent, isFriend, healerProfile)
 
 end
 
-function Announcer:HHTD_HEALER_UNDER_ATTACK (selfevent, sourceName, sourceGUID, destName, destGUID)
+function Announcer:HHTD_HEALER_UNDER_ATTACK (selfevent, sourceName, sourceGUID, destName, destGUID, isCurrentPlayer)
+
+    if isCurrentPlayer then
+        return;
+    end
+
     local message = HHTD:ColorText("HHTD: ", '88555555') .. (L["HEALER_UNDER_ATTACK"]):format(HHTD:ColorText(HHTD:MakePlayerName(destName), 'FF00DD00'), HHTD:ColorText(HHTD:MakePlayerName(sourceName), 'FFDD0000'));
 
     RaidNotice_AddMessage( RaidWarningFrame, message, ChatTypeInfo["RAID_WARNING"] );

@@ -662,6 +662,7 @@ function HHTD:OnInitialize()
 end
 
 local PLAYER_FACTION = "";
+local PLAYER_GUID    = "";
 function HHTD:OnEnable()
 
     REGISTER_HEALERS_ONLY_SPELLS_ONCE ();
@@ -681,6 +682,7 @@ function HHTD:OnEnable()
     self:SetModulesStates();
 
     PLAYER_FACTION = UnitFactionGroup("player");
+    PLAYER_GUID    = UnitGUID("player");
 
     self:ScheduleRepeatingTimer(self.Undertaker,          10, self);
     self:ScheduleRepeatingTimer(self.UpdateHealThreshold, 50, self);
@@ -691,6 +693,7 @@ function HHTD:PLAYER_ALIVE()
     self:Debug("PLAYER_ALIVE");
 
     PLAYER_FACTION = UnitFactionGroup("player");
+    PLAYER_GUID    = UnitGUID("player");
 
     self:UnregisterEvent("PLAYER_ALIVE");
 end
@@ -1125,9 +1128,10 @@ do
         if (not Source_Is_Friendly) and (configRef.HealerUnderAttackAlerts and (Source_Is_NPC or Source_Is_Human) and Registry_by_GUID[true][destGUID]) then
 
             if not self.Friendly_Healers_Attacked_by_GUID[destGUID] then
-                if ( CheckInteractDistance(destName, 1) ) then
 
-                    self:SendMessage("HHTD_HEALER_UNDER_ATTACK", sourceName, sourceGUID, destName, destGUID);
+                if PLAYER_GUID == destGUID or CheckInteractDistance(destName, 1) then
+
+                    self:SendMessage("HHTD_HEALER_UNDER_ATTACK", sourceName, sourceGUID, destName, destGUID, PLAYER_GUID == destGUID);
 
                     self.Friendly_Healers_Attacked_by_GUID[destGUID] = GetTime();
 
