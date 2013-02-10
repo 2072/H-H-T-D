@@ -199,10 +199,6 @@ end -- }}}
 function NPH:OnDisable() -- {{{
     self:Debug(INFO2, "OnDisable");
 
-    NPR.UnregisterCallback(self, "NPR_ON_NEW_PLATE");
-    NPR.UnregisterCallback(self, "NPR_ON_RECYCLE_PLATE");
-    NPR.UnregisterCallback(self, "NPR_ON_GUID_FOUND");
-
     -- clean all nameplates
     for i, isFriend in ipairs({true,false}) do
         for plateTID, plate in pairs(self.DisplayedPlates_byFrameTID[isFriend]) do
