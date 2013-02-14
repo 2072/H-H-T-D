@@ -129,10 +129,11 @@ function(t, frame)
             -- children per number cache
             function(t, childNum)
 
-                t[childNum] = (select(childNum, frame:GetChildren()));
-                --@debug@
+                t[childNum] = (select(childNum, frame:GetChildren())) or false;
+                --@alpha@
+                assert(t[childNum], "CFCache: Child" .. childNum .. " not found.");
                 NPR:Debug(INFO, 'cached a new frame child', childNum);
-                --@end-debug@
+                --@end-alpha@
                 return  t[childNum];
 
             end
@@ -151,11 +152,12 @@ function(t, frame)
             -- children per number cache
             function(t, regionNum)
 
-                t[regionNum] = (select(regionNum, frame:GetRegions()));
-                --@debug@
+                t[regionNum] = (select(regionNum, frame:GetRegions())) or false;
+                --@alpha@
+                assert(t[regionNum], "CFCache: Region" .. regionNum .. " not found.");
                 NPR:Debug(INFO, 'cached a new frame region', regionNum);
-                --@end-debug@
-                return  t[regionNum];
+                --@end-alpha@
+                return t[regionNum];
 
             end
         })
