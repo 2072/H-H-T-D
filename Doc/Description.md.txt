@@ -3,6 +3,8 @@ Healers Have To Die
 *Spot those bloody healers instantly and help them accomplish their destiny!
 (PVP and PVE)*
 
+**NOTE: Type /HHTDG to open the configuration panel.**
+*HHTD's options are not directly available in the "Interface" panel due to ongoing tainting issues Blizzard is not willing to fix.*
 
 HHTD adds a **red cross** over *enemy* healer's name plates. *You can't miss them!*
  (see the [screen-shot][redcross]).
