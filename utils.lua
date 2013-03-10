@@ -34,6 +34,7 @@ local HHTD_C = T.Healers_Have_To_Die.Constants;
 
 local pairs = _G.pairs;
 local table = _G.table;
+local select = _G.select;
 
 function HHTD:MakePlayerName (name) --{{{
     if not name then name = "NONAME" end
@@ -221,6 +222,23 @@ function HHTD:pairs_ordered (t, reverse, SortKey) -- Not to be used where perfor
 
     end, t, 0;
 
+end
+
+function HHTD:AddDelayedFunctionCall(callID, functionLink, ...)
+
+    
+    if (not self.DelayedFunctionCalls[callID]) then 
+        self.DelayedFunctionCalls[callID] =  {["func"] = functionLink, ["args"] =  {...}};
+        self.DelayedFunctionCallsCount = self.DelayedFunctionCallsCount + 1;
+    elseif select("#",...) > 1 then -- if we had more than the function reference and its object
+
+        local args = self.DelayedFunctionCalls[callID].args;
+
+        for i=1,select("#",...), 1 do
+            args[i]=select(i, ...);
+        end
+
+    end
 end
 
 local function BadLocalTest (localtest)
