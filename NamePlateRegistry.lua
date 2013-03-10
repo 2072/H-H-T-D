@@ -116,7 +116,7 @@ local ActivePlates_per_frame    = {};
 
 local CurrentTarget             = false;
 local HasTarget                 = false;
-local TargetCheckScannedAll     = false; -- useful when a target eists but it cannot be found (ie: not on screen)
+local TargetCheckScannedAll     = false; -- useful when a target exists but it cannot be found (ie: not on screen)
 
 -- frame children and regions cache
 

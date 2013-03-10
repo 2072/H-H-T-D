@@ -269,7 +269,7 @@ function NPH:HHTD_HEALER_GONE(selfevent, isFriend, healer)
 
         elseif not self.db.global.sPve and not HHTD.Registry_by_Name[isFriend][healer.name] then -- Just hide all the symbols on the plates with that name if there is none left
 
-            for plate, plate in pairs (Multi_Plates_byName[isFriend][healer.name]) do -- XXX quite dodgy even if index == value
+            for _, plate in pairs (Multi_Plates_byName[isFriend][healer.name]) do
                 self:HideCrossFromPlate(plate, isFriend, healer.name);
             end
         end
@@ -308,7 +308,7 @@ function NPH:HHTD_HEALER_BORN (selfevent, isFriend, healer)
 
         elseif not self.db.global.sPve then -- we can only access through its name and we are not in strict pve mode -- when multi pop, it will add the cross to all plates
 
-            for plate, plate in pairs (Multi_Plates_byName[isFriend][healer.name]) do
+            for _, plate in pairs (Multi_Plates_byName[isFriend][healer.name]) do
                 self:AddCrossToPlate (plate, isFriend, healer.name);
 
                 self:Debug(INFO, "HHTD_HEALER_BORN(): Using name only", healer.name);
@@ -325,7 +325,7 @@ end
 
 -- }}}
 
--- Lib Name Plates CallBacks {{{
+-- Name Plates CallBacks {{{
 function NPH:NPR_ON_NEW_PLATE(selfevent, plate, data)
 
     local plateName = data.name;
@@ -363,6 +363,16 @@ function NPH:NPR_ON_NEW_PLATE(selfevent, plate, data)
         end
 
         self:AddCrossToPlate(plate, isFriend, plateName, data.guid);
+        --@alpha@
+    else -- it's not a healer
+        for i, isFriend in ipairs({true,false}) do
+            local plateAdditions = plate[PLATES__NPH_NAMES[isFriend]];
+
+            if plateAdditions and (plateAdditions.IsShown or plateAdditions.texture:IsShown() or plateAdditions.rankFont:IsShown()) then -- check if the plate appeared with our additions shown
+                error("Plate prev-recycling hiding failed: "..tostring(plateAdditions.IsShown).." for " .. plateName);
+            end
+        end
+        --@end-alpha@
     end
 end
 
@@ -461,16 +471,22 @@ do
     end
 
     local function SetRank ()  -- ONCE
+        --@alpha@
         assert(PlateAdditions, 'PlateAdditions is not defined'); -- to diagnose issue repoted on 2012-09-07
         assert(PlateAdditions.rankFont, "rankFont is invalid"); -- to diagnose issue repoted on 2012-09-07
         assert(PlateAdditions.rankFont.SetText, "rankFont.SetText is invalid"); -- to diagnose issue repoted on 2012-10-17
         assert(IsFriend == true or IsFriend == false, "IsFriend is invalid"); -- to diagnose issue repoted on 2012-09-07
+        --@end-alpha@
 
          if not Guid then
+             --@alpha@
              assert(NP_Is_Not_Unique[IsFriend], "NP_Is_Not_Unique[IsFriend] is invalid"); -- to diagnose issue repoted on 2012-09-07
+             --@end-alpha@
              PlateAdditions.rankFont:SetText(NP_Is_Not_Unique[IsFriend][PlateName] and '?' or HHTD.Registry_by_Name[IsFriend][PlateName].rank);
-        else
-            assert(HHTD.Registry_by_GUID[IsFriend][Guid], "HHTD.Registry_by_GUID[IsFriend][Guid] is not defined"); -- to diagnose issue repoted on 2012-10-17
+         else
+             if not HHTD.Registry_by_GUID[IsFriend][Guid] then
+                 assert(HHTD.Registry_by_GUID[IsFriend][Guid], "HHTD.Registry_by_GUID[IsFriend][Guid] is not defined for plate:" .. tostring(PlateName).. " isfriend:"..tostring(IsFriend) .. " Found with Name:"..tostring(HHTD.Registry_by_Name[IsFriend][PlateName] and true or false)); -- to diagnose issue repoted on 2012-10-17 and 2013-03-08
+             end
             PlateAdditions.rankFont:SetText(HHTD.Registry_by_GUID[IsFriend][Guid].rank);
         end
     end
@@ -494,13 +510,13 @@ do
 
         PlateAdditions.texture = texture;
         PlateAdditions.texture:Show();
+        PlateAdditions.IsShown = true; -- set it as soon as we show something
 
         PlateAdditions.rankFont = rankFont;
         SetRank();
        
         PlateAdditions.rankFont:Show();
 
-        PlateAdditions.IsShown = true;
 
     end
 
@@ -524,6 +540,7 @@ do
         -- export useful data
         IsFriend        = isFriend;
         Guid            = guid or NPR:GetGUID(plate);
+        Guid            = HHTD.Registry_by_GUID[IsFriend][Guid] and Guid or nil; -- make sure the Guid is actually usable.
         Plate           = plate;
         PlateName       = plateName;
         PlateAdditions  = plate[PLATES__NPH_NAMES[isFriend]];
@@ -552,7 +569,7 @@ do
 
         PlateAdditions.plateName = plateName;
 
-        self.DisplayedPlates_byFrameTID[isFriend][plate] = plate;
+        self.DisplayedPlates_byFrameTID[isFriend][plate] = plate; -- used later to update what was created above
 
         --@alpha@
         -- IsFriend        = nil;
@@ -599,7 +616,7 @@ do
 
                 if not HHTD.Registry_by_Name[isFriend][PlateName] then
                     --@alpha@
-                    --error("PlateName: '"..PlateName.."' is no longer defined in registry");
+                    error("PlateName: '"..PlateName.."' is no longer defined in registry");
                     --@end-alpha@
                 end
 
