@@ -482,6 +482,10 @@ do
              --@alpha@
              assert(NP_Is_Not_Unique[IsFriend], "NP_Is_Not_Unique[IsFriend] is invalid"); -- to diagnose issue repoted on 2012-09-07
              --@end-alpha@
+
+             if not HHTD.Registry_by_Name[IsFriend][PlateName] then
+                 assert(HHTD.Registry_by_Name[IsFriend][PlateName], "HHTD.Registry_by_Name[IsFriend][PlateName] is invalid for plate:" .. tostring(PlateName).. " isfriend:"..tostring(IsFriend)); -- to diagnose issue repoted on 2012-09-07 and 2013-03-11
+             end
              PlateAdditions.rankFont:SetText(NP_Is_Not_Unique[IsFriend][PlateName] and '?' or HHTD.Registry_by_Name[IsFriend][PlateName].rank);
          else
              if not HHTD.Registry_by_GUID[IsFriend][Guid] then
