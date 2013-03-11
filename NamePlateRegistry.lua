@@ -74,6 +74,7 @@ local GetTexCoordsForRole   = _G.GetTexCoordsForRole;
 local GetMouseFocus         = _G.GetMouseFocus;
 local UnitExists            = _G.UnitExists;
 local UnitGUID              = _G.UnitGUID;
+local UnitName              = _G.UnitName;
 
 local WorldFrame            = _G.WorldFrame;
 -- }}}
@@ -393,6 +394,7 @@ end
 
 function NPR:UPDATE_MOUSEOVER_UNIT()
 
+    local unitName = "";
     if GetMouseFocus() == WorldFrame then -- the cursor is either on a name plate or on a 3d model (ie: not on a unit-frame)
         --self:Debug(INFO, "UPDATE_MOUSEOVER_UNIT");
 
@@ -400,12 +402,19 @@ function NPR:UPDATE_MOUSEOVER_UNIT()
             if not data.GUID and FrameRegionsCache[  FrameChildrenCache[frame][1]  ][3]:IsShown() then -- test for highlight among shown plates
 
                 data.GUID = UnitGUID('mouseover');
-                AddGUIDToCache(data);
-                self:SendMessage("NPR_ON_GUID_FOUND", frame, data.GUID, 'mouseover');
+                unitName = UnitName('mouseover');
+
+                if unitName == data.name then
+                    AddGUIDToCache(data);
+                    self:SendMessage("NPR_ON_GUID_FOUND", frame, data.GUID, 'mouseover');
+                    --@debug@
+                    self:Debug(INFO, 'Guid found for', data.name, 'mouseover');
+                    --@end-debug@
+                else
+                    error('UMU: Nameplate inconsistency detected: un:' .. tostring(unitName) .. ' rpn:'..tostring(data.name) .. ' rawpn:' .. tostring(RawGetPlateName(frame)));
+                    -- TODO recycle the nameplate if that happens
+                end
                 
-                --@debug@
-                self:Debug(INFO, 'Guid found for', data.name, 'mouseover');
-                --@end-debug@
                 
                 break; -- we found what we were looking for, no need to continue
             end
@@ -476,12 +485,12 @@ do
 
 
 
-            --@debug@
+            --@alpha@
         elseif PlateRegistry_per_frame[worldChild] then
 
             assert(not ActivePlates_per_frame[worldChild] == not worldChild:IsShown(), 'OnHide/Show hook failure: ' .. tostring(ActivePlates_per_frame[worldChild]).." != "..tostring(worldChild:IsShown()));
             
-            --@end-debug@
+            --@end-alpha@
         end
 
         RegisterNewPlates(...);
@@ -508,6 +517,7 @@ do
 
 
     function NPR:CheckPlatesForTarget() -- run by a timer, only active when a target exists
+        local unitName = "";
 
         if CurrentTarget or TargetCheckScannedAll or not HasTarget then return; end
 
@@ -518,11 +528,16 @@ do
         for frame, data in pairs(ActivePlates_per_frame) do
             if not data.GUID and IsPlateTargeted(frame) then
                 data.GUID = UnitGUID('target');
-                AddGUIDToCache(data);
-                self:SendMessage("NPR_ON_GUID_FOUND", frame, data.GUID, 'target');
-                --@debug@
-                self:Debug(INFO, 'Guid found for', data.name, 'target');
-                --@end-debug@
+                unitName = UnitName('target');
+                if unitName == data.name then
+                    AddGUIDToCache(data);
+                    self:SendMessage("NPR_ON_GUID_FOUND", frame, data.GUID, 'target');
+                    --@debug@
+                    self:Debug(INFO, 'Guid found for', data.name, 'target');
+                    --@end-debug@
+                else
+                    error('CPFT: Nameplate inconsistency detected: un:' .. tostring(unitName) .. ' rpn:'..tostring(data.name) .. ' rawpn:' .. tostring(RawGetPlateName(frame)));
+                end
 
                 break; -- there can be only one target
             end
@@ -536,6 +551,13 @@ end
 -- public meant methods
 
 function NPR:GetName(plateFrame)
+
+    --@alpha@
+    if PlateRegistry_per_frame[plateFrame] and PlateRegistry_per_frame[plateFrame].name and PlateRegistry_per_frame[plateFrame].name ~= RawGetPlateName(plateFrame) then
+        error('GN: Nameplate inconsistency detected: rpn:' .. tostring(PlateRegistry_per_frame[plateFrame].name) .. ' rawpn:' .. tostring(RawGetPlateName(plateFrame)));
+    end
+    --@end-alpha@
+
     return PlateRegistry_per_frame[plateFrame] and PlateRegistry_per_frame[plateFrame].name or nil;
 end
 
@@ -567,6 +589,11 @@ function NPR:GetByName (name)
 
     for frame, data in pairs(ActivePlates_per_frame) do
         if data.name == name then
+            --@alpha@
+            if RawGetPlateName(frame) ~= name then
+                error('GBN: Nameplate inconsistency detected: n:' .. tostring(name) ..  ' rawpn:' .. tostring(RawGetPlateName(frame)) );
+            end
+            --@end-alpha@
             return frame, data;
         end
     end
