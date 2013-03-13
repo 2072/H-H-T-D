@@ -77,6 +77,7 @@ local UnitGUID              = _G.UnitGUID;
 local UnitName              = _G.UnitName;
 
 local WorldFrame            = _G.WorldFrame;
+local tostring              = _G.tostring;
 -- }}}
 
 function NPR:OnInitialize() -- {{{
@@ -93,9 +94,10 @@ function NPR:OnEnable() -- {{{
 
     self.PlateCheckTimer = self:ScheduleRepeatingTimer("LookForNewPlates", 0.1);
 
-    --@debug@
+    --@alpha@
     self.DebugTestsTimer = self:ScheduleRepeatingTimer("DebugTests", 1);
-    --@end-debug@
+    self.Debug_CheckHookSanityTimer = self:ScheduleRepeatingTimer("Debug_CheckHookSanity", 0.1);
+    --@end-alpha@
 
 end -- }}}
 
@@ -103,9 +105,10 @@ function NPR:OnDisable() -- {{{
     self:Debug(INFO2, "OnDisable");
     self:CancelTimer(self.PlateCheckTimer);
     self:CancelTimer(self.TargetCheckTimer);
-    --@debug@
+    --@alpha@
     self:CancelTimer(self.DebugTestsTimer);
-    --@end-debug@
+    self:CancelTimer(self.Debug_CheckHookSanityTimer);
+    --@end-alpha@
 end -- }}}
 
 
@@ -225,7 +228,7 @@ local function IsPlateTargeted (frame)
         return false;
     end
 
-    if not ActivePlates_per_frame[frame] then -- it's not even on the screen...
+    if not ActivePlates_per_frame[frame] or not ActivePlates_per_frame[frame].name then -- it's not even on the screen...
         return false;
     end
 
@@ -244,21 +247,21 @@ end
 
 local RawGetPlateType;
 
---@debug@
+--@alpha@
 local DiffColors = { ['r'] = {}, ['g'] = {}, ['b'] = {}, ['a'] = {} };
 local DiffColors_ExpectedDiffs = 0;
---@end-debug@
+--@end-alpha@
 
 do
 
     local function TypeFromColor (r, g, b, a)
 
-        --@debug@
+        --@alpha@
         DiffColors['r'][r] = true;
         DiffColors['g'][g] = true;
         DiffColors['b'][b] = true;
         DiffColors['a'][a] = true;
-        --@end-debug@
+        --@end-alpha@
 
 
         -- the following block is borrowed from TidyPlates
@@ -284,53 +287,134 @@ do
     end
 end
 
-local function PlateOnShow (frame)
-    --NPR:Debug(INFO, "PlateOnShow", frame:GetName());
+--@alpha@
+local LastThrow = 0;
+function NPR:Debug_CheckHookSanity()
+
+    local count = 0;
 
 
-    if CurrentTarget == frame then
-        CurrentTarget = false; -- it can't be true --> recycling occuered
+    for frame, data in pairs(PlateRegistry_per_frame) do
+
+        count = count + 1;
+
+        if frame:IsShown()then
+            if not ActivePlates_per_frame[frame] then
+                if GetTime() - LastThrow > 4 then
+                    LastThrow = GetTime();
+                    error("Debug_CheckHookSanity(): OnShow hook failed");
+                end
+            end
+        else
+            if ActivePlates_per_frame[frame] then
+                if GetTime() - LastThrow > 3 then
+                    LastThrow = GetTime();
+                    error("Debug_CheckHookSanity(): OnHide hook failed");
+                end
+            end
+        end
     end
 
-    TargetCheckScannedAll = false;
+    -- self:Debug(INFO2, 'Debug_CheckHookSanity():', count, 'tests done');
+
+end
+--@end-alpha@
+
+local function PlateOnShow (frame, delayed_previousName)
+    --NPR:Debug(INFO, "PlateOnShow", frame:GetName());
+
+    if delayed_previousName and not ActivePlates_per_frame[frame] then -- it can already have been hidden...
+        return
+    end;
+
+    --@alpha@
+    local testCase1 = false;
+    if not delayed_previousName and ActivePlates_per_frame[frame] then -- test onHide hook
+        testCase1 = true;
+    end
+    --@end-alpha@
 
     local data = PlateRegistry_per_frame[frame];
+    local oldName = data.name;
+    local newName = RawGetPlateName(frame);
 
     ActivePlates_per_frame[frame] = data;
 
-    data.name = RawGetPlateName(frame);
-    data.reaction, data.type = RawGetPlateType(frame);
+    if newName ~= oldName then
+        if CurrentTarget == frame then
+            CurrentTarget = false; -- it can't be true --> recycling occuered
+        end
 
-    -- it's not safe to test for plate attribute now because they are not accurate at this stage...
-    data.GUID = GetGUIDFromCache(frame);
+        TargetCheckScannedAll = false;
 
-    --@debug@
-    if data.GUID then
-        --NPR:Debug(INFO, 'GUID was set during onshow for ', data.name);
-        --HHTD:Hickup(10);
+
+        data.name = newName;
+        data.reaction, data.type = RawGetPlateType(frame);
+
+
+        -- it's not safe to test for plate attribute now because they are not accurate at this stage...
+        data.GUID = GetGUIDFromCache(frame);
+
+        --@debug@
+        --if data.GUID then
+            --NPR:Debug(INFO, 'GUID was set during onshow for ', data.name);
+            --HHTD:Hickup(10);
+        --end
+        --@end-debug@
+
+        NPR:SendMessage("NPR_ON_NEW_PLATE", frame, data);
+
+        --@alpha@
+        if delayed_previousName and delayed_previousName ~= newName then
+            error('previousName('..tostring(delayed_previousName)..') ~= newName('..tostring(newName)..')');
+        end
+        --@end-alpha@
+
+    else -- reschedule this onshow
+        data.reaction, data.type, data.name = nil, nil, nil; -- clear the old datas, we delay only once...
+        NPR:ScheduleTimer(PlateOnShow, 0.1, frame, newName);
+        --NPR:Debug(WARNING, 'Name did not change, waiting before sending onshow event', newName);
     end
-    --@end-debug@
 
-    NPR:SendMessage("NPR_ON_NEW_PLATE", frame, data);
-
+    --@alpha@
+    if testCase1 then
+        error('onHide() failed for ' .. tostring(RawGetPlateName(frame)));
+    end
+    --@end-alpha@
 end
 
-local data;
 local function PlateOnHide (frame)
     --NPR:Debug(INFO2, "PlateOnHide", frame:GetName());
+
+    --@alpha@
+    local testCase1 = false
+    if not ActivePlates_per_frame[frame] then
+        testCase1 = true;
+    end
+    --@end-alpha@
+
+    local data;
 
     data = PlateRegistry_per_frame[frame];
     ActivePlates_per_frame[frame] = nil;
     data.GUID = false;
-    NPR:SendMessage("NPR_ON_RECYCLE_PLATE", frame, data);
+
+    if data.name then -- only trigger the recycling if we sent a NPR_ON_NEW_PLATE
+        NPR:SendMessage("NPR_ON_RECYCLE_PLATE", frame, data);
+    end
 
     if frame == CurrentTarget then
         CurrentTarget = false;
         NPR:Debug(INFO2, 'Current Target\'s plate was hidden');
     end
+    --@alpha@
+    if testCase1 then
+        error('onShow() failed for ' .. tostring(RawGetPlateName(frame)));
+    end
+    --@end-alpha@
 end
 
---@debug@
+--@alpha@
  local ShownPlateCount = 0;
  local DiffColorsCount = 0;
 function NPR:DebugTests()
@@ -366,7 +450,7 @@ function NPR:DebugTests()
 end
 
 end
---@end-debug@
+--@end-alpha@
 
 -- Event handlers {{{
 
@@ -399,7 +483,7 @@ function NPR:UPDATE_MOUSEOVER_UNIT()
         --self:Debug(INFO, "UPDATE_MOUSEOVER_UNIT");
 
         for frame, data in pairs(ActivePlates_per_frame) do
-            if not data.GUID and FrameRegionsCache[  FrameChildrenCache[frame][1]  ][3]:IsShown() then -- test for highlight among shown plates
+            if data.name and not data.GUID and FrameRegionsCache[  FrameChildrenCache[frame][1]  ][3]:IsShown() then -- test for highlight among shown plates
 
                 data.GUID = UnitGUID('mouseover');
                 unitName = UnitName('mouseover');
@@ -459,20 +543,20 @@ do
     local function RegisterNewPlates (worldChild, ...)
 
         if not worldChild then
-            --@debug@
+            --@alpha@
             NPR:Debug(INFO, 'No more children', temp, 'frames checked');
-            --@end-debug@
+            --@end-alpha@
             return;
         end
 
-        --@debug@
+        --@alpha@
         temp = temp + 1;
-        --@end-debug@
+        --@end-alpha@
 
         if not PlateRegistry_per_frame[worldChild] and worldChild:IsShown() and IsPlate(worldChild) then
-            --@debug@
+            --@alpha@
             NPR:Debug(INFO, 'New plate frame (fname: ', worldChild:GetName() , ')');
-            --@end-debug@
+            --@end-alpha@
 
             -- keep a reference
             PlateRegistry_per_frame[worldChild] = {};
@@ -502,15 +586,15 @@ do
 
         if temp ~= WorldFrameChildrenNumber then
 
-            --@debug@
+            --@alpha@
             self:Debug(INFO, "WorldFrame gave birth to", temp - WorldFrameChildrenNumber);
-            --@end-debug@
+            --@end-alpha@
 
             WorldFrameChildrenNumber = temp;
 
-            --@debug@
+            --@alpha@
             temp = 0; -- used to count the number of checked frame for profiling purposes
-            --@end-debug@
+            --@end-alpha@
             RegisterNewPlates(WorldFrame:GetChildren());
         end
     end
@@ -526,7 +610,7 @@ do
         --@end-debug@
 
         for frame, data in pairs(ActivePlates_per_frame) do
-            if not data.GUID and IsPlateTargeted(frame) then
+            if data.name and not data.GUID and IsPlateTargeted(frame) then
                 data.GUID = UnitGUID('target');
                 unitName = UnitName('target');
                 if unitName == data.name then
@@ -576,7 +660,7 @@ end
 function NPR:GetByGUID (GUID)
 
     for frame, data in pairs(ActivePlates_per_frame) do
-        if data.GUID == GUID then
+        if data.GUID == GUID and data.name then
             return frame, data;
         end
     end
@@ -585,7 +669,36 @@ function NPR:GetByGUID (GUID)
 
 end
 
-function NPR:GetByName (name)
+do
+    local CurrentPlate;
+    local Data, Name;
+    local function iter ()
+        CurrentPlate, Data = next (ActivePlates_per_frame, CurrentPlate);
+
+        if not CurrentPlate then
+            return nil;
+        end
+
+        if Name == Data.name then
+            return CurrentPlate, Data;
+        else
+            return iter();
+        end
+
+    end
+    function NPR:EachByName (name)
+        CurrentPlate = nil;
+        Name = name;
+
+        return iter;
+    end
+end
+
+function NPR:GetByName (name) -- XXX returns just one if several name plates have the same name...
+
+    --@alpha@
+    assert(name, "name cannot be nil or false");
+    --@end-alpha@
 
     for frame, data in pairs(ActivePlates_per_frame) do
         if data.name == name then

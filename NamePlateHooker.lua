@@ -185,7 +185,7 @@ function NPH:OnEnable() -- {{{
         -- Add nameplates to known healers by GUID
         for healerGUID, healer in pairs(HHTD.Registry_by_GUID[isFriend]) do
 
-            plate = NPR:GetByGUID(healerGUID) or NPR:GetByName(healer.name);
+            plate = NPR:GetByGUID(healerGUID); -- or NPR:GetByName(healer.name); -- XXX
 
             if plate then
                 self:AddCrossToPlate (plate, isFriend, healer.name);
@@ -251,30 +251,21 @@ function NPH:HHTD_HEALER_GONE(selfevent, isFriend, healer)
         return;
     end
 
-    local plateByName = NPR:GetByName(healer.name);
+    
     local plateByGuid;
     if self.db.global.sPve then
         plateByGuid = NPR:GetByGUID(healer.guid);
     end
 
-    local plate = plateByGuid or plateByName;
+    for frame, data in NPR:EachByName(healer.name) do
+        local plate = plateByGuid or frame;
 
+        --self:Debug("Must drop", healer.name);
+        self:HideCrossFromPlate(plate, isFriend, healer.name);
 
-    if plate then
-
-        -- if we can acces to the plate using its guid or if it's unique
-        if plateByGuid or not NP_Is_Not_Unique[isFriend][healer.name] then
-            --self:Debug("Must drop", healer.name);
-            self:HideCrossFromPlate(plate, isFriend, healer.name);
-
-        elseif not self.db.global.sPve and not HHTD.Registry_by_Name[isFriend][healer.name] then -- Just hide all the symbols on the plates with that name if there is none left
-
-            for _, plate in pairs (Multi_Plates_byName[isFriend][healer.name]) do
-                self:HideCrossFromPlate(plate, isFriend, healer.name);
-            end
+        if plateByGuid then
+            break;
         end
-    else
-        self:Debug(INFO2, "HHTD_HEALER_GONE: no plate for", healer.name);
     end
 end
 
@@ -290,36 +281,28 @@ function NPH:HHTD_HEALER_BORN (selfevent, isFriend, healer)
     end
 
 
-    local plateByName = NPR:GetByName(healer.name);
     local plateByGuid;
     if self.db.global.sPve then
         plateByGuid = NPR:GetByGUID(healer.guid);
     end
 
-    local plate = plateByGuid or plateByName;
+    for frame, data in NPR:EachByName(healer.name) do
 
-    if plate then
+        local plate = plateByGuid or frame;
+
         -- we have have access to the correct plate through the unit's GUID or it's uniquely named.
-        if plateByGuid or not NP_Is_Not_Unique[isFriend][healer.name] then
+        if plateByGuid or not self.db.global.sPve then
             self:AddCrossToPlate (plate, isFriend, healer.name, healer.guid);
 
             self:Debug(INFO, "HHTD_HEALER_BORN(): GUID available or unique", NP_Is_Not_Unique[isFriend][healer.name]);
-            self:Debug(WARNING, healer.name, NP_Is_Not_Unique[isFriend][healer.name]);
-
-        elseif not self.db.global.sPve then -- we can only access through its name and we are not in strict pve mode -- when multi pop, it will add the cross to all plates
-
-            for _, plate in pairs (Multi_Plates_byName[isFriend][healer.name]) do
-                self:AddCrossToPlate (plate, isFriend, healer.name);
-
-                self:Debug(INFO, "HHTD_HEALER_BORN(): Using name only", healer.name);
-            end
         else
             self:Debug(WARNING, "HHTD_HEALER_BORN: multi and sPVE and noguid :'( ", healer.name);
         end
-    else
-        -- if spve we won't do anything since thee is no way to know the right plate.
-        self:Debug(WARNING, "HHTD_HEALER_BORN: no plate for ", healer.name);
-        return;
+
+        if plateByGuid then
+            break;
+        end
+
     end
 end
 
@@ -369,7 +352,12 @@ function NPH:NPR_ON_NEW_PLATE(selfevent, plate, data)
             local plateAdditions = plate[PLATES__NPH_NAMES[isFriend]];
 
             if plateAdditions and (plateAdditions.IsShown or plateAdditions.texture:IsShown() or plateAdditions.rankFont:IsShown()) then -- check if the plate appeared with our additions shown
-                error("Plate prev-recycling hiding failed: "..tostring(plateAdditions.IsShown).." for " .. plateName);
+                self:Debug(ERROR, "Plate prev-recycling hiding failed: ", plateAdditions.IsShown, plateName, isFriend, data.reaction);
+                error("Plate prev-recycling hiding failed: "..tostring(plateAdditions.IsShown).." for " .. plateName .. ' friend:' .. tostring(isFriend) .. '-' .. tostring(data.reaction)); -- seems to trigger when plateadditions are hidden while the plate are being recycled
+                -- this means:
+                --  New_plate fires before the cross was hidden
+                --  New_plate fires before recycle
+                --  HideCross fails
             end
         end
         --@end-alpha@
@@ -386,25 +374,24 @@ function NPH:NPR_ON_RECYCLE_PLATE(selfevent, plate, data)
     --x end
 
     local plateName = data.name;
+    local isFriend = (data.reaction == 'FRIENDLY') and true or false;
 
     --@debug@
     -- self:Debug(INFO, "NPR_ON_RECYCLE_PLATE():", plateName);
     --@end-debug@
 
-    for i, isFriend in ipairs({true,false}) do
 
-        self:HideCrossFromPlate(plate, isFriend, plateName);
+    self:HideCrossFromPlate(plate, isFriend, plateName);
 
 
-        -- prevent uniqueness data from stacking
-        if Plate_Name_Count[isFriend][plateName] then
+    -- prevent uniqueness data from stacking
+    if Plate_Name_Count[isFriend][plateName] then
 
-            Multi_Plates_byName[isFriend][plateName][plate] = nil;
+        Multi_Plates_byName[isFriend][plateName][plate] = nil;
 
-            Plate_Name_Count[isFriend][plateName] = Plate_Name_Count[isFriend][plateName] - 1;
-            if Plate_Name_Count[isFriend][plateName] == 0 then
-                Plate_Name_Count[isFriend][plateName] = nil;
-            end
+        Plate_Name_Count[isFriend][plateName] = Plate_Name_Count[isFriend][plateName] - 1;
+        if Plate_Name_Count[isFriend][plateName] == 0 then
+            Plate_Name_Count[isFriend][plateName] = nil;
         end
     end
 end
@@ -541,6 +528,13 @@ do
             self:Debug(ERROR, "AddCrossToPlate(), isFriend was not defined", isFriend);
         end
 
+        --@alpha@
+        if plateName ~= NPR:GetName(plate) then
+            self:Debug(ERROR, 'AddCrossToPlate(): plateName ~= NPR:GetName(plate):', plateName, '-_-', NPR:GetName(plate));
+            error('AddCrossToPlate(): plateName ~= NPR:GetName(plate)');
+        end
+        --@end-alpha@
+
         -- export useful data
         IsFriend        = isFriend;
         Guid            = guid or NPR:GetGUID(plate);
@@ -561,11 +555,11 @@ do
 
             UpdateTexture();
             PlateAdditions.texture:Show();
+            PlateAdditions.IsShown = true;
 
             SetRank();
 
             PlateAdditions.rankFont:Show();
-            PlateAdditions.IsShown = true;
 
         elseif guid and NP_Is_Not_Unique[IsFriend][plateName] then
             SetRank();
@@ -620,7 +614,7 @@ do
 
                 if not HHTD.Registry_by_Name[isFriend][PlateName] then
                     --@alpha@
-                    error("PlateName: '"..PlateName.."' is no longer defined in registry");
+                    error("PlateName: '"..PlateName.."' is no longer defined in registry"); -- 2013-03-13: does triggers
                     --@end-alpha@
                 end
 
@@ -651,13 +645,20 @@ function NPH:HideCrossFromPlate(plate, isFriend, plateName) -- {{{
 
     local plateAdditions = plate[PLATES__NPH_NAMES[isFriend]];
 
+    --@alpha@
+    --if not plateAdditions then
+      --  error('HideCrossFromPlate() called for nothing. if:' .. tostring(isFriend) .. ' n:' .. tostring(plateName));
+    --end
+    --@end-alpha@
+
     if plateAdditions and plateAdditions.IsShown then
 
-        --@debug@
+        --@alpha@
         if plateName and plateName ~= plateAdditions.plateName then
-            self:Debug(ERROR, "plateAdditions.plateName ~= plateName:", plateAdditions.plateName, plateName);
+            self:Debug(ERROR, "plateAdditions.plateName ~= plateName:", plateAdditions.plateName, "-__-",  plateName);
+            error("plateAdditions.plateName ~= plateName:");
         end
-        --@end-debug@
+        --@end-alpha@
 
         plateAdditions.texture:Hide();
         plateAdditions.rankFont:Hide();

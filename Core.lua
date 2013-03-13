@@ -692,8 +692,8 @@ function HHTD:OnEnable()
     -- self:RegisterEvent("PARTY_MEMBER_DISABLE"); -- useless event, no argument...
     
     -- Subscribe to our own callbacks
-    self:RegisterMessage("HHTD_HEALER_GONE");
-    self:RegisterMessage("HHTD_HEALER_BORN");
+    --self:RegisterMessage("HHTD_HEALER_GONE");
+    --self:RegisterMessage("HHTD_HEALER_BORN");
 
     self:Print(L["ENABLED"]);
 
@@ -891,6 +891,7 @@ do
             Private_registry_by_Name[isFriend][corpse.name] = nil;
 
             -- announce the (un)timely departure of this healer and expose the corpse for all to see
+            self:HHTD_HEALER_GONE("HHTD_HEALER_GONE", isFriend, corpse); -- make sure our handler is the first to be called
             self:SendMessage("HHTD_HEALER_GONE", isFriend, corpse);
             self:Debug(INFO2, corpse.name, "reaped");
         else
@@ -1014,6 +1015,7 @@ do
                 --@debug@
                 HHTD:Debug(INFO, "Healer detected:", sourceName, 'uhmhap:', configRef.UHMHAP, 'healdone:', record.healDone, 'threshold:', HHTD.HealThreshold);
                 --@end-debug@
+                HHTD:HHTD_HEALER_BORN("HHTD_HEALER_BORN", isFriend, record); -- make sure ours is the first to be called
                 HHTD:SendMessage("HHTD_HEALER_BORN", isFriend, record);
             end
 
