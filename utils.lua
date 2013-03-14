@@ -138,17 +138,28 @@ end -- }}}
 --  function HHTD:Debug(...) {{{
 do
     local Debug_Templates = {
-        [ERROR]     = "|cFFFF2222Debug:|cFFCC4444[%s.%3d]:|r|cFFFF5555",
-        [WARNING]   = "|cFFFF2222Debug:|cFFCC4444[%s.%3d]:|r|cFF55FF55",
-        [INFO]      = "|cFFFF2222Debug:|cFFCC4444[%s.%3d]:|r|cFF9999FF",
-        [INFO2]     = "|cFFFF2222Debug:|cFFCC4444[%s.%3d]:|r|cFFFF9922",
+        [ERROR]     = "|cFFFF2222Debug:|cFFCC4444[%s.%3d]:|r|cFFFF5555",--3
+        [WARNING]   = "|cFFFF2222Debug:|cFFCC4444[%s.%3d]:|r|cFF55FF55",--2
+        [INFO]      = "|cFFFF2222Debug:|cFFCC4444[%s.%3d]:|r|cFF9999FF",--1
+        [INFO2]     = "|cFFFF2222Debug:|cFFCC4444[%s.%3d]:|r|cFFFF9922",--1
         [false]     = "|cFFFF2222Debug:|cFFCC4444[%s.%3d]:|r",
+    }
+    local Debug_Levels = {
+        [INFO2]     = 1,
+        [INFO]      = 1,
+        [WARNING]   = 2,
+        [ERROR]     = 3,
+        [false]     = 3,
     }
     local select, type = _G.select, _G.type;
     function HHTD:Debug(...)
         if not HHTD.db.global.Debug then return end;
 
         local template = type((select(1,...))) == "number" and (select(1, ...)) or false;
+
+        if HHTD.db.global.DebugLevel and HHTD.db.global.DebugLevel > Debug_Levels[template] then
+            return;
+        end
 
         local DebugHeader = (Debug_Templates[template]):format(date("%S"), (GetTime() % 1) * 1000);
 

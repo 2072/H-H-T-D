@@ -417,6 +417,16 @@ do
                 disabled = false,
                 order = -2,
             },
+            DebugLevel = {
+                type = 'range',
+                name = L["OPT_DEBUGLEVEL"],
+                desc = L["OPT_DEBUGLEVEL_DESC"],
+                min = 1,
+                max = 3,
+                guiHidden = true,
+                disabled = false,
+                order = -3,
+            },
             
             Version = {
                 type = 'execute',
@@ -651,6 +661,11 @@ local DEFAULT__CONFIGURATION = {
         HFT = 60,
         Enabled = true,
         Debug = false,
+        DebugLevel = 1,
+        --@alpha@
+        Debug = true,
+        DebugLevel = 2,
+        --@end-alpha@
         Log = false,
         Pve = true,
         PvpHSpecsOnly = true,
@@ -691,10 +706,6 @@ function HHTD:OnEnable()
     self:RegisterEvent("PLAYER_ALIVE"); -- talents SHOULD be available
     -- self:RegisterEvent("PARTY_MEMBER_DISABLE"); -- useless event, no argument...
     
-    -- Subscribe to our own callbacks
-    --self:RegisterMessage("HHTD_HEALER_GONE");
-    --self:RegisterMessage("HHTD_HEALER_BORN");
-
     self:Print(L["ENABLED"]);
 
     self:SetModulesStates();
