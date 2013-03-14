@@ -726,6 +726,11 @@ do
         end
 
         if Name == Data.name and not Data.delayed then
+            --@alpha@
+            if RawGetPlateName(CurrentPlate) ~= Name then
+                error('EBN: Nameplate inconsistency detected: n:' .. tostring(Name) ..  ' rawpn:' .. tostring(RawGetPlateName(CurrentPlate)) );
+            end
+            --@end-alpha@
             return CurrentPlate, Data;
         else
             return iter();
