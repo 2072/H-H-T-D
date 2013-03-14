@@ -320,18 +320,34 @@ function NPR:Debug_CheckHookSanity()
 end
 --@end-alpha@
 
+--@alpha@
+local callbacks_consisistency_check = {};    
+local callbacks_consisistency_check2 = {};    
+--@end-alpha@
+
 local function PlateOnShow (frame, delayed_previousName)
     --NPR:Debug(INFO, "PlateOnShow", frame:GetName());
 
     if delayed_previousName and not ActivePlates_per_frame[frame] then -- it can already have been hidden...
-        return
-    end;
+        return;
+    end
 
     --@alpha@
     local testCase1 = false;
     if not delayed_previousName and ActivePlates_per_frame[frame] then -- test onHide hook
         testCase1 = true;
     end
+
+    if not callbacks_consisistency_check[frame] then
+        callbacks_consisistency_check[frame] = 1;
+    elseif not delayed_previousName then
+        callbacks_consisistency_check[frame] = callbacks_consisistency_check[frame] + 1;
+    end
+
+    if callbacks_consisistency_check[frame] ~= 1 then
+        NPR:Debug(ERROR, 'PlateOnShow/hide sync broken:', callbacks_consisistency_check[frame]);
+    end
+
     --@end-alpha@
 
     local data = PlateRegistry_per_frame[frame];
@@ -340,7 +356,9 @@ local function PlateOnShow (frame, delayed_previousName)
 
     ActivePlates_per_frame[frame] = data;
 
-    if newName ~= oldName then
+    if newName ~= oldName or data.delayed then
+        data.delayed = false; -- only one chance
+
         if CurrentTarget == frame then
             CurrentTarget = false; -- it can't be true --> recycling occuered
         end
@@ -365,14 +383,25 @@ local function PlateOnShow (frame, delayed_previousName)
         NPR:SendMessage("NPR_ON_NEW_PLATE", frame, data);
 
         --@alpha@
+
+        if not callbacks_consisistency_check2[frame] then
+            callbacks_consisistency_check2[frame] = 1;
+        else
+            callbacks_consisistency_check2[frame] = callbacks_consisistency_check2[frame] + 1;
+        end
+
+        if callbacks_consisistency_check2[frame] ~= 1 then
+            NPR:Debug(ERROR, 'PlateOnShow/hide sync broken _2_:', callbacks_consisistency_check2[frame]);
+        end
+
         if delayed_previousName and delayed_previousName ~= newName then
             error('previousName('..tostring(delayed_previousName)..') ~= newName('..tostring(newName)..')');
         end
         --@end-alpha@
 
     else -- reschedule this onshow
-        data.reaction, data.type, data.name = nil, nil, nil; -- clear the old datas, we delay only once...
-        NPR:ScheduleTimer(PlateOnShow, 0.1, frame, newName);
+       -- data.reaction, data.type, data.name = nil, nil, nil; -- clear the old datas, we delay only once...
+        data.delayed = NPR:ScheduleTimer(PlateOnShow, 0.1, frame, newName);
         --NPR:Debug(WARNING, 'Name did not change, waiting before sending onshow event', newName);
     end
 
@@ -387,6 +416,13 @@ local function PlateOnHide (frame)
     --NPR:Debug(INFO2, "PlateOnHide", frame:GetName());
 
     --@alpha@
+
+    if not callbacks_consisistency_check[frame] then
+        callbacks_consisistency_check[frame] = 0;
+    else
+        callbacks_consisistency_check[frame] = callbacks_consisistency_check[frame] - 1;
+    end
+    
     local testCase1 = false
     if not ActivePlates_per_frame[frame] then
         testCase1 = true;
@@ -399,8 +435,18 @@ local function PlateOnHide (frame)
     ActivePlates_per_frame[frame] = nil;
     data.GUID = false;
 
-    if data.name then -- only trigger the recycling if we sent a NPR_ON_NEW_PLATE
+    if not data.delayed then -- only trigger the recycling if we sent a NPR_ON_NEW_PLATE
+        --@alpha@
+        if not callbacks_consisistency_check2[frame] then
+            callbacks_consisistency_check2[frame] = 0;
+        else
+            callbacks_consisistency_check2[frame] = callbacks_consisistency_check2[frame] - 1;
+        end
+        --@end-alpha@
         NPR:SendMessage("NPR_ON_RECYCLE_PLATE", frame, data);
+    else
+        NPR:CancelTimer(data.delayed);
+        data.delayed = false;
     end
 
     if frame == CurrentTarget then
@@ -483,7 +529,7 @@ function NPR:UPDATE_MOUSEOVER_UNIT()
         --self:Debug(INFO, "UPDATE_MOUSEOVER_UNIT");
 
         for frame, data in pairs(ActivePlates_per_frame) do
-            if data.name and not data.GUID and FrameRegionsCache[  FrameChildrenCache[frame][1]  ][3]:IsShown() then -- test for highlight among shown plates
+            if not data.delayed and not data.GUID and FrameRegionsCache[  FrameChildrenCache[frame][1]  ][3]:IsShown() then -- test for highlight among shown plates
 
                 data.GUID = UnitGUID('mouseover');
                 unitName = UnitName('mouseover');
@@ -610,7 +656,7 @@ do
         --@end-debug@
 
         for frame, data in pairs(ActivePlates_per_frame) do
-            if data.name and not data.GUID and IsPlateTargeted(frame) then
+            if not data.delayed and not data.GUID and IsPlateTargeted(frame) then
                 data.GUID = UnitGUID('target');
                 unitName = UnitName('target');
                 if unitName == data.name then
@@ -660,7 +706,7 @@ end
 function NPR:GetByGUID (GUID)
 
     for frame, data in pairs(ActivePlates_per_frame) do
-        if data.GUID == GUID and data.name then
+        if data.GUID == GUID and not data.delayed then
             return frame, data;
         end
     end
@@ -679,7 +725,7 @@ do
             return nil;
         end
 
-        if Name == Data.name then
+        if Name == Data.name and not Data.delayed then
             return CurrentPlate, Data;
         else
             return iter();
@@ -701,7 +747,7 @@ function NPR:GetByName (name) -- XXX returns just one if several name plates hav
     --@end-alpha@
 
     for frame, data in pairs(ActivePlates_per_frame) do
-        if data.name == name then
+        if not data.delayed and data.name == name then
             --@alpha@
             if RawGetPlateName(frame) ~= name then
                 error('GBN: Nameplate inconsistency detected: n:' .. tostring(name) ..  ' rawpn:' .. tostring(RawGetPlateName(frame)) );

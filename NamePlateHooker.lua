@@ -202,7 +202,7 @@ function NPH:OnDisable() -- {{{
     -- clean all nameplates
     for i, isFriend in ipairs({true,false}) do
         for plateTID, plate in pairs(self.DisplayedPlates_byFrameTID[isFriend]) do
-            self:HideCrossFromPlate(plate, isFriend);
+            self:HideCrossFromPlate(plate, isFriend, false, "OnDisable");
         end
     end
 end -- }}}
@@ -261,7 +261,7 @@ function NPH:HHTD_HEALER_GONE(selfevent, isFriend, healer)
         local plate = plateByGuid or frame;
 
         --self:Debug("Must drop", healer.name);
-        self:HideCrossFromPlate(plate, isFriend, healer.name);
+        self:HideCrossFromPlate(plate, isFriend, healer.name, "HHTD_HEALER_GONE");
 
         if plateByGuid then
             break;
@@ -308,11 +308,33 @@ end
 
 -- }}}
 
+--@alpha@
+local callbacks_consisistency_check = {};    
+--@end-alpha@
+
+
 -- Name Plates CallBacks {{{
 function NPH:NPR_ON_NEW_PLATE(selfevent, plate, data)
 
     local plateName = data.name;
     local isFriend = (data.reaction == "FRIENDLY") and true or false;
+
+    --@alpha@
+
+    if not callbacks_consisistency_check[plate] then
+        callbacks_consisistency_check[plate] = 1;
+    else
+        callbacks_consisistency_check[plate] = callbacks_consisistency_check[plate] + 1;
+    end
+
+    if self.DisplayedPlates_byFrameTID[true][plate] then
+        self:Debug(ERROR, 'NPR_ON_NEW_PLATE() called but no recycling occured for friendly plate, ccc:', callbacks_consisistency_check[plate]);
+        error('NPR_ON_NEW_PLATE() called but no recycling occured for _FRIENDLY_ plate');
+    elseif self.DisplayedPlates_byFrameTID[false][plate] then
+        self:Debug(ERROR, 'NPR_ON_NEW_PLATE() called but no recycling occured for _ENEMY_ plate, ccc:', callbacks_consisistency_check[plate]);
+        error('NPR_ON_NEW_PLATE() called but no recycling occured for enemy plate');
+    end
+    --@end-alpha@
 
     --@debug@
     -- self:Debug(INFO2, "new plate LNP:IsTarget()?|cff00ff00", LNP:IsTarget(plate) , "|rname:", plateName, 'isFriend?', isFriend, 'alpha:', plate:GetAlpha(),'plate.alpha:', plate.alpha, "plate.unit.alpha:", plate.unit and plate.unit.alpha or nil);
@@ -376,12 +398,21 @@ function NPH:NPR_ON_RECYCLE_PLATE(selfevent, plate, data)
     local plateName = data.name;
     local isFriend = (data.reaction == 'FRIENDLY') and true or false;
 
+
+    --@alpha@
+    if not callbacks_consisistency_check[plate] then
+        callbacks_consisistency_check[plate] = 0;
+    else
+        callbacks_consisistency_check[plate] = callbacks_consisistency_check[plate] - 1;
+    end
+    --@end-alpha@
+
     --@debug@
     -- self:Debug(INFO, "NPR_ON_RECYCLE_PLATE():", plateName);
     --@end-debug@
 
 
-    self:HideCrossFromPlate(plate, isFriend, plateName);
+    self:HideCrossFromPlate(plate, isFriend, plateName, "NPR_ON_RECYCLE_PLATE");
 
 
     -- prevent uniqueness data from stacking
@@ -633,30 +664,34 @@ do
 
 end
 
-function NPH:HideCrossFromPlate(plate, isFriend, plateName) -- {{{
+function NPH:HideCrossFromPlate(plate, isFriend, plateName, caller) -- {{{
 
+    --@alpha@
     if not plate then
         self:Debug(ERROR, "HideCrossFromPlate(), plate is not defined");
-        --@alpha@
         error("'Plate' is not defined");
-        --@end-alpha@
         return;
     end
+    --@end-alpha@
 
     local plateAdditions = plate[PLATES__NPH_NAMES[isFriend]];
 
     --@alpha@
+    if NPR:GetName(plate) ~= plateName and caller ~= "OnDisable" then -- XXX if the name has changed we shouldn't do anything since it has already taken care of by recycle calls
+        self:Debug('NPR:GetName(plate)(', NPR:GetName(plate), ') ~= plateName(',plateName,') Caller:', caller);
+        error('NPR:GetName(plate)('..tostring(NPR:GetName(plate))..') ~= plateName('..tostring(plateName)..')');
+    end
     --if not plateAdditions then
       --  error('HideCrossFromPlate() called for nothing. if:' .. tostring(isFriend) .. ' n:' .. tostring(plateName));
     --end
+    local testCase1 = false;
     --@end-alpha@
 
     if plateAdditions and plateAdditions.IsShown then
 
         --@alpha@
         if plateName and plateName ~= plateAdditions.plateName then
-            self:Debug(ERROR, "plateAdditions.plateName ~= plateName:", plateAdditions.plateName, "-__-",  plateName);
-            error("plateAdditions.plateName ~= plateName:");
+            testCase1 = true;
         end
         --@end-alpha@
 
@@ -669,6 +704,13 @@ function NPH:HideCrossFromPlate(plate, isFriend, plateName) -- {{{
     end
 
     self.DisplayedPlates_byFrameTID[isFriend][plate] = nil;
+
+    --@alpha@
+    if testCase1 then
+        self:Debug(ERROR, "plateAdditions.plateName ~= plateName:", plateAdditions.plateName, "-__-",  plateName, 'CALLER:', caller);
+        --error("plateAdditions.plateName ~= plateName, caller:" .. caller);
+    end
+    --@end-alpha@
 
 end -- }}}
 
