@@ -559,13 +559,42 @@ end
 
 do
 
+    local hooksecurefunc = _G.hooksecurefunc;
     local WorldFrame = WorldFrame
     local WorldFrameChildrenNumber = 0;
     local temp = 0;
     local frameName;
 
     local NotPlateCache = {};
+    local DidSnitched = false;
 
+    local function SetScriptAlert(frame, script, func)
+
+        -- re-apply our hooks then...
+        if script == "OnShow" then
+            frame:HookScript("OnShow", PlateOnShow);
+        elseif script == "OnHide" then
+            frame:HookScript("OnHide", PlateOnHide);
+        end
+
+        --@alpha@
+        --NPR:Debug(WARNING, "SetScript(OnSHow/Onhide) detected", frame, frame:GetName(), script);
+        --@end-alpha@
+
+        if not DidSnitched then
+            DidSnitched = true;
+            -- try to identify and report the add-on doing this selfish and stupid thing
+            local stack = debugstack(3,1,1);
+            if not stack:lower():find("\\libs\\")
+                and not stack:find("[/\\]CallbackHandler")
+                and not stack:find("[/\\]AceTimer")
+                and not stack:find("[/\\]AceHook")
+                and not stack:find("[/\\]AceEvent") then
+                local badAddon = stack:match("[/\\]AddOns[/\\]([^/\\]+)[/\\]");
+                NPR:Print("|cFFFF0000WARNING:|r Apprently the add-on|cffee2222", badAddon:upper(), "|ris using |cFFFFAA55:SetScript()|r instead of |cFF00DD00:HookScript()|r on Blizzard's nameplates. This will cause many issues with other add-ons depending on nameplates. You should contact|cffee2222", badAddon:upper(), "|r's author about this.");
+            end
+        end
+    end
 
     local function IsPlate (frame)
 
@@ -609,6 +638,7 @@ do
             -- hooks show and hide event
             worldChild:HookScript("OnShow", PlateOnShow);
             worldChild:HookScript("OnHide", PlateOnHide);
+            hooksecurefunc(worldChild, 'SetScript', SetScriptAlert);
 
             -- since we're here it means the frame is already shown
             PlateOnShow(worldChild);
