@@ -16,6 +16,9 @@ Healers Have To Die
 
 - Fix a problem which could lead into healer symbols not being hidden.
 
+- Special thanks to Cegthlhekz who helped a lot by testing the numerous alpha
+  versions leading to this release of Healers Have To Die.
+
 
 **version 2.1.0 (2013-03-06):**
 
