@@ -4,6 +4,19 @@ Healers Have To Die
 *Change log*
 ------------
 
+**version 2.1.1 (2013-03-15):**
+
+- Fix huge compatibility problems with other (selfish) add-ons breaking
+  nameplates hooking. This caused HHTD's symbols being displayed above the
+  wrong players. HHTD will also denounce these add-ons in the chat so you can
+  ask their author to fix them.
+
+- Fix automatic healer role setting while in combat which was causing a
+  'protected function call' exception pop-up for BG leaders.
+
+- Fix a problem which could lead into healer symbols not being hidden.
+
+
 **version 2.1.0 (2013-03-06):**
 
 - HHTD no longer relies on LibNamePlate-1.0. The HHTD's NamePlateHooker module
