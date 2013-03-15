@@ -72,7 +72,7 @@ function Announcer:GetOptions () -- {{{
     local validatePostChatMessage = function (info, v)
 
         local counterpartMessage = info[#info] == 'ProtectMessage' and 'KillMessage' or 'ProtectMessage';
-        Announcer:Debug('counterpartMessage:', counterpartMessage);
+        Announcer:Debug(INFO, 'counterpartMessage:', counterpartMessage);
       
         if not v:find('%[HEALERS%]') then
             return self:Error(L["OPT_POST_ANNOUNCE_MISSING_KEYWORD"]);
@@ -376,12 +376,12 @@ do
         -- send to chat
         if #FriendsFoes[true] > 0 then
             local FriendsText = ( config.ProtectMessage:gsub('%[HEALERS%]', table.concat(FriendsFoes[true],  ' - ')) );
-            self:Debug("HHTD:", FriendsText);
+            self:Debug(INFO, "HHTD:", FriendsText);
             Post(FriendsText);
         end
         if #FriendsFoes[false] > 0 then
             local FoesText    = ( config.KillMessage:gsub('%[HEALERS%]', table.concat(FriendsFoes[false], ' - ')) );
-            self:Debug("HHTD:", FoesText);
+            self:Debug(INFO, "HHTD:", FoesText);
             Post(FoesText);
         end
 

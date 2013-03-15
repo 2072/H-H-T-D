@@ -260,7 +260,7 @@ function NPH:HHTD_HEALER_GONE(selfevent, isFriend, healer)
     for frame, data in NPR:EachByName(healer.name) do
         local plate = plateByGuid or frame;
 
-        --self:Debug("Must drop", healer.name);
+        --self:Debug(INFO, "Must drop", healer.name);
         self:HideCrossFromPlate(plate, isFriend, healer.name, "HHTD_HEALER_GONE");
 
         if plateByGuid then
@@ -516,7 +516,7 @@ do
     local function UpdateTexture () -- MUL XXX
 
         if not PlateAdditions.textureUpdate or PlateAdditions.textureUpdate < LAST_TEXTURE_UPDATE then
-            --self:Debug('Updating texture');
+            --self:Debug(INFO, 'Updating texture');
 
             SetTextureParams(PlateAdditions.texture);
 
@@ -678,7 +678,7 @@ function NPH:HideCrossFromPlate(plate, isFriend, plateName, caller) -- {{{
 
     --@alpha@
     if NPR:GetName(plate) ~= plateName and caller ~= "OnDisable" then -- XXX if the name has changed we shouldn't do anything since it has already taken care of by recycle calls
-        self:Debug('NPR:GetName(plate)(', NPR:GetName(plate), ') ~= plateName(',plateName,') Caller:', caller);
+        self:Debug(ERROR, 'NPR:GetName(plate)(', NPR:GetName(plate), ') ~= plateName(',plateName,') Caller:', caller);
         error('NPR:GetName(plate)('..tostring(NPR:GetName(plate))..') ~= plateName('..tostring(plateName)..')');
     end
     --if not plateAdditions then

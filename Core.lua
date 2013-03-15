@@ -719,7 +719,7 @@ function HHTD:OnEnable()
 end
 
 function HHTD:PLAYER_ALIVE()
-    self:Debug("PLAYER_ALIVE");
+    self:Debug(INFO, "PLAYER_ALIVE");
 
     PLAYER_FACTION = UnitFactionGroup("player");
     PLAYER_GUID    = UnitGUID("player");
@@ -788,7 +788,7 @@ do
 
             if LastDetectedGUID == unitGuid and unit == "target" then
                 self:SendMessage("HHTD_TARGET_LOCKED", isFriend, HHTD.Registry_by_GUID[isFriend][unitGuid]);
-                --self:Debug("LastDetectedGUID == unitGuid and unit == \"target\""); -- XXX
+                --self:Debug(INFO, "LastDetectedGUID == unitGuid and unit == \"target\""); -- XXX
 
                 return;
             end
@@ -798,7 +798,7 @@ do
                 -- Is this sitill true?
 
                 self:SendMessage("HHTD_HEALER_MOUSE_OVER", isFriend, HHTD.Registry_by_GUID[isFriend][unitGuid]);
-                --self:Debug("HHTD_HEALER_UNDER_MOUSE"); -- XXX
+                --self:Debug(INFO, "HHTD_HEALER_UNDER_MOUSE"); -- XXX
                 LastDetectedGUID = unitGuid;
             end
         end
@@ -1101,7 +1101,7 @@ do
  
         --@debug@
         if hideCaster then
-            --self:Debug(e, timestamp, event, hideCaster, sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags, _spellID, spellNAME, _spellSCHOOL, healAMOUNT);
+            --self:Debug(INFO, e, timestamp, event, hideCaster, sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags, _spellID, spellNAME, _spellSCHOOL, healAMOUNT);
         end
         --@end-debug@
 
