@@ -567,13 +567,14 @@ function NPR:UPDATE_MOUSEOVER_UNIT()
                     --@debug@
                     self:Debug(INFO, 'Guid found for', data.name, 'mouseover');
                     --@end-debug@
-                else
+
+                    break; -- we found what we were looking for, no need to continue
+                elseif data.name ~= RawGetPlateName(frame) then
                     error('UMU: Nameplate inconsistency detected: un:' .. tostring(unitName) .. ' rpn:'..tostring(data.name) .. ' rawpn:' .. tostring(RawGetPlateName(frame)));
                     -- TODO recycle the nameplate if that happens
                 end
                 
                 
-                break; -- we found what we were looking for, no need to continue
             end
         end
     end
