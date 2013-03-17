@@ -4,12 +4,17 @@ Healers Have To Die
 *Change log*
 ------------
 
-**version 2.1.1 (2013-03-15):**
+**version 2.1.1 (2013-03-17):**
 
 - Fix huge compatibility problems with other (selfish) add-ons breaking
   nameplates hooking. This caused HHTD's symbols being displayed above the
   wrong players. HHTD will also denounce these add-ons in the chat so you can
   ask their author to fix them.
+
+- HHTD will also disable its nameplate module when another add-on unilaterally
+  modifies nameplate making them unusable for other add-ons. A message will be
+  displayed. (FYI: the add-on ["Tidy Plates"][tidyplates] doesn't do this and
+  therefore is fully compatible with HHTD)
 
 - Fix automatic healer role setting while in combat which was causing a
   'protected function call' exception pop-up for BG leaders.
@@ -223,3 +228,4 @@ Until then, just use the command /HHTDG to access HHTD's option panel.
 
 [spelllist]: http://www.wowace.com/addons/healers-have-to-die/pages/specialized-healers-spells/
 [localization]: http://www.wowace.com/addons/healers-have-to-die/localization/
+[tidyplates]: http://www.curse.com/addons/wow/tidy-plates

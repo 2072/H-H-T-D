@@ -178,6 +178,7 @@ function NPH:OnEnable() -- {{{
     self:RegisterMessage("NPR_ON_NEW_PLATE");
     self:RegisterMessage("NPR_ON_RECYCLE_PLATE");
     self:RegisterMessage("NPR_ON_GUID_FOUND");
+    self:RegisterMessage("NPR_FATAL_INCOMPATIBILITY");
 
     local plate;
     for i, isFriend in ipairs({true,false}) do
@@ -435,6 +436,19 @@ function NPH:NPR_ON_GUID_FOUND(selfevent, plate, guid)
         self:Debug(INFO2, "GUID found but not a healer");
     end
 
+end
+
+function NPH:NPR_FATAL_INCOMPATIBILITY(selfevent, outdated)
+
+    if outdated then
+        self:Print("|cFFFF0000ERROR:|rHHTD is outdated and no longer compatible with this version of WoW, you need to update HHTD from Curse.com. The Nameplate Hooker module is now disabled.");
+    else
+        self:Print("|cFFFF0000ERROR:|rAn add-on is unduly modifying Blizzard's nameplates in a way preventing other add-ons from using them. HHTD is not compatible with such selfish add-ons. The Nameplate Hooker module is now disabled.");
+    end
+
+    HHTD:FatalError("The Nameplate Hooker module had to be disabled due to an incompatibility.\nSee the chat window for more details.");
+
+    self:Disable();
 end
 
 -- }}}

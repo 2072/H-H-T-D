@@ -60,7 +60,7 @@ local HHTD = T.Healers_Have_To_Die;
 HHTD.Name_Plate_Registry = HHTD.Name_Plate_Hooker:NewModule("NPR", "AceTimer-3.0")
 
 local NPR = HHTD.Name_Plate_Registry;
-
+local NPR_ENABLED = false;
 
 -- upvalues {{{
 local _G                    = _G;
@@ -98,6 +98,9 @@ function NPR:OnEnable() -- {{{
     self.DebugTestsTimer = self:ScheduleRepeatingTimer("DebugTests", 1);
     self.Debug_CheckHookSanityTimer = self:ScheduleRepeatingTimer("Debug_CheckHookSanity", 0.1);
     --@end-alpha@
+    
+    NPR_ENABLED = true;
+
 
 end -- }}}
 
@@ -109,6 +112,8 @@ function NPR:OnDisable() -- {{{
     self:CancelTimer(self.DebugTestsTimer);
     self:CancelTimer(self.Debug_CheckHookSanityTimer);
     --@end-alpha@
+
+    NPR_ENABLED = false;
 end -- }}}
 
 
@@ -124,6 +129,13 @@ local TargetCheckScannedAll     = false; -- useful when a target exists but it c
 
 -- frame children and regions cache
 
+local function abnormalNameplateManifest()
+
+    local HHTDMaxTOC = tonumber(GetAddOnMetadata("Healers-Have-To-Die", "X-Max-Interface") or math.huge); -- once GetAddOnMetadata() was bugged and returned nil...
+
+    NPR:SendMessage("NPR_FATAL_INCOMPATIBILITY", T._tocversion > HHTDMaxTOC );
+    
+end
 
 local FrameChildrenCache = setmetatable({}, {__index =
 -- frame cache
@@ -134,8 +146,14 @@ function(t, frame)
             function(t, childNum)
 
                 t[childNum] = (select(childNum, frame:GetChildren())) or false;
+
+                if not t[childNum] then
+                    t[childNum] = nil;
+                    abnormalNameplateManifest();
+                    error("CFCache: Child" .. childNum .. " not found.");
+                end
+
                 --@alpha@
-                assert(t[childNum], "CFCache: Child" .. childNum .. " not found.");
                 NPR:Debug(INFO, 'cached a new frame child', childNum);
                 --@end-alpha@
                 return  t[childNum];
@@ -157,8 +175,14 @@ function(t, frame)
             function(t, regionNum)
 
                 t[regionNum] = (select(regionNum, frame:GetRegions())) or false;
+
+                if not t[regionNum] then
+                    t[regionNum] = nil;
+                    abnormalNameplateManifest();
+                    error( "CFCache: Region" .. regionNum .. " not found.");
+                end
+
                 --@alpha@
-                assert(t[regionNum], "CFCache: Region" .. regionNum .. " not found.");
                 NPR:Debug(INFO, 'cached a new frame region', regionNum);
                 --@end-alpha@
                 return t[regionNum];
@@ -241,7 +265,6 @@ local function IsPlatMouseOvered (frame)
 end
 
 local function RawGetPlateName (frame)
-    --return ((select(2, frame:GetChildren())):GetRegions()):GetText();
     return FrameRegionsCache[  FrameChildrenCache[frame][2]  ][1]:GetText();
 end
 
@@ -328,7 +351,7 @@ local callbacks_consisistency_check2 = {};
 local function PlateOnShow (frame, delayed_previousName)
     --NPR:Debug(INFO, "PlateOnShow", frame:GetName());
 
-    if delayed_previousName and not ActivePlates_per_frame[frame] then -- it can already have been hidden...
+    if delayed_previousName and not ActivePlates_per_frame[frame] or not NPR_ENABLED then -- it can already have been hidden...
         return;
     end
 
@@ -414,6 +437,10 @@ end
 
 local function PlateOnHide (frame)
     --NPR:Debug(INFO2, "PlateOnHide", frame:GetName());
+
+    if not NPR_ENABLED then
+        return;
+    end
 
     --@alpha@
 
@@ -591,7 +618,7 @@ do
                 and not stack:find("[/\\]AceHook")
                 and not stack:find("[/\\]AceEvent") then
                 local badAddon = stack:match("[/\\]AddOns[/\\]([^/\\]+)[/\\]");
-                NPR:Print("|cFFFF0000WARNING:|r Apprently the add-on|cffee2222", badAddon:upper(), "|ris using |cFFFFAA55:SetScript()|r instead of |cFF00DD00:HookScript()|r on Blizzard's nameplates. This will cause many issues with other add-ons depending on nameplates. You should contact|cffee2222", badAddon:upper(), "|r's author about this.");
+                NPR:Print("|cFFFF0000WARNING:|r Apparently the add-on|cffee2222", badAddon:upper(), "|ris using |cFFFFAA55:SetScript()|r instead of |cFF00DD00:HookScript()|r on Blizzard's nameplates. This will cause many issues with other add-ons relying on nameplates. You should contact|cffee2222", badAddon:upper(), "|r's author about this.");
             end
         end
     end
@@ -748,6 +775,7 @@ end
 do
     local CurrentPlate;
     local Data, Name;
+    local next = _G.next;
     local function iter ()
         CurrentPlate, Data = next (ActivePlates_per_frame, CurrentPlate);
 

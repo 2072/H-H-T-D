@@ -281,7 +281,7 @@ function Announcer:HHTD_HEALER_UNDER_ATTACK (selfevent, sourceName, sourceGUID, 
         -- TODO: add an option to display alert only if the source is human
     if isCurrentPlayer then
         -- TODO: add a new feature to display a set of custom messages when we are under attack.
-        --       We need to ignore Aoes.
+        --       We need to ignore AOEs.
         return;
     end
 

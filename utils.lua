@@ -32,9 +32,13 @@ local HHTD = T.Healers_Have_To_Die;
 
 local HHTD_C = T.Healers_Have_To_Die.Constants;
 
-local pairs = _G.pairs;
-local table = _G.table;
-local select = _G.select;
+local _G        = _G;
+local pairs     = _G.pairs;
+local tostring  = _G.tostring;
+local table     = _G.table;
+local select    = _G.select;
+local type      = _G.type;
+local date      = _G.date;
 
 function HHTD:MakePlayerName (name) --{{{
     if not name then name = "NONAME" end
@@ -287,3 +291,26 @@ function HHTD:Hickup(mul)
     self:Debug(ERROR, 'Hickup ', t);
 end
 --@end-debug@
+
+
+function HHTD:FatalError (TheError)
+
+    if not StaticPopupDialogs["HHTD_ERROR_FRAME"] then
+        StaticPopupDialogs["HHTD_ERROR_FRAME"] = {
+            text = "|cFFFF0000HHTD Fatal Error:|r\n%s",
+            button1 = "OK",
+            OnAccept = function()
+                return false;
+            end,
+            timeout = 0,
+            whileDead = 1,
+            hideOnEscape = 1,
+            showAlert = 1,
+            preferredIndex = 3,
+        };
+    end
+
+    StaticPopup_Show ("HHTD_ERROR_FRAME", TheError);
+end
+
+
