@@ -185,7 +185,7 @@ function NPH:OnEnable() -- {{{
         -- Add nameplates to known healers by GUID
         for healerGUID, healer in pairs(HHTD.Registry_by_GUID[isFriend]) do
 
-            plate = NPR:GetByGUID(healerGUID); -- or NPR:GetByName(healer.name); -- XXX
+            plate = NPR:GetByGUID(healerGUID);
 
             if plate then
                 self:AddCrossToPlate (plate, isFriend, healer.name);
@@ -216,27 +216,15 @@ NPH.DisplayedPlates_byFrameTID = { -- used for updating plates dipslay attribute
 };
 
 local Plate_Name_Count = { -- array by name so we have to make the difference between friends and foes
-    [true] = {}, -- for Friendly healers
-    [false] = {} -- for enemy healers
 };
 local NP_Is_Not_Unique = { -- array by name so we have to make the difference between friends and foes
-    [true] = {}, -- for Friendly healers
-    [false] = {} -- for enemy healers
 };
 
-local Multi_Plates_byName = {
-    [true] = {}, -- for Friendly healers
-    [false] = {} -- for enemy healers
-};
 
 function NPH:PLAYER_ENTERING_WORLD() -- {{{
     self:Debug(INFO2, "Cleaning multi instanced healers data");
-    Plate_Name_Count[true] = {};
-    Plate_Name_Count[false] = {};
-    NP_Is_Not_Unique[true] = {};
-    NP_Is_Not_Unique[false] = {};
-    Multi_Plates_byName[true] = {};
-    Multi_Plates_byName[false] = {};
+    Plate_Name_Count = {};
+    NP_Is_Not_Unique = {};
 end
 
 
@@ -294,7 +282,7 @@ function NPH:HHTD_HEALER_BORN (selfevent, isFriend, healer)
         if plateByGuid or not self.db.global.sPve then
             self:AddCrossToPlate (plate, isFriend, healer.name, healer.guid);
 
-            self:Debug(INFO, "HHTD_HEALER_BORN(): GUID available or unique", NP_Is_Not_Unique[isFriend][healer.name]);
+            self:Debug(INFO, "HHTD_HEALER_BORN(): GUID available or unique", NP_Is_Not_Unique[healer.name]);
         else
             self:Debug(WARNING, "HHTD_HEALER_BORN: multi and sPVE and noguid :'( ", healer.name);
         end
@@ -329,10 +317,10 @@ function NPH:NPR_ON_NEW_PLATE(selfevent, plate, data)
 
     if self.DisplayedPlates_byFrameTID[true][plate] then
         self:Debug(ERROR, 'NPR_ON_NEW_PLATE() called but no recycling occured for friendly plate, ccc:', callbacks_consisistency_check[plate]);
-        error('NPR_ON_NEW_PLATE() called but no recycling occured for _FRIENDLY_ plate');
+        error('NPR_ON_NEW_PLATE() called but no recycling occured for _FRIENDLY_ plate' .. callbacks_consisistency_check[plate]);
     elseif self.DisplayedPlates_byFrameTID[false][plate] then
         self:Debug(ERROR, 'NPR_ON_NEW_PLATE() called but no recycling occured for _ENEMY_ plate, ccc:', callbacks_consisistency_check[plate]);
-        error('NPR_ON_NEW_PLATE() called but no recycling occured for enemy plate');
+        error('NPR_ON_NEW_PLATE() called but no recycling occured for enemy plate' .. callbacks_consisistency_check[plate]);
     end
     --@end-alpha@
 
@@ -341,28 +329,22 @@ function NPH:NPR_ON_NEW_PLATE(selfevent, plate, data)
     --@end-debug@
 
     -- test for uniqueness of the nameplate
-    if not Plate_Name_Count[isFriend][plateName] then
-        Plate_Name_Count[isFriend][plateName] = 1;
+    if not Plate_Name_Count[plateName] then
+        Plate_Name_Count[plateName] = 1;
     else
-        Plate_Name_Count[isFriend][plateName] = Plate_Name_Count[isFriend][plateName] + 1;
-        if not NP_Is_Not_Unique[isFriend][plateName] then
-            NP_Is_Not_Unique[isFriend][plateName] = true;
-            self:Debug(INFO, plateName, "is not unique");
+        Plate_Name_Count[plateName] = Plate_Name_Count[plateName] + 1;
+        if not NP_Is_Not_Unique[plateName] then
+            NP_Is_Not_Unique[plateName] = true;
+            self:Debug(INFO2, plateName, "is not unique");
         end
     end
-
-    if not Multi_Plates_byName[isFriend][plateName] then
-        Multi_Plates_byName[isFriend][plateName] = {};
-    end
-
-    Multi_Plates_byName[isFriend][plateName][plate] = plate;
 
     -- Check if this name plate is of interest -- XXX
     if HHTD.Registry_by_Name[isFriend][plateName] then
         
         -- If there are several plates with the same name and sPve is set then
         -- we do nothing since there is no way to be sure
-        if NP_Is_Not_Unique[isFriend][plateName] and self.db.global.sPve then
+        if NP_Is_Not_Unique[plateName] and self.db.global.sPve then
             self:Debug(INFO2, "new plate but sPve and not unique");
             return;
         end
@@ -396,7 +378,7 @@ function NPH:NPR_ON_RECYCLE_PLATE(selfevent, plate, data)
     --x end
 
     local plateName = data.name;
-    local isFriend = (data.reaction == 'FRIENDLY') and true or false;
+    -- local isFriend = (data.reaction == 'FRIENDLY') and true or false;
 
 
     --@alpha@
@@ -411,18 +393,18 @@ function NPH:NPR_ON_RECYCLE_PLATE(selfevent, plate, data)
     -- self:Debug(INFO, "NPR_ON_RECYCLE_PLATE():", plateName);
     --@end-debug@
 
-
-    self:HideCrossFromPlate(plate, isFriend, plateName, "NPR_ON_RECYCLE_PLATE");
+    -- unfortunately a plate can change of faction without being hidden first (if a unit gets mind controlled)
+    -- so we have to check both sides
+    self:HideCrossFromPlate(plate, true,  plateName, "NPR_ON_RECYCLE_PLATE");
+    self:HideCrossFromPlate(plate, false, plateName, "NPR_ON_RECYCLE_PLATE");
 
 
     -- prevent uniqueness data from stacking
-    if Plate_Name_Count[isFriend][plateName] then
+    if Plate_Name_Count[plateName] then
 
-        Multi_Plates_byName[isFriend][plateName][plate] = nil;
-
-        Plate_Name_Count[isFriend][plateName] = Plate_Name_Count[isFriend][plateName] - 1;
-        if Plate_Name_Count[isFriend][plateName] == 0 then
-            Plate_Name_Count[isFriend][plateName] = nil;
+        Plate_Name_Count[plateName] = Plate_Name_Count[plateName] - 1;
+        if Plate_Name_Count[plateName] == 0 then
+            Plate_Name_Count[plateName] = nil;
         end
     end
 end
@@ -510,14 +492,11 @@ do
         --@end-alpha@
 
          if not Guid then
-             --@alpha@
-             assert(NP_Is_Not_Unique[IsFriend], "NP_Is_Not_Unique[IsFriend] is invalid"); -- to diagnose issue repoted on 2012-09-07
-             --@end-alpha@
 
              if not HHTD.Registry_by_Name[IsFriend][PlateName] then
                  assert(HHTD.Registry_by_Name[IsFriend][PlateName], "HHTD.Registry_by_Name[IsFriend][PlateName] is invalid for plate:" .. tostring(PlateName).. " isfriend:"..tostring(IsFriend).."  PlateAdditions.plateName:" .. tostring(PlateAdditions.plateName)); -- to diagnose issue repoted on 2012-09-07 and 2013-03-11 - and now on 2013-03-19 when player is mind controlled...
              end
-             PlateAdditions.rankFont:SetText(NP_Is_Not_Unique[IsFriend][PlateName] and '?' or HHTD.Registry_by_Name[IsFriend][PlateName].rank);
+             PlateAdditions.rankFont:SetText(NP_Is_Not_Unique[PlateName] and '?' or HHTD.Registry_by_Name[IsFriend][PlateName].rank);
          else
              if not HHTD.Registry_by_GUID[IsFriend][Guid] then
                  assert(HHTD.Registry_by_GUID[IsFriend][Guid], "HHTD.Registry_by_GUID[IsFriend][Guid] is not defined for plate:" .. tostring(PlateName).. " isfriend:"..tostring(IsFriend) .. " Found with Name:"..tostring(HHTD.Registry_by_Name[IsFriend][PlateName] and true or false)); -- to diagnose issue repoted on 2012-10-17 and 2013-03-08
@@ -605,7 +584,7 @@ do
 
             PlateAdditions.rankFont:Show();
 
-        elseif guid and NP_Is_Not_Unique[IsFriend][plateName] then
+        elseif guid and NP_Is_Not_Unique[plateName] then
             SetRank();
         end
 
@@ -658,7 +637,7 @@ do
 
                 if not HHTD.Registry_by_Name[isFriend][PlateName] then
                     --@alpha@
-                    error("PlateName: '"..PlateName.."' is no longer defined in registry"); -- 2013-03-13: does triggers
+                    error("PlateName: '"..tostring(PlateName).."' is no longer defined in registry"); -- 2013-03-13: does triggers
                     --@end-alpha@
                 end
 
@@ -690,13 +669,6 @@ function NPH:HideCrossFromPlate(plate, isFriend, plateName, caller) -- {{{
     local plateAdditions = plate[PLATES__NPH_NAMES[isFriend]];
 
     --@alpha@
-    if NPR:GetName(plate) ~= plateName and caller ~= "OnDisable" then -- XXX if the name has changed we shouldn't do anything since it has already taken care of by recycle calls
-        self:Debug(ERROR, 'NPR:GetName(plate)(', NPR:GetName(plate), ') ~= plateName(',plateName,') Caller:', caller);
-        error('NPR:GetName(plate)('..tostring(NPR:GetName(plate))..') ~= plateName('..tostring(plateName)..')');
-    end
-    --if not plateAdditions then
-      --  error('HideCrossFromPlate() called for nothing. if:' .. tostring(isFriend) .. ' n:' .. tostring(plateName));
-    --end
     local testCase1 = false;
     --@end-alpha@
 

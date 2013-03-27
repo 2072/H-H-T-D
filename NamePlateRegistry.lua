@@ -64,13 +64,13 @@ local NPR_ENABLED = false;
 
 -- upvalues {{{
 local _G                    = _G;
-local GetCVarBool           = _G.GetCVarBool;
 local GetTime               = _G.GetTime;
+local assert                = _G.assert;
 local pairs                 = _G.pairs;
 local ipairs                = _G.ipairs;
 local select                = _G.select;
-local CreateFrame           = _G.CreateFrame;
-local GetTexCoordsForRole   = _G.GetTexCoordsForRole;
+local unpack                = _G.unpack;
+local setmetatable          = _G.setmetatable;
 local GetMouseFocus         = _G.GetMouseFocus;
 local UnitExists            = _G.UnitExists;
 local UnitGUID              = _G.UnitGUID;
@@ -137,6 +137,8 @@ local function abnormalNameplateManifest()
     
 end
 
+
+
 local FrameChildrenCache = setmetatable({}, {__index =
 -- frame cache
 function(t, frame)
@@ -192,6 +194,31 @@ function(t, frame)
         return t[frame];
     end
 });
+
+
+local PlatePartCache = setmetatable ({}, {__index =
+
+function (t, plateFrame)
+    t[plateFrame] = setmetatable({}, {__index =
+        function (t, regionName)
+            if regionName == 'name' then
+                t[regionName] = FrameRegionsCache[  FrameChildrenCache[plateFrame][2]  ][1];
+            elseif regionName == 'statusBar' then
+                t[regionName] = FrameChildrenCache[  FrameChildrenCache[plateFrame][1]  ][1];
+            elseif regionName == 'highlight' then
+                t[regionName] = FrameRegionsCache[  FrameChildrenCache[plateFrame][1]  ][3];
+            end
+            --@alpha@
+            NPR:Debug(INFO, 'cached a new plateFrame part:', regionName);
+            --@end-alpha@
+            return t[regionName];
+        end
+    })
+    return t[plateFrame];
+end
+})
+
+local ValidateCache, UpdateCache;
 
 --Name to GUID cache for players (their GUID are constant)
 local AddGUIDToCache, GetGUIDFromCache;
@@ -265,7 +292,7 @@ local function IsPlatMouseOvered (frame)
 end
 
 local function RawGetPlateName (frame)
-    return FrameRegionsCache[  FrameChildrenCache[frame][2]  ][1]:GetText();
+    return PlatePartCache[frame].name:GetText();
 end
 
 local RawGetPlateType;
@@ -305,8 +332,7 @@ do
 
     function RawGetPlateType (frame)
         --return ((select(2, frame:GetChildren())):GetRegions()):GetText();
-        return TypeFromColor( FrameChildrenCache[  FrameChildrenCache[frame][1]  ][1]:GetStatusBarColor() );
-
+        return TypeFromColor( PlatePartCache[frame].statusBar:GetStatusBarColor() );
     end
 end
 
@@ -345,34 +371,33 @@ end
 
 --@alpha@
 local callbacks_consisistency_check = {};    
-local callbacks_consisistency_check2 = {};    
 --@end-alpha@
 
 local PlateOnShow, PlateOnHide, PlateOnChange;
-do
+do -- {{{
     local PlateFrame, PlateData, PlateName;
         --@alpha@
     local testCase1 = false;
         --@end-alpha@
 
-    function PlateOnShow (healthBar, delayed_previousName)
+    function PlateOnShow (healthBar)
         --NPR:Debug(INFO, "PlateOnShow", healthBar.HHTDParentPlate:GetName());
 
-        PlateFrame = healthBar.HHTDParentPlate;
-        if delayed_previousName and not ActivePlates_per_frame[PlateFrame] or not NPR_ENABLED then -- it can already have been hidden...
+        if not NPR_ENABLED then -- it can already have been hidden...
             return;
         end
 
+        PlateFrame = healthBar.HHTDParentPlate;
 
         --@alpha@
         testCase1 = false;
-        if not delayed_previousName and ActivePlates_per_frame[PlateFrame] then -- test onHide hook
+        if ActivePlates_per_frame[PlateFrame] then -- test onHide hook
             testCase1 = true;
         end
 
         if not callbacks_consisistency_check[PlateFrame] then
             callbacks_consisistency_check[PlateFrame] = 1;
-        elseif not delayed_previousName then
+        else
             callbacks_consisistency_check[PlateFrame] = callbacks_consisistency_check[PlateFrame] + 1;
         end
 
@@ -387,53 +412,24 @@ do
 
         ActivePlates_per_frame[PlateFrame] = PlateData;
 
-        if PlateName ~= PlateData.name or PlateData.delayed then
-            PlateData.delayed = false; -- only one chance
-
-            if CurrentTarget == PlateFrame then
-                CurrentTarget = false; -- it can't be true --> recycling occured
-            end
-
-            TargetCheckScannedAll = false;
-
-
-            PlateData.name = PlateName;
-            PlateData.reaction, PlateData.type = RawGetPlateType(PlateFrame);
-
-
-            PlateData.GUID = GetGUIDFromCache(PlateFrame);
-
-            --@debug@
-            --if PlateData.GUID then
-            --NPR:Debug(INFO, 'GUID was set during onshow for ', PlateData.name);
-            --HHTD:Hickup(10);
-            --end
-            --@end-debug@
-
-            NPR:SendMessage("NPR_ON_NEW_PLATE", PlateFrame, PlateData);
-
-            --@alpha@
-
-            if not callbacks_consisistency_check2[PlateFrame] then
-                callbacks_consisistency_check2[PlateFrame] = 1;
-            else
-                callbacks_consisistency_check2[PlateFrame] = callbacks_consisistency_check2[PlateFrame] + 1;
-            end
-
-            if callbacks_consisistency_check2[PlateFrame] ~= 1 then
-                NPR:Debug(ERROR, 'PlateOnShow/hide sync broken _2_:', callbacks_consisistency_check2[PlateFrame]);
-            end
-
-            if delayed_previousName and delayed_previousName ~= PlateName then
-                error('previousName('..tostring(delayed_previousName)..') ~= PlateName('..tostring(PlateName)..')');
-            end
-            --@end-alpha@
-
-        else -- reschedule this onshow
-            -- PlateData.reaction, PlateData.type, PlateData.name = nil, nil, nil; -- clear the old datas, we delay only once...
-            PlateData.delayed = NPR:ScheduleTimer(PlateOnShow, 0.1, healthBar, PlateName);
-            --NPR:Debug(WARNING, 'Name did not change, waiting before sending onshow event', PlateName);
+        if CurrentTarget == PlateFrame then
+            CurrentTarget = false; -- it can't be true --> recycling occured obviously
         end
+        TargetCheckScannedAll = false;
+
+
+        PlateData.name = PlateName;
+        PlateData.reaction, PlateData.type = RawGetPlateType(PlateFrame);
+        PlateData.GUID = GetGUIDFromCache(PlateFrame);
+
+        --@debug@
+        --if PlateData.GUID then
+        --NPR:Debug(INFO, 'GUID was set during onshow for ', PlateData.name);
+        --HHTD:Hickup(10);
+        --end
+        --@end-debug@
+
+        NPR:SendMessage("NPR_ON_NEW_PLATE", PlateFrame, PlateData);
 
         --@alpha@
         if testCase1 then
@@ -468,19 +464,9 @@ do
         PlateData = PlateRegistry_per_frame[PlateFrame];
         PlateData.GUID = false;
 
-        if not PlateData.delayed then -- only trigger the recycling if we sent a NPR_ON_NEW_PLATE
-            --@alpha@
-            if not callbacks_consisistency_check2[PlateFrame] then
-                callbacks_consisistency_check2[PlateFrame] = 0;
-            else
-                callbacks_consisistency_check2[PlateFrame] = callbacks_consisistency_check2[PlateFrame] - 1;
-            end
-            --@end-alpha@
-            NPR:SendMessage("NPR_ON_RECYCLE_PLATE", PlateFrame, PlateData);
-        else
-            NPR:CancelTimer(PlateData.delayed);
-            PlateData.delayed = false;
-        end
+        UpdateCache(PlateFrame); -- make sure everything is accurate
+        NPR:SendMessage("NPR_ON_RECYCLE_PLATE", PlateFrame, PlateData);
+
 
         if PlateFrame == CurrentTarget then
             CurrentTarget = false;
@@ -501,27 +487,24 @@ do
 
         PlateData = ActivePlates_per_frame[PlateFrame];
 
-        if not PlateData or PlateData.delayed then
+        if not PlateData then
             return;
         end
 
         -- if the name has changed or the reaction is different then trigger a recycling
         if PlateData.name ~= RawGetPlateName(PlateFrame) or PlateData.reaction ~= (RawGetPlateType(PlateFrame)) then
             --@alpha@
-            NPR:Debug(WARNING, "PlateOnChange for '", PlateData.name, "' rawName:'", RawGetPlateName(PlateFrame));
+            NPR:Debug(WARNING, "PlateOnChange for '", PlateData.name, "' rawName:'", RawGetPlateName(PlateFrame), 'r:', PlateData.reaction, PlateData.type, 'rawr:',  RawGetPlateType(PlateFrame));
             --@end-alpha@
             NPR:SendMessage("NPR_ON_RECYCLE_PLATE", PlateFrame, PlateData);
 
-
-            PlateData.name                        = RawGetPlateName(PlateFrame);
-            PlateData.reaction, PlateData.type    = RawGetPlateType(PlateFrame);
-            PlateData.GUID                        = GetGUIDFromCache(PlateFrame);
+            UpdateCache(PlateFrame);
 
             NPR:SendMessage("NPR_ON_NEW_PLATE", PlateFrame, PlateData);
         end
 
     end
-end
+end -- }}}
 
 --@alpha@
  local ShownPlateCount = 0;
@@ -592,12 +575,12 @@ function NPR:UPDATE_MOUSEOVER_UNIT()
         --self:Debug(INFO, "UPDATE_MOUSEOVER_UNIT");
 
         for frame, data in pairs(ActivePlates_per_frame) do
-            if not data.delayed and not data.GUID and FrameRegionsCache[  FrameChildrenCache[frame][1]  ][3]:IsShown() then -- test for highlight among shown plates
+            if not data.GUID and PlatePartCache[frame].highlight:IsShown() then -- test for highlight among shown plates
 
                 data.GUID = UnitGUID('mouseover');
                 unitName = UnitName('mouseover');
 
-                if unitName == data.name then
+                if unitName == data.name and ValidateCache(frame, 'name') == 0 then
                     AddGUIDToCache(data);
                     self:SendMessage("NPR_ON_GUID_FOUND", frame, data.GUID, 'mouseover');
                     --@debug@
@@ -605,10 +588,7 @@ function NPR:UPDATE_MOUSEOVER_UNIT()
                     --@end-debug@
 
                     break; -- we found what we were looking for, no need to continue
-                elseif data.name ~= RawGetPlateName(frame) then
-                    error('UMU: Nameplate inconsistency detected: un:' .. tostring(unitName) .. ' rpn:'..tostring(data.name) .. ' rawpn:' .. tostring(RawGetPlateName(frame)));
-                    -- TODO recycle the nameplate if that happens
-                end
+               end
                 
                 
             end
@@ -758,17 +738,17 @@ do
         --@end-debug@
 
         for frame, data in pairs(ActivePlates_per_frame) do
-            if not data.delayed and not data.GUID and IsPlateTargeted(frame) then
+            if not data.GUID and IsPlateTargeted(frame) then
+
                 data.GUID = UnitGUID('target');
                 unitName = UnitName('target');
-                if unitName == data.name then
+
+                if unitName == data.name and ValidateCache(frame, 'name') == 0 then
                     AddGUIDToCache(data);
                     self:SendMessage("NPR_ON_GUID_FOUND", frame, data.GUID, 'target');
                     --@debug@
                     self:Debug(INFO, 'Guid found for', data.name, 'target');
                     --@end-debug@
-                else
-                    error('CPFT: Nameplate inconsistency detected: un:' .. tostring(unitName) .. ' rpn:'..tostring(data.name) .. ' rawpn:' .. tostring(RawGetPlateName(frame)));
                 end
 
                 break; -- there can be only one target
@@ -778,6 +758,54 @@ do
         TargetCheckScannedAll = true; -- no need to scan continuously if no new name plate are shown
     end
 
+end
+
+do
+
+    local PlateData;
+
+    function UpdateCache (plateFrame)
+        PlateData = ActivePlates_per_frame[plateFrame];
+
+        PlateData.name = RawGetPlateName(plateFrame);
+        PlateData.reaction, PlateData.type = RawGetPlateType(plateFrame);
+        PlateData.GUID = GetGUIDFromCache(plateFrame);
+    end
+
+    local function IsGUIDValid (plateFrame)
+        if ActivePlates_per_frame[plateFrame].GUID and ActivePlates_per_frame[plateFrame].name == RawGetPlateName(plateFrame) then
+            return ActivePlates_per_frame[plateFrame].GUID;
+        else
+            ActivePlates_per_frame[plateFrame].GUID = false;
+            return false;
+        end
+    end
+
+    local Getters = {
+        ['name'] = RawGetPlateName,
+        ['reaction'] = RawGetPlateType, -- 1st
+        ['type'] = function (plateFrame) return select(2, RawGetPlateType(plateFrame)); end, -- 2nd
+        ['GUID'] = IsGUIDValid,
+    };
+    function ValidateCache (plateFrame, entry)
+        PlateData = ActivePlates_per_frame[plateFrame];
+
+        if not PlateData then
+            return -1;
+        end
+
+        if not PlateData[entry] then
+            return -2;
+        end
+
+        if PlateData[entry] == (Getters[entry](plateFrame)) then
+            return 0;
+        else
+            NPR:Debug(WARNING, 'Cache validation failed for entry', entry, 'on plate named', PlateData.name);
+            UpdateCache(plateFrame);
+            return 1;
+        end
+    end
 end
 
 -- public meant methods
@@ -807,9 +835,11 @@ end
 
 function NPR:GetByGUID (GUID)
 
-    for frame, data in pairs(ActivePlates_per_frame) do
-        if data.GUID == GUID and not data.delayed then
-            return frame, data;
+    if GUID then
+        for frame, data in pairs(ActivePlates_per_frame) do
+            if data.GUID == GUID and ValidateCache(frame, 'GUID') == 0 then
+                return frame, data;
+            end
         end
     end
 
@@ -828,12 +858,7 @@ do
             return nil;
         end
 
-        if Name == Data.name and not Data.delayed then
-            --@alpha@
-            if RawGetPlateName(CurrentPlate) ~= Name then
-                error('EBN: Nameplate inconsistency detected: n:' .. tostring(Name) ..  ' rawpn:' .. tostring(RawGetPlateName(CurrentPlate)) );
-            end
-            --@end-alpha@
+        if Name == Data.name and ValidateCache(CurrentPlate, 'name') == 0 then -- ValidateCache() will fail only rarely (upon mind controll events) so it's not a big deal if we miss a few frames then... (to keep in mind)
             return CurrentPlate, Data;
         else
             return iter();
@@ -848,6 +873,17 @@ do
     end
 end
 
+
+
+
+
+
+
+
+
+
+
+--[=============[
 function NPR:GetByName (name) -- XXX returns just one if several name plates have the same name...
 
     --@alpha@
@@ -855,7 +891,7 @@ function NPR:GetByName (name) -- XXX returns just one if several name plates hav
     --@end-alpha@
 
     for frame, data in pairs(ActivePlates_per_frame) do
-        if not data.delayed and data.name == name then
+        if data.name == name and ValidateCache(frame, 'name') == 0 then
             --@alpha@
             if RawGetPlateName(frame) ~= name then
                 error('GBN: Nameplate inconsistency detected: n:' .. tostring(name) ..  ' rawpn:' .. tostring(RawGetPlateName(frame)) );
@@ -868,3 +904,4 @@ function NPR:GetByName (name) -- XXX returns just one if several name plates hav
     return nil;
 
 end
+--]=============]
