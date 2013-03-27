@@ -635,11 +635,11 @@ do
                 Guid            = NPR:GetGUID(plate);
                 Guid            = HHTD.Registry_by_GUID[IsFriend][Guid] and Guid or nil;
 
-                if not HHTD.Registry_by_Name[isFriend][PlateName] then
+               -- if not HHTD.Registry_by_Name[isFriend][PlateName] then -- may trigger in case of 'mirror image' name changes... XXX TO FIX
                     --@alpha@
-                    error("PlateName: '"..tostring(PlateName).."' is no longer defined in registry"); -- 2013-03-13: does triggers
+                 --   error("PlateName: '"..tostring(PlateName).."' is no longer defined in registry"); -- 2013-03-13: does triggers
                     --@end-alpha@
-                end
+                -- end
 
                 SetRank();
 
