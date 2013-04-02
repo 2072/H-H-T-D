@@ -85,7 +85,8 @@ function NPR:OnInitialize() -- {{{
 end -- }}}
 
 function NPR:OnEnable() -- {{{
-    self:Debug(INFO, "OnEnable");
+    NPR_ENABLED = true;
+    self:Debug(INFO, "OnEnable", debugstack(2,1,1));
 
     self:RegisterEvent("PLAYER_ENTERING_WORLD");
     self:RegisterEvent("PLAYER_TARGET_CHANGED")
@@ -98,9 +99,12 @@ function NPR:OnEnable() -- {{{
     self.DebugTestsTimer = self:ScheduleRepeatingTimer("DebugTests", 1);
     self.Debug_CheckHookSanityTimer = self:ScheduleRepeatingTimer("Debug_CheckHookSanity", 0.1);
     --@end-alpha@
-    
-    NPR_ENABLED = true;
 
+    local success, errorm = pcall(self.LookForNewPlates, self); -- make sure we do it once as soon as possible to hook things first in order to detect baddons...
+
+    if not success and not errorm:find("CFCache") then
+        self:Debug(ERROR, errorm);
+    end
 
 end -- }}}
 
@@ -133,7 +137,9 @@ local function abnormalNameplateManifest()
 
     local HHTDMaxTOC = tonumber(GetAddOnMetadata("Healers-Have-To-Die", "X-Max-Interface") or math.huge); -- once GetAddOnMetadata() was bugged and returned nil...
 
-    NPR:SendMessage("NPR_FATAL_INCOMPATIBILITY", T._tocversion > HHTDMaxTOC );
+    NPR:OnDisable(); -- cancel all timers right now
+    NPR:ScheduleTimer("SendMessage", 0.01, "NPR_FATAL_INCOMPATIBILITY", T._tocversion > HHTDMaxTOC); -- sending the message while the initisalisation is in progress is not working as expected
+    --NPR:SendMessage("NPR_FATAL_INCOMPATIBILITY", T._tocversion > HHTDMaxTOC );
     
 end
 
@@ -613,6 +619,25 @@ do
     local DidSnitched = false;
     local HealthBar;
 
+    local function SetParentAlert (frame)
+
+        if DidSnitched then
+            return;
+        end
+
+        local baddon = HHTD:GetBAddon(2);
+
+        if baddon then
+            DidSnitched = true;
+
+            local alertMessage = "|cFFFF0000WARNING:|r Apparently the add-on |cffee2222" .. baddon:upper() .. "|r is reparenting Blizzard's nameplates elements. This prevent any other add-on from reading or modifying nameplates. You should contact |cffee2222" .. baddon:upper() .. "|r's author about this. FYI HHTD is compatible with TidyPlates...";
+
+            NPR:Print(alertMessage);
+            HHTD:FatalError(alertMessage);
+        end
+
+    end
+
     local function SetScriptAlert(frame, script, func)
 
         -- re-apply our hooks then...
@@ -621,7 +646,7 @@ do
         elseif script == "OnHide" then
             frame:HookScript("OnHide", PlateOnHide);
         elseif script == "OnMinMaxChanged" then
-            HealthBar:HookScript("OnMinMaxChanged", PlateOnChange);
+            frame:HookScript("OnMinMaxChanged", PlateOnChange);
         end
 
         --@alpha@
@@ -629,16 +654,11 @@ do
         --@end-alpha@
 
         if not DidSnitched then
-            DidSnitched = true;
+            local baddon = HHTD:GetBAddon(2);
             -- try to identify and report the add-on doing this selfish and stupid thing
-            local stack = debugstack(3,1,1);
-            if not stack:lower():find("\\libs\\")
-                and not stack:find("[/\\]CallbackHandler")
-                and not stack:find("[/\\]AceTimer")
-                and not stack:find("[/\\]AceHook")
-                and not stack:find("[/\\]AceEvent") then
-                local badAddon = stack:match("[/\\]AddOns[/\\]([^/\\]+)[/\\]");
-                NPR:Print("|cFFFF0000WARNING:|r Apparently the add-on|cffee2222", badAddon:upper(), "|ris using |cFFFFAA55:SetScript()|r instead of |cFF00DD00:HookScript()|r on Blizzard's nameplates. This will cause many issues with other add-ons relying on nameplates. You should contact|cffee2222", badAddon:upper(), "|r's author about this.");
+            if baddon then
+                DidSnitched = true;
+                NPR:Print("|cFFFF0000WARNING:|r Apparently the add-on|cffee2222", baddon:upper(), "|ris using |cFFFFAA55:SetScript()|r instead of |cFF00DD00:HookScript()|r on Blizzard's nameplates. This will cause many issues with other add-ons relying on nameplates. You should contact|cffee2222", baddon:upper(), "|r's author about this.");
             end
         end
     end
@@ -691,6 +711,7 @@ do
             HealthBar:HookScript("OnHide", PlateOnHide);
             HealthBar:HookScript("OnMinMaxChanged", PlateOnChange);
             hooksecurefunc(HealthBar, 'SetScript', SetScriptAlert);
+            hooksecurefunc(HealthBar, 'SetParent', SetParentAlert);
 
             -- since we're here it means the frame is already shown
             PlateOnShow(HealthBar);

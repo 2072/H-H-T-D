@@ -171,14 +171,15 @@ function NPH:OnEnable() -- {{{
 
     self:RegisterEvent("PLAYER_ENTERING_WORLD");
 
-    NPR = self:GetModule("NPR");
-    NPR:Enable();
 
     -- Subscribe to callbacks
     self:RegisterMessage("NPR_ON_NEW_PLATE");
     self:RegisterMessage("NPR_ON_RECYCLE_PLATE");
     self:RegisterMessage("NPR_ON_GUID_FOUND");
     self:RegisterMessage("NPR_FATAL_INCOMPATIBILITY");
+
+    NPR = self:GetModule("NPR");
+    NPR:Enable();
 
     local plate;
     for i, isFriend in ipairs({true,false}) do

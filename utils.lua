@@ -39,6 +39,7 @@ local table     = _G.table;
 local select    = _G.select;
 local type      = _G.type;
 local date      = _G.date;
+local debugstack= _G.debugstack;
 
 function HHTD:MakePlayerName (name) --{{{
     if not name then name = "NONAME" end
@@ -313,4 +314,21 @@ function HHTD:FatalError (TheError)
     StaticPopup_Show ("HHTD_ERROR_FRAME", TheError);
 end
 
+function HHTD:GetBAddon (StackLevel)
+    local stack = debugstack(1 + StackLevel,1,1);
+    if not stack:lower():find("\\libs\\")
+        and not stack:find("[/\\]CallbackHandler")
+        and not stack:find("[/\\]AceTimer")
+        and not stack:find("[/\\]AceHook")
+        and not stack:find("[/\\]AceEvent") then
 
+        if stack:find("[/\\]Healers-Have-To-Die") then
+            self:Debug(ERROR, "GetBAddon failed!"); -- XXX to test
+            return false;
+        end
+
+        return stack:match("[/\\]AddOns[/\\]([^/\\]+)[/\\]");
+    else
+        return false;
+    end
+end

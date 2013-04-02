@@ -313,6 +313,7 @@ HHTD:SetDefaultModuleState( false )
 
 function HHTD:SetModulesStates ()
     for moduleName, module in self:IterateModules() do
+        self:Debug(INFO2, 'enabling module:', moduleName);
         module:SetEnabledState(self.db.global.Modules[moduleName].Enabled);
     end
 end
