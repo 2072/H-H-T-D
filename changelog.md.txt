@@ -4,6 +4,16 @@ Healers Have To Die
 *Change log*
 ------------
 
+**version 2.1.2 (2013-04-05):**
+
+- HHTD nameplate module broke completely whenever someone's nameplate changed
+  side (upon mind controls and the likes). Thanks to all the people who help me
+  diagnose the problem and test the alpha versions leading to this release.
+
+- HHTD will fail more graciously if another add-on is unduly modifying
+  Blizzard's nameplates (a message is displayed but no Lua error is thrown).
+
+
 **version 2.1.1 (2013-03-17):**
 
 - Fix huge compatibility problems with other (selfish) add-ons breaking
