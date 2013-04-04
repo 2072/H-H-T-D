@@ -103,7 +103,7 @@ function NPR:OnEnable() -- {{{
     local success, errorm = pcall(self.LookForNewPlates, self); -- make sure we do it once as soon as possible to hook things first in order to detect baddons...
 
     if not success and not errorm:find("CFCache") then
-        self:Debug(ERROR, errorm);
+        self:Debug(WARNING, errorm);
     end
 
 end -- }}}

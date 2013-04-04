@@ -495,12 +495,14 @@ do
          if not Guid then
 
              if not HHTD.Registry_by_Name[IsFriend][PlateName] then
-                 assert(HHTD.Registry_by_Name[IsFriend][PlateName], "HHTD.Registry_by_Name[IsFriend][PlateName] is invalid for plate:" .. tostring(PlateName).. " isfriend:"..tostring(IsFriend).."  PlateAdditions.plateName:" .. tostring(PlateAdditions.plateName)); -- to diagnose issue repoted on 2012-09-07 and 2013-03-11 - and now on 2013-03-19 when player is mind controlled...
+                 NPH:Debug(ERROR, "HHTD.Registry_by_Name[IsFriend][PlateName] is invalid for plate:", PlateName, "isfriend:", IsFriend, "PlateAdditions.plateName:", PlateAdditions.plateName);
+                 --assert(HHTD.Registry_by_Name[IsFriend][PlateName], "HHTD.Registry_by_Name[IsFriend][PlateName] is invalid for plate:" .. tostring(PlateName).. " isfriend:"..tostring(IsFriend).."  PlateAdditions.plateName:" .. tostring(PlateAdditions.plateName)); -- to diagnose issue repoted on 2012-09-07 and 2013-03-11 - and now on 2013-03-19 when player is mind controlled...
              end
              PlateAdditions.rankFont:SetText(NP_Is_Not_Unique[PlateName] and '?' or HHTD.Registry_by_Name[IsFriend][PlateName].rank);
          else
              if not HHTD.Registry_by_GUID[IsFriend][Guid] then
-                 assert(HHTD.Registry_by_GUID[IsFriend][Guid], "HHTD.Registry_by_GUID[IsFriend][Guid] is not defined for plate:" .. tostring(PlateName).. " isfriend:"..tostring(IsFriend) .. " Found with Name:"..tostring(HHTD.Registry_by_Name[IsFriend][PlateName] and true or false)); -- to diagnose issue repoted on 2012-10-17 and 2013-03-08
+                 NPH:Debug(ERROR, "HHTD.Registry_by_GUID[IsFriend][Guid] is not defined for plate:", PlateName, "isfriend:", IsFriend, "Found with Name:", HHTD.Registry_by_Name[IsFriend][PlateName] and true or false);
+                 --assert(HHTD.Registry_by_GUID[IsFriend][Guid], "HHTD.Registry_by_GUID[IsFriend][Guid] is not defined for plate:" .. tostring(PlateName).. " isfriend:"..tostring(IsFriend) .. " Found with Name:"..tostring(HHTD.Registry_by_Name[IsFriend][PlateName] and true or false)); -- to diagnose issue repoted on 2012-10-17 and 2013-03-08
              end
             PlateAdditions.rankFont:SetText(HHTD.Registry_by_GUID[IsFriend][Guid].rank);
         end
@@ -635,12 +637,6 @@ do
                 PlateName       = NPR:GetName(plate);
                 Guid            = NPR:GetGUID(plate);
                 Guid            = HHTD.Registry_by_GUID[IsFriend][Guid] and Guid or nil;
-
-               -- if not HHTD.Registry_by_Name[isFriend][PlateName] then -- may trigger in case of 'mirror image' name changes... XXX TO FIX
-                    --@alpha@
-                 --   error("PlateName: '"..tostring(PlateName).."' is no longer defined in registry"); -- 2013-03-13: does triggers
-                    --@end-alpha@
-                -- end
 
                 SetRank();
 

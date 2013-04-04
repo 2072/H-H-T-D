@@ -158,9 +158,18 @@ do
     }
     local select, type = _G.select, _G.type;
     function HHTD:Debug(...)
+
+        -- if Decursive is loaded then use its debug report facility...
+        if (...) == ERROR and DecursiveRootTable then
+            local message = {'HHTD Debug error:', select(2, ...)};
+            message[#message + 1] = '\nSTACK:\n' .. debugstack(2);
+            DecursiveRootTable._HHTDErrors = DecursiveRootTable._HHTDErrors + 1;
+            DecursiveRootTable._AddDebugText(unpack(message));
+        end
+
         if not HHTD.db.global.Debug then return end;
 
-        local template = type((select(1,...))) == "number" and (select(1, ...)) or false;
+        local template = type((...)) == "number" and (...) or false;
 
         if HHTD.db.global.DebugLevel and HHTD.db.global.DebugLevel > Debug_Levels[template] then
             return;
@@ -289,7 +298,7 @@ function HHTD:Hickup(mul)
         t = t + 1
     end
 
-    self:Debug(ERROR, 'Hickup ', t);
+    self:Debug(WARNING, 'Hickup ', t);
 end
 --@end-debug@
 

@@ -233,7 +233,7 @@ local previousUnitGuid;
 function Announcer:HHTD_HEALER_MOUSE_OVER(selfevent, isFriend, healerProfile)
 
     if isFriend then
-        return; -- XXX
+        return;
     end
 
     if previousUnitGuid ~= healerProfile.guid then
@@ -257,7 +257,7 @@ end
 function Announcer:HHTD_TARGET_LOCKED (selfevent, isFriend, healerProfile)
 
     if isFriend then
-        return; -- XXX
+        return;
     end
 
     self:PlaySoundFile("Sound\\interface\\AuctionWindowOpen.wav");
