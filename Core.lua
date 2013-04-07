@@ -66,6 +66,8 @@ HHTD_C.Healing_Classes = {
     ["SHAMAN"]  = true,
 };
 
+HHTD_C.MaxTOC = tonumber(GetAddOnMetadata("Healers-Have-To-Die", "X-Max-Interface") or math.huge); -- once GetAddOnMetadata() was bugged and returned nil...
+
 -- The header for HHTD key bindings
 BINDING_HEADER_HHTD = "Healers Have To Die";
 BINDING_NAME_HHTDP = L["OPT_POST_ANNOUNCE_ENABLE"];

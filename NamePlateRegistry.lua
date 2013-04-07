@@ -75,6 +75,7 @@ local GetMouseFocus         = _G.GetMouseFocus;
 local UnitExists            = _G.UnitExists;
 local UnitGUID              = _G.UnitGUID;
 local UnitName              = _G.UnitName;
+local InCombatLockdown      = _G.InCombatLockdown;
 
 local WorldFrame            = _G.WorldFrame;
 local tostring              = _G.tostring;
@@ -97,8 +98,8 @@ function NPR:OnEnable() -- {{{
 
     --@alpha@
     self.DebugTestsTimer = self:ScheduleRepeatingTimer("DebugTests", 1);
-    self.Debug_CheckHookSanityTimer = self:ScheduleRepeatingTimer("Debug_CheckHookSanity", 0.1);
     --@end-alpha@
+    self.CheckHookSanityTimer = self:ScheduleRepeatingTimer("CheckHookSanity", 10);
 
     local success, errorm = pcall(self.LookForNewPlates, self); -- make sure we do it once as soon as possible to hook things first in order to detect baddons...
 
@@ -114,8 +115,8 @@ function NPR:OnDisable() -- {{{
     self:CancelTimer(self.TargetCheckTimer);
     --@alpha@
     self:CancelTimer(self.DebugTestsTimer);
-    self:CancelTimer(self.Debug_CheckHookSanityTimer);
     --@end-alpha@
+    self:CancelTimer(self.CheckHookSanityTimer);
 
     NPR_ENABLED = false;
 end -- }}}
@@ -135,12 +136,8 @@ local TargetCheckScannedAll     = false; -- useful when a target exists but it c
 
 local function abnormalNameplateManifest()
 
-    local HHTDMaxTOC = tonumber(GetAddOnMetadata("Healers-Have-To-Die", "X-Max-Interface") or math.huge); -- once GetAddOnMetadata() was bugged and returned nil...
-
     NPR:OnDisable(); -- cancel all timers right now
-    NPR:ScheduleTimer("SendMessage", 0.01, "NPR_FATAL_INCOMPATIBILITY", T._tocversion > HHTDMaxTOC); -- sending the message while the initisalisation is in progress is not working as expected
-    --NPR:SendMessage("NPR_FATAL_INCOMPATIBILITY", T._tocversion > HHTDMaxTOC );
-    
+    NPR:ScheduleTimer("SendMessage", 0.01, "NPR_FATAL_INCOMPATIBILITY", T._tocversion > HHTD.Constants.MaxTOC, 'MANIFEST'); -- sending the message while the initisalisation is in progress is not working as expected
 end
 
 
@@ -342,12 +339,14 @@ do
     end
 end
 
---@alpha@
-local LastThrow = 0;
-function NPR:Debug_CheckHookSanity()
+function NPR:CheckHookSanity()
+
+    if InCombatLockdown() then
+        return
+    end
 
     local count = 0;
-
+    local hookInconsistency = false;
 
     for frame, data in pairs(PlateRegistry_per_frame) do
 
@@ -355,25 +354,23 @@ function NPR:Debug_CheckHookSanity()
 
         if frame:IsShown()then
             if not ActivePlates_per_frame[frame] then
-                if GetTime() - LastThrow > 4 then
-                    LastThrow = GetTime();
-                    error("Debug_CheckHookSanity(): OnShow hook failed");
-                end
+                hookInconsistency = 'OnShow';
+                self:Debug(ERROR, "CheckHookSanity(): OnShow hook failed");
             end
         else
             if ActivePlates_per_frame[frame] then
-                if GetTime() - LastThrow > 3 then
-                    LastThrow = GetTime();
-                    error("Debug_CheckHookSanity(): OnHide hook failed");
-                end
+                hookInconsistency = 'OnHide';
+                self:Debug(ERROR, "CheckHookSanity(): OnHide hook failed");
             end
         end
     end
 
-    -- self:Debug(INFO2, 'Debug_CheckHookSanity():', count, 'tests done');
+    if hookInconsistency then
+        NPR:OnDisable(); -- cancel all timers right now
+        NPR:ScheduleTimer("SendMessage", 0.01, "NPR_FATAL_INCOMPATIBILITY", T._tocversion > HHTD.Constants.MaxTOC, 'HOOK: '..hookInconsistency);
+    end
 
 end
---@end-alpha@
 
 --@alpha@
 local callbacks_consisistency_check = {};    
