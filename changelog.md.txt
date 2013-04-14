@@ -4,6 +4,28 @@ Healers Have To Die
 *Change log*
 ------------
 
+**version 2.1.3 (2013-04-15):**
+
+- Enhanced add-on incompatibility detection (when using another add-on
+  modifying nameplates in the wrong way): the nameplate module will disable
+  itself instead of displaying wrong information (such as a healer symbol above
+  a warrior's nameplate...) because it can't reliably identify nameplates anymore.
+
+  There are many nameplate add-ons around and only a few of them are _not_ coded
+  selfishly. Most of these add-ons modify the default nameplates instead of
+  making them _invisible_ and creating their own frames. These modifications,
+  which are particular to each of these add-ons, prevent HHTD (and any other
+  add-ons wanting to use nameplates) from working properly as they can't
+  identify and read the nameplates anymore.
+
+  I could have coded around the modifications of a few of these selfish add-ons
+  (the most used ones) but I chose not to, it's far better to have their author
+  fix them and code responsibly than creating exceptions and bugs for everyone.
+
+  So if you want HHTD to be compatible with your favorite nameplate add-ons,
+  just ask their author to do things the right way, it'll be better for everyone.
+
+
 **version 2.1.2 (2013-04-05):**
 
 - HHTD's nameplate module broke completely whenever someone's nameplate changed
