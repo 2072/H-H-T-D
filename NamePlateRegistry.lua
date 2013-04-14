@@ -450,17 +450,16 @@ do -- {{{
 
         PlateFrame = healthBar.HHTDParentPlate;
 
-        --@alpha@
+        if not ActivePlates_per_frame[PlateFrame] then
+            NPR:OnDisable(); -- cancel all timers right now
+            NPR:ScheduleTimer("SendMessage", 0.01, "NPR_FATAL_INCOMPATIBILITY", T._tocversion > HHTD.Constants.MaxTOC, 'HOOK: '..'OnShow missed');
+        end
 
+        --@alpha@
         if not callbacks_consisistency_check[PlateFrame] then
             callbacks_consisistency_check[PlateFrame] = 0;
         else
             callbacks_consisistency_check[PlateFrame] = callbacks_consisistency_check[PlateFrame] - 1;
-        end
-
-        local testCase1 = false
-        if not ActivePlates_per_frame[PlateFrame] then
-            testCase1 = true;
         end
         --@end-alpha@
 
@@ -478,11 +477,6 @@ do -- {{{
 
         ActivePlates_per_frame[PlateFrame] = nil;
 
-        --@alpha@
-        if testCase1 then
-            error('onShow() failed for ' .. tostring(RawGetPlateName(PlateFrame)));
-        end
-        --@end-alpha@
     end
 
     function PlateOnChange (healthBar)
@@ -591,7 +585,9 @@ function NPR:UPDATE_MOUSEOVER_UNIT()
                     --@end-debug@
 
                     break; -- we found what we were looking for, no need to continue
-               end
+                else
+                    self:Debug(WARNING, 'bad cache on highlight check:', unitName, "V/S:", data.name, 'mouseover');
+                end
                 
                 
             end
@@ -651,11 +647,13 @@ do
         --@end-alpha@
 
         if not DidSnitched then
-            local baddon = HHTD:GetBAddon(2);
+            local baddon, proof = HHTD:GetBAddon(2);
             -- try to identify and report the add-on doing this selfish and stupid thing
             if baddon then
                 DidSnitched = true;
                 NPR:Print("|cFFFF0000WARNING:|r Apparently the add-on|cffee2222", baddon:upper(), "|ris using |cFFFFAA55:SetScript()|r instead of |cFF00DD00:HookScript()|r on Blizzard's nameplates. This will cause many issues with other add-ons relying on nameplates. You should contact|cffee2222", baddon:upper(), "|r's author about this.");
+                NPR:Print('Offending call:', proof);
+                --error('setscript used...');
             end
         end
     end
@@ -783,7 +781,7 @@ do
     local PlateData;
 
     function UpdateCache (plateFrame)
-        PlateData = ActivePlates_per_frame[plateFrame];
+        PlateData = ActivePlates_per_frame[plateFrame]; -- data can only be true if the plate is actually shown
 
         PlateData.name = RawGetPlateName(plateFrame);
         PlateData.reaction, PlateData.type = RawGetPlateType(plateFrame);

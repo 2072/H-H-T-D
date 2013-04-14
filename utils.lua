@@ -324,7 +324,7 @@ function HHTD:FatalError (TheError)
 end
 
 function HHTD:GetBAddon (StackLevel)
-    local stack = debugstack(1 + StackLevel,1,1);
+    local stack = debugstack(1 + StackLevel,2,0);
     if not stack:lower():find("\\libs\\")
         and not stack:find("[/\\]CallbackHandler")
         and not stack:find("[/\\]AceTimer")
@@ -336,8 +336,9 @@ function HHTD:GetBAddon (StackLevel)
             return false;
         end
 
-        return stack:match("[/\\]AddOns[/\\]([^/\\]+)[/\\]");
+        return stack:match("[/\\]AddOns[/\\]([^/\\]+)[/\\]"), stack;
     else
+        self:Debug(WARNING, 'SetScript called but not reported:', stack);
         return false;
     end
 end
