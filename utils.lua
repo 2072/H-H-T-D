@@ -97,7 +97,7 @@ function HHTD:CreateClassColorTables () -- {{{
                 HHTD:GetClassHexColor(class);
             else
                 RAID_CLASS_COLORS[class] = nil; -- Eat that!
-                print("HHTD: |cFFFF0000Stupid value found in _G.RAID_CLASS_COLORS table|r\nThis will cause many issues (tainting), HHTD will display this message until the culprit add-on is fixed or removed, the Stupid value is: '", class, "'");
+                self:Print("|cFFFF0000Stupid value found in _G.RAID_CLASS_COLORS table|r\nThis will cause many issues (tainting), HHTD will display this message until the culprit add-on is fixed or removed, the Stupid value is: '", class, "'");
             end
         end
     else

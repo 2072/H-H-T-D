@@ -87,7 +87,7 @@ end -- }}}
 
 function NPR:OnEnable() -- {{{
     NPR_ENABLED = true;
-    self:Debug(INFO, "OnEnable", debugstack(2,1,1));
+    self:Debug(INFO, "OnEnable", debugstack(1,2,0));
 
     self:RegisterEvent("PLAYER_ENTERING_WORLD");
     self:RegisterEvent("PLAYER_TARGET_CHANGED")
@@ -565,12 +565,14 @@ function NPR:PLAYER_TARGET_CHANGED()
 
 end
 
+local HighlightFailsReported = false;
 function NPR:UPDATE_MOUSEOVER_UNIT()
 
     local unitName = "";
     if GetMouseFocus() == WorldFrame then -- the cursor is either on a name plate or on a 3d model (ie: not on a unit-frame)
         --self:Debug(INFO, "UPDATE_MOUSEOVER_UNIT");
 
+        local failCount = 0;
         for frame, data in pairs(ActivePlates_per_frame) do
             if not data.GUID and PlatePartCache[frame].highlight:IsShown() then -- test for highlight among shown plates
 
@@ -586,12 +588,19 @@ function NPR:UPDATE_MOUSEOVER_UNIT()
 
                     break; -- we found what we were looking for, no need to continue
                 else
-                    self:Debug(WARNING, 'bad cache on highlight check:', unitName, "V/S:", data.name, 'mouseover');
+                    self:Debug(HighlightFailsReported and INFO2 or WARNING, 'bad cache on highlight check:', unitName, "V/S:", data.name, 'mouseover');
+                    failCount = failCount + 1;
                 end
                 
                 
             end
         end
+
+        if failCount > 3 and not HighlightFailsReported then
+            HighlightFailsReported = true;
+            self:Print("|cFFFF0000WARNING:|r Another add-on is unduly modifying Blizzard's default nameplates' manifest (probably by using |cFFFFAA55:SetParent()|r) preventing HHTD from identifying nameplates accurately. You should report this to the problematic add-on's author.");
+        end
+
     end
 end
 
