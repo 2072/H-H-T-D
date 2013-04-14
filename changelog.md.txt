@@ -7,7 +7,7 @@ Healers Have To Die
 **version 2.1.3 (2013-04-15):**
 
 - Enhanced add-on incompatibility detection (when using another add-on
-  modifying nameplates in the wrong way): the nameplate module will disable
+  which modifies nameplates in the wrong way): the nameplate module will disable
   itself instead of displaying wrong information (such as a healer symbol above
   a warrior's nameplate...) because it can't reliably identify nameplates anymore.
 

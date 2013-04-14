@@ -44,7 +44,9 @@ nameplate add-ons.
 - **Do not call :SetParent() on nameplates' subframes**, this would prevent other
   add-ons from finding and hooking nameplate elements.
 
-- **Do not use SetScript() EVER.** You don't need it. :SetScript() shall only be used on frames  YOU create. You can simply replace all your SetScript() calls by HookScript().
+- **Do not use SetScript() EVER.** You don't need it. :SetScript() shall only
+  be used on frames  YOU create. You can simply replace all your SetScript()
+  calls by HookScript().
 
 
 Special commands
