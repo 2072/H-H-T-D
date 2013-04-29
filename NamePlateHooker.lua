@@ -414,7 +414,7 @@ function NPH:NPR_ON_GUID_FOUND(selfevent, plate, guid)
 
     if HHTD.Registry_by_GUID[true][guid] or HHTD.Registry_by_GUID[false][guid] then
         self:Debug(INFO, "GUID found");
-        self:AddCrossToPlate(plate, HHTD.Registry_by_GUID[true][guid] and true or false, NPR:GetName(plate), guid);
+        self:AddCrossToPlate(plate, HHTD.Registry_by_GUID[true][guid] and true or false, NPR:GetPlateName(plate), guid);
     else
         self:Debug(INFO2, "GUID found but not a healer");
     end
@@ -554,9 +554,9 @@ do
         end
 
         --@alpha@
-        if plateName ~= NPR:GetName(plate) then
-            self:Debug(ERROR, 'AddCrossToPlate(): plateName ~= NPR:GetName(plate):', plateName, '-_-', NPR:GetName(plate));
-            error('AddCrossToPlate(): plateName ~= NPR:GetName(plate)');
+        if plateName ~= NPR:GetPlateName(plate) then
+            self:Debug(ERROR, 'AddCrossToPlate(): plateName ~= NPR:GetPlateName(plate):', plateName, '-_-', NPR:GetPlateName(plate));
+            error('AddCrossToPlate(): plateName ~= NPR:GetPlateName(plate)');
         end
         --@end-alpha@
 
@@ -633,7 +633,7 @@ do
                 IsFriend        = isFriend;
                 Plate           = plate;
                 PlateAdditions  = plate[PLATES__NPH_NAMES[isFriend]];
-                PlateName       = NPR:GetName(plate);
+                PlateName       = NPR:GetPlateName(plate);
                 Guid            = NPR:GetGUID(plate);
                 Guid            = HHTD.Registry_by_GUID[IsFriend][Guid] and Guid or nil;
 

@@ -835,7 +835,7 @@ end
 
 -- public meant methods
 
-function NPR:GetName(plateFrame)
+function NPR:GetPlateName(plateFrame)
 
     --@alpha@
     if ActivePlates_per_frame[plateFrame] and ActivePlates_per_frame[plateFrame].name and ActivePlates_per_frame[plateFrame].name ~= RawGetPlateName(plateFrame) then
