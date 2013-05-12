@@ -383,14 +383,14 @@ do -- {{{
     local testCase1 = false;
         --@end-alpha@
 
-    function PlateOnShow (healthBar)
+    function PlateOnShow (PlateFrame)
         --NPR:Debug(INFO, "PlateOnShow", healthBar.HHTDParentPlate:GetName());
 
         if not NPR_ENABLED then -- it can already have been hidden...
             return;
         end
 
-        PlateFrame = healthBar.HHTDParentPlate;
+        -- PlateFrame = healthBar.HHTDParentPlate;
 
         --@alpha@
         testCase1 = false;
@@ -441,14 +441,14 @@ do -- {{{
         --@end-alpha@
     end
 
-    function PlateOnHide (healthBar)
+    function PlateOnHide (PlateFrame)
         --NPR:Debug(INFO2, "PlateOnHide", healthBar.HHTDParentPlate:GetName());
 
         if not NPR_ENABLED then
             return;
         end
 
-        PlateFrame = healthBar.HHTDParentPlate;
+        -- PlateFrame = healthBar.HHTDParentPlate;
 
         if not ActivePlates_per_frame[PlateFrame] then
             NPR:OnDisable(); -- cancel all timers right now
@@ -647,8 +647,8 @@ do
             frame:HookScript("OnShow", PlateOnShow);
         elseif script == "OnHide" then
             frame:HookScript("OnHide", PlateOnHide);
-        elseif script == "OnMinMaxChanged" then
-            frame:HookScript("OnMinMaxChanged", PlateOnChange);
+        --elseif script == "OnMinMaxChanged" then
+          --  frame:HookScript("OnMinMaxChanged", PlateOnChange);
         end
 
         --@alpha@
@@ -711,14 +711,14 @@ do
             HealthBar.HHTDParentPlate = worldChild;
 
             -- hooks show and hide event
-            HealthBar:HookScript("OnShow", PlateOnShow);
-            HealthBar:HookScript("OnHide", PlateOnHide);
+            worldChild:HookScript("OnShow", PlateOnShow);
+            worldChild:HookScript("OnHide", PlateOnHide);
+            hooksecurefunc(worldChild, 'SetScript', SetScriptAlert);
             HealthBar:HookScript("OnMinMaxChanged", PlateOnChange);
-            hooksecurefunc(HealthBar, 'SetScript', SetScriptAlert);
-            hooksecurefunc(HealthBar, 'SetParent', SetParentAlert);
+            hooksecurefunc(HealthBar, 'SetParent', SetParentAlert); -- just to detect baddons
 
             -- since we're here it means the frame is already shown
-            PlateOnShow(HealthBar);
+            PlateOnShow(worldChild);
 
 
 

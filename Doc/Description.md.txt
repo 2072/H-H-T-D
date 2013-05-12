@@ -35,10 +35,10 @@ nameplate add-ons.
 
 **Guidelines for other add-on authors:**
 
-- **Do not call :Hide() or :Show() on nameplates sub-frames.** This breaks
+- **Do not call :Hide() or :Show() on nameplates' base frame.** This breaks
   nameplate tracking for other add-ons by unduly firing OnHide/OnShow hooks...
 
-  Instead, make them invisible by changing their size and/or setting them to
+  Instead, make its sub-frames invisible by changing their size and/or setting them to
   the _empty_ (not _nil_) texture. (check out how TidyPlates does)
 
 - **Do not call :SetParent() on nameplates' subframes**, this would prevent other
