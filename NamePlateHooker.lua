@@ -164,10 +164,10 @@ end -- }}}
 function NPH:OnEnable() -- {{{
     self:Debug(INFO, "OnEnable");
 
-    -- Subscribe to HHTD callbacks
-    self:RegisterMessage("HHTD_HEALER_GONE");
+    -- Subscribe to HHTD's callbacks
     self:RegisterMessage("HHTD_HEALER_BORN");
     self:RegisterMessage("HHTD_HEALER_GROW");
+    self:RegisterMessage("HHTD_HEALER_GONE");
 
     self:RegisterEvent("PLAYER_ENTERING_WORLD");
 
