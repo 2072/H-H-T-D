@@ -29,8 +29,8 @@
 
 ## X-License: All Rights Reserved
 
-## OptionalDeps: Ace3
-## X-Embeds: Ace3
+## OptionalDeps: Ace3, LibNameplateRegistry-1.0
+## X-Embeds: Ace3, LibNameplateRegistry-1.0
 
 ## X-ReleaseDate: "@project-date-iso@"
 ## X-Category: PvP

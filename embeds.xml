@@ -17,6 +17,8 @@
 <Include file="Libs\AceConfig-3.0\AceConfig-3.0.xml"/>
 <Include file="Libs\AceLocale-3.0\AceLocale-3.0.xml" />
 
+<Include file="Libs\LibNameplateRegistry-1.0\LibNameplateRegistry-1.0.xml" />
+
 <!--@end-no-lib-strip@-->
 
 

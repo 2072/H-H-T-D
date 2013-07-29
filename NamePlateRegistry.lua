@@ -21,12 +21,6 @@ type /hhtd to get a list of existing options.
 This component builds and keep a registry of all the name-plates and provide
 callbacks as well as basic analysis of the name plates
 
-TODO:
-
-Make a GUID cache for players (not for NPCs which are not necessarily uniq)
-which will keep only 200 names ecedent shall be cleaned on zonning
-There will be two cache: friendly and not friendly
-
 ==========CALLBACKS
 - Show event -- DONE
 - Hide event -- DONE

@@ -33,10 +33,9 @@ local INFO2     = 4;
 local ADDON_NAME, T = ...;
 local HHTD = T.Healers_Have_To_Die;
 local L = HHTD.Localized_Text;
-local NPR;
 
 
-HHTD.Name_Plate_Hooker = HHTD:NewModule("NPH")
+HHTD.Name_Plate_Hooker = HHTD:NewModule("NPH", "LibNameplateRegistry-1.0");
 
 local NPH = HHTD.Name_Plate_Hooker;
 
@@ -172,21 +171,26 @@ function NPH:OnEnable() -- {{{
     self:RegisterEvent("PLAYER_ENTERING_WORLD");
 
 
-    -- Subscribe to callbacks
-    self:RegisterMessage("NPR_ON_NEW_PLATE");
-    self:RegisterMessage("NPR_ON_RECYCLE_PLATE");
-    self:RegisterMessage("NPR_ON_GUID_FOUND");
-    self:RegisterMessage("NPR_FATAL_INCOMPATIBILITY");
+    NP = LibStub("LibNameplateRegistry-1.0");
 
-    NPR = self:GetModule("NPR");
-    NPR:Enable();
+    -- Subscribe to callbacks
+    self:LNR_RegisterCallback("LNR_DEBUG");
+    self:LNR_RegisterCallback("LNR_ON_NEW_PLATE");
+    self:LNR_RegisterCallback("LNR_ON_RECYCLE_PLATE");
+    self:LNR_RegisterCallback("LNR_ON_GUID_FOUND");
+
+    self:LNR_RegisterCallback("LNR_ERROR_FATAL_INCOMPATIBILITY");
+    self:LNR_RegisterCallback("LNR_ERROR_GUID_ID_HAMPERED");
+    self:LNR_RegisterCallback("LNR_ERROR_SETPARENT_ALERT");
+    self:LNR_RegisterCallback("LNR_ERROR_SETSCRIPT_ALERT");
+
 
     local plate;
     for i, isFriend in ipairs({true,false}) do
         -- Add nameplates to known healers by GUID
         for healerGUID, healer in pairs(HHTD.Registry_by_GUID[isFriend]) do
 
-            plate = NPR:GetByGUID(healerGUID);
+            plate = self:GetPlateByGUID(healerGUID);
 
             if plate then
                 self:AddCrossToPlate (plate, isFriend, healer.name);
@@ -200,6 +204,8 @@ end -- }}}
 function NPH:OnDisable() -- {{{
     self:Debug(INFO2, "OnDisable");
 
+    self:LNR_UnregisterCallback("LNR_ON_NEW_PLATE"); -- remove this one alone so I can see LNR debug callback
+    self:LNR_UnregisterAllCallbacks();
     -- clean all nameplates
     for i, isFriend in ipairs({true,false}) do
         for plateTID, plate in pairs(self.DisplayedPlates_byFrameTID[isFriend]) do
@@ -243,10 +249,10 @@ function NPH:HHTD_HEALER_GONE(selfevent, isFriend, healer)
     
     local plateByGuid;
     if self.db.global.sPve then
-        plateByGuid = NPR:GetByGUID(healer.guid);
+        plateByGuid = self:GetPlateByGUID(healer.guid);
     end
 
-    for frame, data in NPR:EachByName(healer.name) do
+    for frame, data in self:EachPlateByName(healer.name) do
         local plate = plateByGuid or frame;
 
         --self:Debug(INFO, "Must drop", healer.name);
@@ -272,10 +278,10 @@ function NPH:HHTD_HEALER_BORN (selfevent, isFriend, healer)
 
     local plateByGuid;
     if self.db.global.sPve then
-        plateByGuid = NPR:GetByGUID(healer.guid);
+        plateByGuid = self:GetPlateByGUID(healer.guid);
     end
 
-    for frame, data in NPR:EachByName(healer.name) do
+    for frame, data in self:EachPlateByName(healer.name) do
 
         local plate = plateByGuid or frame;
 
@@ -303,7 +309,7 @@ local callbacks_consisistency_check = {};
 
 
 -- Name Plates CallBacks {{{
-function NPH:NPR_ON_NEW_PLATE(selfevent, plate, data)
+function NPH:LNR_ON_NEW_PLATE(selfevent, plate, data)
 
     local plateName = data.name;
     local isFriend = (data.reaction == "FRIENDLY") and true or false;
@@ -317,11 +323,11 @@ function NPH:NPR_ON_NEW_PLATE(selfevent, plate, data)
     end
 
     if self.DisplayedPlates_byFrameTID[true][plate] then
-        self:Debug(ERROR, 'NPR_ON_NEW_PLATE() called but no recycling occured for friendly plate, ccc:', callbacks_consisistency_check[plate]);
-        error('NPR_ON_NEW_PLATE() called but no recycling occured for _FRIENDLY_ plate' .. callbacks_consisistency_check[plate]);
+        self:Debug(ERROR, 'LNR_ON_NEW_PLATE() called but no recycling occured for friendly plate, ccc:', callbacks_consisistency_check[plate]);
+        error('LNR_ON_NEW_PLATE() called but no recycling occured for _FRIENDLY_ plate' .. callbacks_consisistency_check[plate]);
     elseif self.DisplayedPlates_byFrameTID[false][plate] then
-        self:Debug(ERROR, 'NPR_ON_NEW_PLATE() called but no recycling occured for _ENEMY_ plate, ccc:', callbacks_consisistency_check[plate]);
-        error('NPR_ON_NEW_PLATE() called but no recycling occured for enemy plate' .. callbacks_consisistency_check[plate]);
+        self:Debug(ERROR, 'LNR_ON_NEW_PLATE() called but no recycling occured for _ENEMY_ plate, ccc:', callbacks_consisistency_check[plate]);
+        error('LNR_ON_NEW_PLATE() called but no recycling occured for enemy plate' .. callbacks_consisistency_check[plate]);
     end
     --@end-alpha@
 
@@ -369,11 +375,11 @@ function NPH:NPR_ON_NEW_PLATE(selfevent, plate, data)
     end
 end
 
-function NPH:NPR_ON_RECYCLE_PLATE(selfevent, plate, data)
+function NPH:LNR_ON_RECYCLE_PLATE(selfevent, plate, data)
 
    --x if LNP.fakePlate[plate] then
         --@debug@
-        --self:Debug(INFO2, "NPR_ON_RECYCLE_PLATE(): unused frame received for:", NPR:GetName(plate));
+        --self:Debug(INFO2, "LNR_ON_RECYCLE_PLATE(): unused frame received for:", self:GetPlateName(plate));
         --@end-debug@
       --x  return;
     --x end
@@ -391,13 +397,13 @@ function NPH:NPR_ON_RECYCLE_PLATE(selfevent, plate, data)
     --@end-alpha@
 
     --@debug@
-    -- self:Debug(INFO, "NPR_ON_RECYCLE_PLATE():", plateName);
+    -- self:Debug(INFO, "LNR_ON_RECYCLE_PLATE():", plateName);
     --@end-debug@
 
     -- unfortunately a plate can change of faction without being hidden first (if a unit gets mind controlled)
     -- so we have to check both sides
-    self:HideCrossFromPlate(plate, true,  plateName, "NPR_ON_RECYCLE_PLATE");
-    self:HideCrossFromPlate(plate, false, plateName, "NPR_ON_RECYCLE_PLATE");
+    self:HideCrossFromPlate(plate, true,  plateName, "LNR_ON_RECYCLE_PLATE");
+    self:HideCrossFromPlate(plate, false, plateName, "LNR_ON_RECYCLE_PLATE");
 
 
     -- prevent uniqueness data from stacking
@@ -410,20 +416,20 @@ function NPH:NPR_ON_RECYCLE_PLATE(selfevent, plate, data)
     end
 end
 
-function NPH:NPR_ON_GUID_FOUND(selfevent, plate, guid)
+function NPH:LNR_ON_GUID_FOUND(selfevent, plate, guid)
 
     if HHTD.Registry_by_GUID[true][guid] or HHTD.Registry_by_GUID[false][guid] then
         self:Debug(INFO, "GUID found");
-        self:AddCrossToPlate(plate, HHTD.Registry_by_GUID[true][guid] and true or false, NPR:GetPlateName(plate), guid);
+        self:AddCrossToPlate(plate, HHTD.Registry_by_GUID[true][guid] and true or false, self:GetPlateName(plate), guid);
     else
         self:Debug(INFO2, "GUID found but not a healer");
     end
 
 end
 
-function NPH:NPR_FATAL_INCOMPATIBILITY(selfevent, outdated, incompatibility_type)
+function NPH:LNR_ERROR_FATAL_INCOMPATIBILITY(selfevent, incompatibility_type)
 
-    if outdated then
+    if T._tocversion > HHTD.Constants.MaxTOC then
         self:Print("|cFFFF0000ERROR:|rHHTD is outdated and no longer compatible with this version of WoW, you need to update HHTD from Curse.com. The Nameplate Hooker module is now disabled.", 'Incompatibility type:', incompatibility_type);
     else
         self:Print("|cFFFF0000ERROR:|rAn add-on is unduly modifying Blizzard's nameplates in a way preventing other add-ons from using them. HHTD is not compatible with such self-centred add-ons. The Nameplate Hooker module is now disabled.", 'Incompatibility type:', incompatibility_type);
@@ -432,6 +438,25 @@ function NPH:NPR_FATAL_INCOMPATIBILITY(selfevent, outdated, incompatibility_type
     HHTD:FatalError("The Nameplate Hooker module had to be disabled due to an incompatibility.\nSee the chat window for more details.");
 
     self:Disable();
+end
+
+function NPH:LNR_DEBUG(selfevent, level, nrMinor, ...)
+    if not HHTD.db.global.Debug and level ~= ERROR then return end;
+
+    self:Debug(level, "|cff50D000LNR", nrMinor, '|r', ...);
+end
+
+function NPH:LNR_ERROR_GUID_ID_HAMPERED(selfevent, message)
+    self:Print(message);
+end
+
+function NPH:LNR_ERROR_SETPARENT_ALERT(selfevent, baddon, message)
+    self:Print(message);
+end
+
+function NPH:LNR_ERROR_SETSCRIPT_ALERT(selfevent, baddon, proof,  message)
+    self:Print(message);
+    self:Print(proof);
 end
 
 -- }}}
@@ -549,20 +574,20 @@ do
         end
 
         if isFriend==nil then
-            isFriend = (NPR:GetReaction(plate) == "FRIENDLY") and true or false;
+            isFriend = (self:GetPlateReaction(plate) == "FRIENDLY") and true or false;
             self:Debug(ERROR, "AddCrossToPlate(), isFriend was not defined", isFriend);
         end
 
         --@alpha@
-        if plateName ~= NPR:GetPlateName(plate) then
-            self:Debug(ERROR, 'AddCrossToPlate(): plateName ~= NPR:GetPlateName(plate):', plateName, '-_-', NPR:GetPlateName(plate));
-            error('AddCrossToPlate(): plateName ~= NPR:GetPlateName(plate)');
+        if plateName ~= self:GetPlateName(plate) then
+            self:Debug(ERROR, 'AddCrossToPlate(): plateName ~= :GetPlateName(plate):', plateName, '-_-', self:GetPlateName(plate));
+            error('AddCrossToPlate(): plateName ~= :GetPlateName(plate)');
         end
         --@end-alpha@
 
         -- export useful data
         IsFriend        = isFriend;
-        Guid            = guid or NPR:GetGUID(plate);
+        Guid            = guid or self:GetPlateGUID(plate);
         Guid            = HHTD.Registry_by_GUID[IsFriend][Guid] and Guid or nil; -- make sure the Guid is actually usable.
         Plate           = plate;
         PlateName       = plateName;
@@ -633,8 +658,8 @@ do
                 IsFriend        = isFriend;
                 Plate           = plate;
                 PlateAdditions  = plate[PLATES__NPH_NAMES[isFriend]];
-                PlateName       = NPR:GetPlateName(plate);
-                Guid            = NPR:GetGUID(plate);
+                PlateName       = self:GetPlateName(plate);
+                Guid            = self:GetPlateGUID(plate);
                 Guid            = HHTD.Registry_by_GUID[IsFriend][Guid] and Guid or nil;
 
                 SetRank();
