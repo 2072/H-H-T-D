@@ -14,6 +14,6 @@ externals:
     Libs/AceLocale-3.0: svn://svn.wowace.com/wow/ace3/mainline/trunk/AceLocale-3.0
     Libs/LibNameplateRegistry-1.0: git://git.wowace.com/wow/libnameplateregistry-1-0/mainline.git/LibNameplateRegistry-1.0
 
-#manual-changelog:
-#    filename: changelog.md.txt
-#    markup-type: markdown
+manual-changelog:
+    filename: changelog.md.txt
+    markup-type: markdown

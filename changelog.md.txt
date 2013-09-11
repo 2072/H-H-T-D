@@ -4,6 +4,14 @@ Healers Have To Die
 *Change log*
 ------------
 
+**version 2.2 (2013-09-11):**
+
+- Now using the new [LibNamePlateRegistry-1.0][LibNamePlateRegistry] shared
+  library instead of the namesake submodule.
+
+- A rare Lua runtime error was fixed.
+
+
 **version 2.1.4 (2013-05-21):**
 
 - Fixed a rare Lua error that would cause '?' to be displayed on human healers'
@@ -272,3 +280,4 @@ Until then, just use the command /HHTDG to access HHTD's option panel.
 [spelllist]: http://www.wowace.com/addons/healers-have-to-die/pages/specialized-healers-spells/
 [localization]: http://www.wowace.com/addons/healers-have-to-die/localization/
 [tidyplates]: http://www.curse.com/addons/wow/tidy-plates
+[LibNamePlateRegistry]: http://www.wowace.com/addons/libnameplateregistry-1-0/
