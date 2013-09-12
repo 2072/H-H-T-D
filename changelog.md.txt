@@ -4,6 +4,17 @@ Healers Have To Die
 *Change log*
 ------------
 
+**version 2.2.1 (2013-09-13):**
+
+- Fix symbol display on players from foreign servers (those who have an
+  asterisk between round brackets appended to their nameplates).
+
+  This issue is an old one, probably dating back to last March.
+  HHTD detected those foreign healers properly (the mouse-over sound worked)
+  but would fail to find their nameplates because of the asterisk present in
+  their displayed names and thus would not display any symbol...
+
+
 **version 2.2 (2013-09-11):**
 
 - Now using the new [LibNamePlateRegistry-1.0][LibNamePlateRegistry] shared
