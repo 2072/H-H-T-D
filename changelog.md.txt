@@ -4,6 +4,12 @@ Healers Have To Die
 *Change log*
 ------------
 
+**version 2.2.2 (2013-11-17):**
+
+- Uses version 0.6 of LibNamePlateRegistry fixing a race condition which could
+  prevent HHTD from adding its healer symbols on some nameplates.
+
+
 **version 2.2.1 (2013-09-13):**
 
 - Fix symbol display on players from foreign servers (those who have an
