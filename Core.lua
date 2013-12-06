@@ -59,12 +59,15 @@ local L = HHTD.Localized_Text;
 HHTD.Constants = {};
 local HHTD_C = HHTD.Constants;
 
-HHTD_C.Healing_Classes = {
+--[=[
+HHTD_C.Healing_Classes = { -- unused
     ["PRIEST"]  = true,
     ["PALADIN"] = true,
     ["DRUID"]   = true,
     ["SHAMAN"]  = true,
+    ["MONK"]    = true,
 };
+--]=]
 
 HHTD_C.MaxTOC = tonumber(GetAddOnMetadata("Healers-Have-To-Die", "X-Max-Interface") or math.huge); -- once GetAddOnMetadata() was bugged and returned nil...
 
@@ -971,7 +974,7 @@ do
 
         -- detect a true healer
         if not record.isTrueHeal then
-            record.isTrueHeal = HHTD_C.Healers_Only_Spells_ByName[spellName];
+            record.isTrueHeal = HHTD_C.Healers_Only_Spells_ByName[spellName] or false;
         end
 
         if configRef.Log then -- {{{
@@ -1095,8 +1098,10 @@ do
                 self:Debug(INFO, "target is a hostile NPC");
             end
         end
-
-        self:COMBAT_LOG_EVENT_UNFILTERED(nil, 0, "DUMMY_HEAL", false, UnitGUID(unit), (UnitName(unit)), flags, 0, destGUID, destName, flags, 0, 0, (GetSpellInfo(33891)), "", HHTD.HealThreshold + 1);
+    
+        local class = select(2, UnitClass("mouseover"));
+        local dummySpell = ({["DRUID"] = GetSpellInfo(033891), ["SHAMAN"] = GetSpellInfo(00974), ["PRIEST"] = GetSpellInfo(047515), ["PALADIN"] = GetSpellInfo(53563), ["MONK"] = GetSpellInfo(115175)})[class] or GetSpellInfo(3273);
+        self:COMBAT_LOG_EVENT_UNFILTERED(nil, 0, "DUMMY_HEAL", false, UnitGUID(unit), (UnitName(unit)), flags, 0, destGUID, destName, flags, 0, 0, dummySpell, "", HHTD.HealThreshold + 1);
     end
 
     -- http://www.wowpedia.org/API_COMBAT_LOG_EVENT

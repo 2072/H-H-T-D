@@ -44,10 +44,6 @@ NPH:SetDefaultModuleLibraries( "AceConsole-3.0", "AceEvent-3.0");
 NPH:SetDefaultModuleState( false );
 
 
-local PLATES__NPH_NAMES = {
-    [true] = 'HHTD_FriendHealer',
-    [false] = 'HHTD_EnemyHealer'
-};
 
 local LAST_TEXTURE_UPDATE = 0;
 
@@ -170,9 +166,6 @@ function NPH:OnEnable() -- {{{
 
     self:RegisterEvent("PLAYER_ENTERING_WORLD");
 
-
-    NP = LibStub("LibNameplateRegistry-1.0");
-
     -- Subscribe to callbacks
     self:LNR_RegisterCallback("LNR_DEBUG");
     self:LNR_RegisterCallback("LNR_ON_NEW_PLATE");
@@ -193,7 +186,7 @@ function NPH:OnEnable() -- {{{
             plate = self:GetPlateByGUID(healerGUID);
 
             if plate then
-                self:AddCrossToPlate (plate, isFriend, healer.name);
+                self:AddCrossToPlate (plate, isFriend, healer.name, healer);
             end
 
         end
@@ -207,20 +200,15 @@ function NPH:OnDisable() -- {{{
     self:LNR_UnregisterCallback("LNR_ON_NEW_PLATE"); -- remove this one alone so I can see LNR debug callback
     self:LNR_UnregisterAllCallbacks();
     -- clean all nameplates
-    for i, isFriend in ipairs({true,false}) do
-        for plateTID, plate in pairs(self.DisplayedPlates_byFrameTID[isFriend]) do
-            self:HideCrossFromPlate(plate, isFriend, false, "OnDisable");
-        end
+    for plateTID, plate in pairs(self.DisplayedPlates_byFrameTID) do
+        self:HideCrossFromPlate(plate, false, "OnDisable");
     end
 end -- }}}
 -- }}}
 
 
 
-NPH.DisplayedPlates_byFrameTID = { -- used for updating plates dipslay attributes
-    [true] = {}, -- for Friendly healers
-    [false] = {} -- for enemy healers
-};
+NPH.DisplayedPlates_byFrameTID = {}; -- used for updating plates dipslay attributes
 
 local Plate_Name_Count = { -- array by name so we have to make the difference between friends and foes
 };
@@ -256,7 +244,7 @@ function NPH:HHTD_HEALER_GONE(selfevent, isFriend, healer)
         local plate = plateByGuid or frame;
 
         --self:Debug(INFO, "Must drop", healer.name);
-        self:HideCrossFromPlate(plate, isFriend, healer.name, "HHTD_HEALER_GONE");
+        self:HideCrossFromPlate(plate, healer.name, "HHTD_HEALER_GONE");
 
         if plateByGuid then
             break;
@@ -287,7 +275,7 @@ function NPH:HHTD_HEALER_BORN (selfevent, isFriend, healer)
 
         -- we have have access to the correct plate through the unit's GUID or it's uniquely named.
         if plateByGuid or not self.db.global.sPve then
-            self:AddCrossToPlate (plate, isFriend, healer.name, healer.guid);
+            self:AddCrossToPlate (plate, isFriend, healer.name, healer.guid, healer);
 
             self:Debug(INFO, "HHTD_HEALER_BORN(): GUID available or unique", NP_Is_Not_Unique[healer.name]);
         else
@@ -322,12 +310,9 @@ function NPH:LNR_ON_NEW_PLATE(selfevent, plate, data)
         callbacks_consisistency_check[plate] = callbacks_consisistency_check[plate] + 1;
     end
 
-    if self.DisplayedPlates_byFrameTID[true][plate] then
-        self:Debug(ERROR, 'LNR_ON_NEW_PLATE() called but no recycling occured for friendly plate, ccc:', callbacks_consisistency_check[plate]);
+    if self.DisplayedPlates_byFrameTID[plate] then
+        self:Debug(ERROR, 'LNR_ON_NEW_PLATE() called but no recycling occured for plate, ccc:', callbacks_consisistency_check[plate]);
         error('LNR_ON_NEW_PLATE() called but no recycling occured for _FRIENDLY_ plate' .. callbacks_consisistency_check[plate]);
-    elseif self.DisplayedPlates_byFrameTID[false][plate] then
-        self:Debug(ERROR, 'LNR_ON_NEW_PLATE() called but no recycling occured for _ENEMY_ plate, ccc:', callbacks_consisistency_check[plate]);
-        error('LNR_ON_NEW_PLATE() called but no recycling occured for enemy plate' .. callbacks_consisistency_check[plate]);
     end
     --@end-alpha@
 
@@ -356,20 +341,18 @@ function NPH:LNR_ON_NEW_PLATE(selfevent, plate, data)
             return;
         end
 
-        self:AddCrossToPlate(plate, isFriend, plateName, data.guid);
+        self:AddCrossToPlate(plate, isFriend, plateName, data.guid, HHTD.Registry_by_Name[isFriend][plateName]);
         --@alpha@
     else -- it's not a healer
-        for i, isFriend in ipairs({true,false}) do
-            local plateAdditions = plate[PLATES__NPH_NAMES[isFriend]];
+        local plateAdditions = plate.HHTD;
 
-            if plateAdditions and (plateAdditions.IsShown or plateAdditions.texture:IsShown() or plateAdditions.rankFont:IsShown()) then -- check if the plate appeared with our additions shown
-                self:Debug(ERROR, "Plate prev-recycling hiding failed: ", plateAdditions.IsShown, plateName, isFriend, data.reaction);
-                error("Plate prev-recycling hiding failed: "..tostring(plateAdditions.IsShown).." for " .. plateName .. ' friend:' .. tostring(isFriend) .. '-' .. tostring(data.reaction)); -- seems to trigger when plateadditions are hidden while the plate are being recycled
-                -- this means:
-                --  New_plate fires before the cross was hidden
-                --  New_plate fires before recycle
-                --  HideCross fails
-            end
+        if plateAdditions and (plateAdditions.IsShown or plateAdditions.texture:IsShown() or plateAdditions.rankFont:IsShown()) then -- check if the plate appeared with our additions shown
+            self:Debug(ERROR, "Plate prev-recycling hiding failed: ", plateAdditions.IsShown, plateName, isFriend, data.reaction);
+            error("Plate prev-recycling hiding failed: "..tostring(plateAdditions.IsShown).." for " .. plateName .. ' friend:' .. tostring(isFriend) .. '-' .. tostring(data.reaction)); -- seems to trigger when plateadditions are hidden while the plate are being recycled
+            -- this means:
+            --  New_plate fires before the cross was hidden
+            --  New_plate fires before recycle
+            --  HideCross fails
         end
         --@end-alpha@
     end
@@ -385,7 +368,6 @@ function NPH:LNR_ON_RECYCLE_PLATE(selfevent, plate, data)
     --x end
 
     local plateName = data.name;
-    -- local isFriend = (data.reaction == 'FRIENDLY') and true or false;
 
 
     --@alpha@
@@ -402,8 +384,7 @@ function NPH:LNR_ON_RECYCLE_PLATE(selfevent, plate, data)
 
     -- unfortunately a plate can change of faction without being hidden first (if a unit gets mind controlled)
     -- so we have to check both sides
-    self:HideCrossFromPlate(plate, true,  plateName, "LNR_ON_RECYCLE_PLATE");
-    self:HideCrossFromPlate(plate, false, plateName, "LNR_ON_RECYCLE_PLATE");
+    self:HideCrossFromPlate(plate, plateName, "LNR_ON_RECYCLE_PLATE");
 
 
     -- prevent uniqueness data from stacking
@@ -418,9 +399,11 @@ end
 
 function NPH:LNR_ON_GUID_FOUND(selfevent, plate, guid)
 
-    if HHTD.Registry_by_GUID[true][guid] or HHTD.Registry_by_GUID[false][guid] then
+    local healer = HHTD.Registry_by_GUID[true][guid] or HHTD.Registry_by_GUID[false][guid];
+
+    if healer then
         self:Debug(INFO, "GUID found");
-        self:AddCrossToPlate(plate, HHTD.Registry_by_GUID[true][guid] and true or false, self:GetPlateName(plate), guid);
+        self:AddCrossToPlate(plate, HHTD.Registry_by_GUID[true][guid] and true or false, self:GetPlateName(plate), guid, healer);
     else
         self:Debug(INFO2, "GUID found but not a healer");
     end
@@ -470,6 +453,16 @@ do
     local PlateAdditions;
     local PlateName;
     local Guid;
+    local HealerClass;
+
+    local ENEMIES_ICONS = {
+        ["PRIEST"]  = "Interface\\AddOns\\Healers-Have-To-Die\\icons\\priest.tga",
+        ["PALADIN"] = "Interface\\AddOns\\Healers-Have-To-Die\\icons\\paladin.tga",
+        ["DRUID"]   = "Interface\\AddOns\\Healers-Have-To-Die\\icons\\druid.tga",
+        ["SHAMAN"]  = "Interface\\AddOns\\Healers-Have-To-Die\\icons\\shaman.tga",
+        ["MONK"]    = "Interface\\AddOns\\Healers-Have-To-Die\\icons\\monk.tga",
+        [false]     = "Interface\\AddOns\\Healers-Have-To-Die\\icons\\black.tga",
+    };
 
     local assert = _G.assert;
 
@@ -477,24 +470,25 @@ do
         local profile = NPH.db.global;
 
         t:SetSize(64 * profile.marker_Scale, 64 * profile.marker_Scale);
+        HHTD:Debug(INFO2, 'XXXXX', t:GetSize());
         t:SetPoint("BOTTOM", Plate, "TOP", 0 + profile.marker_Xoffset, -20 + profile.marker_Yoffset);
     end
 
-    local function MakeTexture() -- ONCE
-        local t = Plate:CreateTexture();
+    local function SetTexture(t) -- MUL
 
-        SetTextureParams(t);
+        if IsFriend and PlateAdditions.textureID ~= 'friendly' then
+            t:SetTexture("Interface\\AddOns\\Healers-Have-To-Die\\icons\\friendly_healer.tga");
+            --t:SetTexture("Interface\\LFGFrame\\UI-LFG-ICON-RoleS");
+            --t:SetTexCoord(GetTexCoordsForRole("HEALER"));
+            PlateAdditions.textureID = 'friendly';
+        elseif not IsFriend and PlateAdditions.textureID ~= HealerClass then
+            t:SetTexture(ENEMIES_ICONS[HealerClass]);
+            PlateAdditions.textureID = HealerClass;
 
-        if IsFriend then
-            t:SetTexture("Interface\\LFGFrame\\UI-LFG-ICON-RoleS");
-            t:SetTexCoord(GetTexCoordsForRole("HEALER"));
-        else
-            t:SetTexture("Interface\\RaidFrame\\ReadyCheck-NotReady.blp");
-            -- rotate it by Pi/2
-            HHTD:RotateTexture(t, 90);
+            --t:SetTexture("Interface\\RaidFrame\\ReadyCheck-NotReady.blp");
+            -- -- rotate it by Pi/2
+            --HHTD:RotateTexture(t, 90);
         end
-
-        return t;
 
     end
 
@@ -533,7 +527,7 @@ do
         end
     end
 
-    local function UpdateTexture () -- MUL XXX
+    local function UpdateTextureParams () -- MUL XXX
 
         if not PlateAdditions.textureUpdate or PlateAdditions.textureUpdate < LAST_TEXTURE_UPDATE then
             --self:Debug(INFO, 'Updating texture');
@@ -546,7 +540,10 @@ do
     end
 
     local function AddElements () -- ONCEx
-        local texture  = MakeTexture();
+        local texture  = Plate:CreateTexture();
+        SetTextureParams(texture);
+        SetTexture(texture);
+        
         local rankFont = MakeFontString(texture);
 
         PlateAdditions.texture = texture;
@@ -561,7 +558,7 @@ do
 
     end
 
-    function NPH:AddCrossToPlate (plate, isFriend, plateName, guid) -- {{{
+    function NPH:AddCrossToPlate (plate, isFriend, plateName, guid, healer) -- {{{
 
         if not plate then
             self:Debug(ERROR, "AddCrossToPlate(), plate is not defined");
@@ -591,19 +588,20 @@ do
         Guid            = HHTD.Registry_by_GUID[IsFriend][Guid] and Guid or nil; -- make sure the Guid is actually usable.
         Plate           = plate;
         PlateName       = plateName;
-        PlateAdditions  = plate[PLATES__NPH_NAMES[isFriend]];
+        PlateAdditions  = plate.HHTD;
+        HealerClass     = healer.isTrueHeal;
 
         if not PlateAdditions then
-            plate[PLATES__NPH_NAMES[isFriend]] = {};
-            plate[PLATES__NPH_NAMES[isFriend]].isFriend = isFriend;
+            plate.HHTD = {};
 
-            PlateAdditions  = plate[PLATES__NPH_NAMES[isFriend]];
+            PlateAdditions = plate.HHTD;
 
             AddElements();
 
         elseif not PlateAdditions.IsShown then
 
-            UpdateTexture();
+            SetTexture(PlateAdditions.texture);
+            UpdateTextureParams();
             PlateAdditions.texture:Show();
             PlateAdditions.IsShown = true;
 
@@ -612,12 +610,14 @@ do
             PlateAdditions.rankFont:Show();
 
         elseif guid and NP_Is_Not_Unique[plateName] then
+            SetTexture(PlateAdditions.texture);
+            UpdateTextureParams();
             SetRank();
         end
 
         PlateAdditions.plateName = plateName;
 
-        self.DisplayedPlates_byFrameTID[isFriend][plate] = plate; -- used later to update what was created above
+        self.DisplayedPlates_byFrameTID[plate] = plate; -- used later to update what was created above
 
         --@alpha@
         -- IsFriend        = nil;
@@ -625,6 +625,7 @@ do
         -- Plate           = nil;
         -- PlateName       = nil;
         -- PlateAdditions  = nil;
+        -- HealerClass     = nil;
         --@end-alpha@
 
     end -- }}}
@@ -633,15 +634,13 @@ do
 
         LAST_TEXTURE_UPDATE = GetTime();
 
-        for i, isFriend in ipairs({true,false}) do
-            for plate in pairs(self.DisplayedPlates_byFrameTID[isFriend]) do
+        for plate in pairs(self.DisplayedPlates_byFrameTID) do
 
-                PlateAdditions  = plate[PLATES__NPH_NAMES[isFriend]];
-                Plate           = plate;
+            PlateAdditions  = plate.HHTD;
+            Plate           = plate;
 
-                UpdateTexture();
+            UpdateTextureParams();
 
-            end
         end
 
         --@alpha@
@@ -652,19 +651,23 @@ do
 
     function NPH:UpdateRanks ()
 
-        for i, isFriend in ipairs({true,false}) do
-            for plate in pairs(self.DisplayedPlates_byFrameTID[isFriend]) do
+        for plate in pairs(self.DisplayedPlates_byFrameTID) do
 
-                IsFriend        = isFriend;
-                Plate           = plate;
-                PlateAdditions  = plate[PLATES__NPH_NAMES[isFriend]];
-                PlateName       = self:GetPlateName(plate);
-                Guid            = self:GetPlateGUID(plate);
-                Guid            = HHTD.Registry_by_GUID[IsFriend][Guid] and Guid or nil;
-
-                SetRank();
-
+            Plate           = plate;
+            PlateAdditions  = plate.HHTD;
+            PlateName       = self:GetPlateName(plate);
+            Guid            = self:GetPlateGUID(plate);
+            Guid            = HHTD.Registry_by_GUID[IsFriend][Guid] and Guid or nil;
+            if Guid then
+                IsFriend = HHTD.Registry_by_GUID[true][Guid] and true or false;
+            else
+                IsFriend = HHTD.Registry_by_Name[true][PlateName] and true or false;
             end
+            --HHTD:Debug(INFO2,'XXXXXX', IsFriend, PlateName); 
+            HealerClass     = HHTD.Registry_by_Name[IsFriend][PlateName].isTrueHeal;
+
+            SetRank();
+
         end
 
         --@alpha@
@@ -672,12 +675,13 @@ do
         Plate           = nil;
         PlateName       = nil;
         PlateAdditions  = nil;
+        HealerClass     = nil;
         --@end-alpha@
     end
 
 end
 
-function NPH:HideCrossFromPlate(plate, isFriend, plateName, caller) -- {{{
+function NPH:HideCrossFromPlate(plate, plateName, caller) -- {{{
 
     --@alpha@
     if not plate then
@@ -687,7 +691,7 @@ function NPH:HideCrossFromPlate(plate, isFriend, plateName, caller) -- {{{
     end
     --@end-alpha@
 
-    local plateAdditions = plate[PLATES__NPH_NAMES[isFriend]];
+    local plateAdditions = plate.HHTD;
 
     --@alpha@
     local testCase1 = false;
@@ -709,7 +713,7 @@ function NPH:HideCrossFromPlate(plate, isFriend, plateName, caller) -- {{{
         -- self:Debug(INFO2, isFriend and "|cff00ff00Friendly|r" or "|cffff0000Enemy|r", "cross hidden for", plateName);
     end
 
-    self.DisplayedPlates_byFrameTID[isFriend][plate] = nil;
+    self.DisplayedPlates_byFrameTID[plate] = nil;
 
     --@alpha@
     if testCase1 then
