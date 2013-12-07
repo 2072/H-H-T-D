@@ -657,7 +657,7 @@ do
             PlateAdditions  = plate.HHTD;
             PlateName       = self:GetPlateName(plate);
             Guid            = self:GetPlateGUID(plate);
-            Guid            = HHTD.Registry_by_GUID[IsFriend][Guid] and Guid or nil;
+            Guid            = (HHTD.Registry_by_GUID[true][Guid] or HHTD.Registry_by_GUID[false][Guid]) and Guid or nil;
             if Guid then
                 IsFriend = HHTD.Registry_by_GUID[true][Guid] and true or false;
             else
