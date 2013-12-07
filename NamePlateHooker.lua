@@ -61,7 +61,7 @@ function NPH:OnInitialize() -- {{{
     self.db = HHTD.db:RegisterNamespace('NPH', {
         global = {
             sPve = false,
-            marker_Scale = 1,
+            marker_Scale = 0.8,
             marker_Xoffset = 0,
             marker_Yoffset = 0,
         },
@@ -466,12 +466,12 @@ do
 
     local assert = _G.assert;
 
-    local function SetTextureParams(t) -- MUL XXX
+    local function SetTextureParams(t) -- MUL
         local profile = NPH.db.global;
 
         t:SetSize(64 * profile.marker_Scale, 64 * profile.marker_Scale);
         HHTD:Debug(INFO2, 'XXXXX', t:GetSize());
-        t:SetPoint("BOTTOM", Plate, "TOP", 0 + profile.marker_Xoffset, -20 + profile.marker_Yoffset);
+        t:SetPoint("BOTTOM", Plate, "TOP", profile.marker_Xoffset, profile.marker_Yoffset);
     end
 
     local function SetTexture(t) -- MUL
