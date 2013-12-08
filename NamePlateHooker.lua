@@ -689,6 +689,11 @@ do
 
             SetRank();
 
+            -- update the icon background color if necessary
+            if HealerClass then
+                AdjustTexCoord(PlateAdditions.texture);
+            end
+
         end
 
         --@alpha@
