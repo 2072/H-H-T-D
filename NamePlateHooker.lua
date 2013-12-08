@@ -477,7 +477,6 @@ do
 
     local function getIconCoords (x, y)
         local b = 1/256;
-        --return {b * x * 64, b * y * 64, b * (x * 64 + 64), b * (y * 64 + 64)};
         return {b * x * 64, b * (x * 64 + 64), b * y * 64, b * (y * 64 + 64)};
     end
 
