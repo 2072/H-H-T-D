@@ -465,6 +465,7 @@ do
     };
 
     local assert = _G.assert;
+    local unpack = _G.unpack;
 
     local function SetTextureParams(t) -- MUL
         local profile = NPH.db.global;
@@ -474,20 +475,39 @@ do
         t:SetPoint("BOTTOM", Plate, "TOP", profile.marker_Xoffset, profile.marker_Yoffset);
     end
 
-    local function SetTexture(t) -- MUL
+    local function getIconCoords (x, y)
+        local b = 1/256;
+        --return {b * x * 64, b * y * 64, b * (x * 64 + 64), b * (y * 64 + 64)};
+        return {b * x * 64, b * (x * 64 + 64), b * y * 64, b * (y * 64 + 64)};
+    end
 
-        if IsFriend and PlateAdditions.textureID ~= 'friendly' then
-            t:SetTexture("Interface\\AddOns\\Healers-Have-To-Die\\icons\\friendly_healer.tga");
-            --t:SetTexture("Interface\\LFGFrame\\UI-LFG-ICON-RoleS");
-            --t:SetTexCoord(GetTexCoordsForRole("HEALER"));
-            PlateAdditions.textureID = 'friendly';
-        elseif not IsFriend and PlateAdditions.textureID ~= HealerClass then
-            t:SetTexture(ENEMIES_ICONS[HealerClass]);
-            PlateAdditions.textureID = HealerClass;
+    local ICONS_COORDS = {
+        [true] = {
+            [false]     = getIconCoords(0,0), --0,0
+            ["DRUID"]   = getIconCoords(1,0), --1,0
+            ["MONK"]    = getIconCoords(2,0), --2,0
+            ["PALADIN"] = getIconCoords(3,0), --3,0
+            ["PRIEST"]  = getIconCoords(0,1), --0,1
+            ["SHAMAN"]  = getIconCoords(1,1), --1,1
+        },
+        [false] = {
+            [false]     = getIconCoords(2,1), --2,1
+            ["DRUID"]   = getIconCoords(3,1), --3,1
+            ["MONK"]    = getIconCoords(0,2), --0,2
+            ["PALADIN"] = getIconCoords(1,2), --1,2
+            ["PRIEST"]  = getIconCoords(2,2), --2,2
+            ["SHAMAN"]  = getIconCoords(3,2), --3,2
+        }
+    };
 
-            --t:SetTexture("Interface\\RaidFrame\\ReadyCheck-NotReady.blp");
-            -- -- rotate it by Pi/2
-            --HHTD:RotateTexture(t, 90);
+    local function AdjustTexCoord(t) -- MUL
+
+        local textureID = ICONS_COORDS[IsFriend][HealerClass];
+        --HHTD:Debug(WARNING, unpack(textureID));
+
+        if PlateAdditions.textureID ~= textureID then
+            t:SetTexCoord(unpack(textureID));
+            PlateAdditions.textureID = textureID;
         end
 
     end
@@ -498,7 +518,7 @@ do
         
         f:SetTextColor(1, 1, 1, 1);
         
-        f:SetPoint("CENTER", symbol, "CENTER", 0, 0);
+        f:SetPoint("CENTER", symbol, "CENTER", 1, 0);
 
         return f;
     end
@@ -541,8 +561,9 @@ do
 
     local function AddElements () -- ONCEx
         local texture  = Plate:CreateTexture();
+        texture:SetTexture("Interface\\AddOns\\Healers-Have-To-Die\\Artwork\\healers_icons.tga");
+        AdjustTexCoord(texture);
         SetTextureParams(texture);
-        SetTexture(texture);
         
         local rankFont = MakeFontString(texture);
 
@@ -600,7 +621,7 @@ do
 
         elseif not PlateAdditions.IsShown then
 
-            SetTexture(PlateAdditions.texture);
+            AdjustTexCoord(PlateAdditions.texture);
             UpdateTextureParams();
             PlateAdditions.texture:Show();
             PlateAdditions.IsShown = true;
@@ -610,7 +631,7 @@ do
             PlateAdditions.rankFont:Show();
 
         elseif guid and NP_Is_Not_Unique[plateName] then
-            SetTexture(PlateAdditions.texture);
+            AdjustTexCoord(PlateAdditions.texture);
             UpdateTextureParams();
             SetRank();
         end

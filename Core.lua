@@ -1099,7 +1099,7 @@ do
             end
         end
     
-        local class = select(2, UnitClass("mouseover"));
+        local class = select(2, UnitClass(unit));
         local dummySpell = ({["DRUID"] = GetSpellInfo(033891), ["SHAMAN"] = GetSpellInfo(00974), ["PRIEST"] = GetSpellInfo(047515), ["PALADIN"] = GetSpellInfo(53563), ["MONK"] = GetSpellInfo(115175)})[class] or GetSpellInfo(3273);
         self:COMBAT_LOG_EVENT_UNFILTERED(nil, 0, "DUMMY_HEAL", false, UnitGUID(unit), (UnitName(unit)), flags, 0, destGUID, destName, flags, 0, 0, dummySpell, "", HHTD.HealThreshold + 1);
     end
