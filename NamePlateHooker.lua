@@ -186,7 +186,7 @@ function NPH:OnEnable() -- {{{
             plate = self:GetPlateByGUID(healerGUID);
 
             if plate then
-                self:AddCrossToPlate (plate, isFriend, healer.name, healer);
+                self:AddCrossToPlate (plate, isFriend, healer.name, healerGUID, healer);
             end
 
         end
@@ -471,7 +471,6 @@ do
         local profile = NPH.db.global;
 
         t:SetSize(64 * profile.marker_Scale, 64 * profile.marker_Scale);
-        HHTD:Debug(INFO2, 'XXXXX', t:GetSize());
         t:SetPoint("BOTTOM", Plate, "TOP", profile.marker_Xoffset, profile.marker_Yoffset);
     end
 
@@ -683,7 +682,6 @@ do
             else
                 IsFriend = HHTD.Registry_by_Name[true][PlateName] and true or false;
             end
-            --HHTD:Debug(INFO2,'XXXXXX', IsFriend, PlateName); 
             HealerClass     = HHTD.Registry_by_Name[IsFriend][PlateName].isTrueHeal;
 
             SetRank();
