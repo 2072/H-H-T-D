@@ -674,7 +674,7 @@ local DEFAULT__CONFIGURATION = {
         --@end-alpha@
         Log = false,
         Pve = true,
-        PvpHSpecsOnly = true,
+        PvpHSpecsOnly = false,
         UHMHAP = true,
         HMHAP = 0.05,
         SetFriendlyHealersRole = true,
