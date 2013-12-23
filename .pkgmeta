@@ -17,6 +17,6 @@ externals:
 ignore:
     - Artwork/healers_icons.psd
 
-# manual-changelog:
-#    filename: changelog.md.txt
-#    markup-type: markdown
+manual-changelog:
+    filename: changelog.md.txt
+    markup-type: markdown
