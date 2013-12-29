@@ -39,7 +39,36 @@ local WARNING   = 2;
 local INFO      = 3;
 local INFO2     = 4;
 
+local UNPACKAGED = "@pro" .. "ject-version@";
+local VERSION = "@project-version@";
+
 local ADDON_NAME, T = ...;
+
+T._FatalError = function (TheError)
+
+    if not StaticPopupDialogs["HHTD_ERROR_FRAME"] then
+        StaticPopupDialogs["HHTD_ERROR_FRAME"] = {
+            text = "|cFFFF0000HHTD Fatal Error:|r\n%s",
+            button1 = "OK",
+            OnAccept = function()
+                T._FatalError_Diaplayed = false;
+                return false;
+            end,
+            timeout = 0,
+            whileDead = 1,
+            hideOnEscape = 1,
+            showAlert = 1,
+            preferredIndex = 3,
+        };
+    end
+
+    if not T._FatalError_Diaplayed then
+        StaticPopup_Show ("HHTD_ERROR_FRAME", TheError);
+        if T._DiagStatus then
+            T._FatalError_Diaplayed = true;
+        end
+    end
+end
 
 local _, _, _, tocversion = GetBuildInfo();
 T._tocversion = tocversion;
@@ -398,7 +427,7 @@ do
                 type = 'toggle',
                 name = L["OPT_ON"],
                 desc = L["OPT_ON_DESC"],
-                set = function(info) HHTD.db.global.Enabled = HHTD:Enable(); return HHTD.db.global.Enabled; end,
+                set = function(info) HHTD.db.global.Enabled = true; HHTD:Enable(); return HHTD.db.global.Enabled; end,
                 get = function(info) return HHTD:IsEnabled(); end,
                 hidden = function() return HHTD:IsEnabled(); end, 
 
@@ -685,6 +714,14 @@ local DEFAULT__CONFIGURATION = {
 
 -- = Add-on Management functions {{{
 function HHTD:OnInitialize()
+-- Catch people updating add-ons while WoW is running before they post "it doesn't work!!!!" comments.
+    local versionInTOC = GetAddOnMetadata("Healers-Have-To-Die", "Version");
+
+    if versionInTOC and versionInTOC ~= VERSION and versionInTOC ~= UNPACKAGED and VERSION ~= UNPACKAGED then
+        T._DiagStatus = 2;
+        T._Diagmessage = "You have updated Healers-Have-To-Die while WoW was still running in the background.\n\nYou need to restart WoW completely or you might experience various issues with your add-ons until you do.";
+        T._FatalError(T._Diagmessage);
+    end
 
     self.db = LibStub("AceDB-3.0"):New("Healers_Have_To_Die", DEFAULT__CONFIGURATION);
 
@@ -703,6 +740,11 @@ end
 local PLAYER_FACTION = "";
 local PLAYER_GUID    = "";
 function HHTD:OnEnable()
+
+    if T._DiagStatus == 2 then
+        self:Disable();
+        return;
+    end
 
     REGISTER_HEALERS_ONLY_SPELLS_ONCE ();
 
@@ -740,6 +782,10 @@ end
 function HHTD:OnDisable()
 
     self:Print(L["DISABLED"]);
+
+    if T._DiagStatus == 2 then
+        self:Print("|cFFD00000"..T._Diagmessage.."|r");
+    end
 
 end
 -- }}}
