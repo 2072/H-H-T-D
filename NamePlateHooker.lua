@@ -35,6 +35,13 @@ local HHTD = T.Healers_Have_To_Die;
 local L = HHTD.Localized_Text;
 
 
+if not LibStub:GetLibrary("LibNameplateRegistry-1.0", true) then
+    T._DiagStatus = 2;
+    T._Diagmessage = "The required library LibNameplateRegistry-1.0 could not be loaded.\n\nMake sure HHTD is installed correctly.";
+    T._FatalError(T._Diagmessage);
+    return;
+end
+
 HHTD.Name_Plate_Hooker = HHTD:NewModule("NPH", "LibNameplateRegistry-1.0");
 
 local NPH = HHTD.Name_Plate_Hooker;
@@ -58,6 +65,14 @@ local GetTexCoordsForRole   = _G.GetTexCoordsForRole;
 
 function NPH:OnInitialize() -- {{{
     self:Debug(INFO, "OnInitialize called!");
+
+    if (select(2, LibStub:GetLibrary("LibNameplateRegistry-1.0"))) < 8 then
+        T._DiagStatus = 2;
+        T._Diagmessage = "The required library LibNameplateRegistry-1.0 is too old.\n\nMake sure HHTD has been installed correctly.";
+        T._FatalError(T._Diagmessage);
+    end
+
+
     self.db = HHTD.db:RegisterNamespace('NPH', {
         global = {
             sPve = false,
@@ -159,6 +174,11 @@ end -- }}}
 function NPH:OnEnable() -- {{{
     self:Debug(INFO, "OnEnable");
 
+    if T._DiagStatus == 2 then
+        self:Disable();
+        return;
+    end
+
     -- Subscribe to HHTD's callbacks
     self:RegisterMessage("HHTD_HEALER_BORN");
     self:RegisterMessage("HHTD_HEALER_GROW");
@@ -196,6 +216,10 @@ end -- }}}
 
 function NPH:OnDisable() -- {{{
     self:Debug(INFO2, "OnDisable");
+
+    if T._DiagStatus == 2 then
+        self:Print("|cFFD00000"..T._Diagmessage.."|r");
+    end
 
     self:LNR_UnregisterCallback("LNR_ON_NEW_PLATE"); -- remove this one alone so I can see LNR debug callback
     self:LNR_UnregisterAllCallbacks();
