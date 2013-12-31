@@ -4,18 +4,18 @@ Healers Have To Die
 *Change log*
 ------------
 
-**version 2.3 beta 1 (2013-12-23):**
+**version 2.3 (2013-12-31):**
 
 - New beautiful healer icons designed by OligoFriends for enemy and friendly healers.
 
 - The color of each specialized healer's class is now shown in the icons background.
 
 - The "Specialized players only" option is now off by default as the new healer
-  icons indicate non-specialized healers with a black background (instead of
-  the player's class color).
+  icons indicate non-specialized healers with a dark grey background (instead
+  of the player's class color).
 
 - Uses version 0.8 of LibNamePlateRegistry which solves an unexpected
-  incompatibility error with Aloft.
+  incompatibility alert with Aloft and possibly others.
 
 
 **version 2.2.2 (2013-11-17):**
