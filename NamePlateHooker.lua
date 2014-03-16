@@ -702,11 +702,12 @@ do
             Guid            = self:GetPlateGUID(plate);
             Guid            = (HHTD.Registry_by_GUID[true][Guid] or HHTD.Registry_by_GUID[false][Guid]) and Guid or nil;
             if Guid then
-                IsFriend = HHTD.Registry_by_GUID[true][Guid] and true or false;
+                IsFriend    = HHTD.Registry_by_GUID[true][Guid] and true or false;
+                HealerClass = HHTD.Registry_by_GUID[IsFriend][Guid].isTrueHeal;
             else
-                IsFriend = HHTD.Registry_by_Name[true][PlateName] and true or false;
+                IsFriend    = HHTD.Registry_by_Name[true][PlateName] and true or false;
+                HealerClass = HHTD.Registry_by_Name[IsFriend][PlateName].isTrueHeal;
             end
-            HealerClass     = HHTD.Registry_by_Name[IsFriend][PlateName].isTrueHeal;
 
             SetRank();
 
