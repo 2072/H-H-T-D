@@ -1,5 +1,9 @@
 Healers Have To Die
 ===================
+
+[![Gratipay and Bitcoin donation options](http://img.shields.io/gratipay/2072.svg)](https://www.gratipay.com/2072/)
+
+
 *Spot those bloody healers instantly and help them accomplish their destiny!
 (PVP and PVE)*
 
@@ -140,6 +144,9 @@ post any additional links to those endless threads.
 **Comments and suggestions are welcome** :-)
 
 To report issues or ask for new features, use the [ticket system][tickets].
+
+Bitcoin donation address: **1JkA5Ns1dMQLM4D8HUsbXyka6yhp312KnN**
+
 
 ![stats](http://www.2072productions.com/to/hhtdcursedisplaystat.gif)
 
