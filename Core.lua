@@ -100,6 +100,8 @@ HHTD_C.Healing_Classes = { -- unused
 
 HHTD_C.MaxTOC = tonumber(GetAddOnMetadata("Healers-Have-To-Die", "X-Max-Interface") or math.huge); -- once GetAddOnMetadata() was bugged and returned nil...
 
+HHTD_C.WOD = (tocversion >= 60000);
+
 -- The header for HHTD key bindings
 BINDING_HEADER_HHTD = "Healers Have To Die";
 BINDING_NAME_HHTDP = L["OPT_POST_ANNOUNCE_ENABLE"];
@@ -239,9 +241,7 @@ local function REGISTER_HEALERS_ONLY_SPELLS_ONCE ()
         [047515] = "PRIEST", -- Divine Aegis
         [081700] = "PRIEST", -- Archangel
         [002060] = "PRIEST", -- Greater Heal
-        [002050] = "PRIEST", -- Heal
         [014914] = "PRIEST", -- Holy Fire
-        [089485] = "PRIEST", -- Inner Focus
         [033206] = "PRIEST", -- Pain Suppression
         [000596] = "PRIEST", -- Prayer of Healing
         [000527] = "PRIEST", -- Purify
@@ -258,11 +258,9 @@ local function REGISTER_HEALERS_ONLY_SPELLS_ONCE ()
         [102342] = "DRUID", -- Ironbark
         [033763] = "DRUID", -- Lifebloom
         [088423] = "DRUID", -- Nature's Cure
-        [050464] = "DRUID", -- Nourish
         [008936] = "DRUID", -- Regrowth
         [033891] = "DRUID", -- Incarnation: Tree of Life
         [048438] = "DRUID", -- Wild Growth
-        [102791] = "DRUID", -- Wild Mushroom Bloom
 
         -- Shamans
         [00974] = "SHAMAN", -- Earth Shield
@@ -279,9 +277,7 @@ local function REGISTER_HEALERS_ONLY_SPELLS_ONCE ()
         [02812] = "PALADIN", -- Denounce
         [31842] = "PALADIN", -- Divine Favor
         [82326] = "PALADIN", -- Divine Light
-        [54428] = "PALADIN", -- Divine Plea
         -- [86669] = "PALADIN", -- Guardian of Ancient Kings (also true for ret paladins)
-        [00635] = "PALADIN", -- Holy Light
         [82327] = "PALADIN", -- Holy Radiance
         [85222] = "PALADIN", -- Light of Dawn
 
@@ -292,10 +288,19 @@ local function REGISTER_HEALERS_ONLY_SPELLS_ONCE ()
         [116670] = "MONK", -- Uplift
         [116680] = "MONK", -- Thunder Focus Tea
         [116849] = "MONK", -- Life Cocoon
-        [116995] = "MONK", -- Surging mist
         [119611] = "MONK", -- Renewing mist
         [132120] = "MONK", -- Envelopping Mist
     };
+
+    if not HHTD_C.WOD then
+        Healers_Only_Spells_ByID[000635] = "PALADIN"; -- Holy Light
+        Healers_Only_Spells_ByID[050464] = "DRUID";   -- Nourish
+        Healers_Only_Spells_ByID[102791] = "DRUID";   -- Wild Mushroom Bloom
+        Healers_Only_Spells_ByID[054428] = "PALADIN"; -- Divine Plea
+        Healers_Only_Spells_ByID[002050] = "PRIEST";  -- Heal
+        Healers_Only_Spells_ByID[089485] = "PRIEST";  -- Inner Focus
+        Healers_Only_Spells_ByID[116995] = "MONK";    -- Surging mist
+    end
 
     HHTD_C.Healers_Only_Spells_ByName = {};
 
