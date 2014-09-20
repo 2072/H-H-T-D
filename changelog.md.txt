@@ -4,6 +4,15 @@ Healers Have To Die
 *Change log*
 ------------
 
+**version 2.3.1_beta_1 (2013-09-21):**
+
+- Compatibility fixes for WoD.
+
+- Fix a rare Lua error.
+
+- Add new [Gratipay](https://gratipay.com/2072/) and [Bitcoin](https://blockchain.info/address/1JkA5Ns1dMQLM4D8HUsbXyka6yhp312KnN) donation options on Curse and WowAce.
+
+
 **version 2.3 (2013-12-31):**
 
 - New beautiful healer icons designed by OligoFriends for enemy and friendly healers.
