@@ -4,7 +4,15 @@ Healers Have To Die
 *Change log*
 ------------
 
-**version 2.3.1_beta_1 (2013-09-21):**
+**version 2.3.1_beta_2 (2014-10-12):**
+
+- WoD: Added detection for spell which have become healer specific. These
+  are: Atonement, Divine Star, Holy Nova, Binding Heal, Echo of Light,
+  Renew, Chain Heal, Healing Wave, Daybreak and Tranquility.
+
+- Increased healing threshold to 23% of the player's health (up from 5%).
+
+**version 2.3.1_beta_1 (2014-09-21):**
 
 - Compatibility fixes for WoD.
 

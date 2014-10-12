@@ -145,7 +145,7 @@ post any additional links to those endless threads.
 
 To report issues or ask for new features, use the [ticket system][tickets].
 
-Bitcoin donation address: [1JkA5Ns1dMQLM4D8HUsbXyka6yhp312KnN](https://blockchain.info/address/1JkA5Ns1dMQLM4D8HUsbXyka6yhp312KnN))
+Bitcoin donation address: [1JkA5Ns1dMQLM4D8HUsbXyka6yhp312KnN](https://blockchain.info/address/1JkA5Ns1dMQLM4D8HUsbXyka6yhp312KnN)
 
 ![stats](http://www.2072productions.com/to/hhtdcursedisplaystat.gif)
 

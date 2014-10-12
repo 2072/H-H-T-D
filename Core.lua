@@ -245,6 +245,9 @@ local function REGISTER_HEALERS_ONLY_SPELLS_ONCE ()
         [033206] = "PRIEST", -- Pain Suppression
         [000596] = "PRIEST", -- Prayer of Healing
         [000527] = "PRIEST", -- Purify
+        [081749] = "PRIEST", -- Atonement
+        [110744] = "PRIEST", -- Divine Star
+        [132157] = "PRIEST", -- Holy Nova
         --      Holy
         [034861] = "PRIEST", -- Circle of Healing
         [064843] = "PRIEST", -- Divine Hymn
@@ -252,6 +255,9 @@ local function REGISTER_HEALERS_ONLY_SPELLS_ONCE ()
         [000724] = "PRIEST", -- Lightwell
         [088684] = "PRIEST", -- Holy Word: Serenity
         [088685] = "PRIEST", -- Holy Word: Sanctuary
+        [032546] = "PRIEST", -- Binding Heal
+        [077485] = "PRIEST", -- Echo of Light
+        [000139] = "PRIEST", -- Renew
 
         -- Druids
         [018562] = "DRUID", -- Swiftmend
@@ -261,25 +267,29 @@ local function REGISTER_HEALERS_ONLY_SPELLS_ONCE ()
         [008936] = "DRUID", -- Regrowth
         [033891] = "DRUID", -- Incarnation: Tree of Life
         [048438] = "DRUID", -- Wild Growth
+        [000740] = "DRUID", -- Tranquility
 
         -- Shamans
-        [00974] = "SHAMAN", -- Earth Shield
-        [61295] = "SHAMAN", -- Riptide
-        [77472] = "SHAMAN", -- Greater Healing Wave
-        [98008] = "SHAMAN", -- Spirit link totem
-        [77130] = "SHAMAN", -- Purify Spirit
+        [000974] = "SHAMAN", -- Earth Shield
+        [061295] = "SHAMAN", -- Riptide
+        [077472] = "SHAMAN", -- Greater Healing Wave
+        [098008] = "SHAMAN", -- Spirit link totem
+        [077130] = "SHAMAN", -- Purify Spirit
+        [001064] = "SHAMAN", -- Chain Heal
+        [000331] = "SHAMAN", -- Healing Wave
 
         -- Paladins
-        [20473] = "PALADIN", -- Holy Shock
+        [020473] = "PALADIN", -- Holy Shock
         -- [85673] = "PALADIN", -- Word of Glory (also true for prot paladins)
-        [82327] = "PALADIN", -- Holy radiance
-        [53563] = "PALADIN", -- Beacon of Light
-        [02812] = "PALADIN", -- Denounce
-        [31842] = "PALADIN", -- Divine Favor
-        [82326] = "PALADIN", -- Divine Light
+        [082327] = "PALADIN", -- Holy radiance
+        [053563] = "PALADIN", -- Beacon of Light
+        [002812] = "PALADIN", -- Denounce
+        [031842] = "PALADIN", -- Divine Favor
+        [082326] = "PALADIN", -- Divine Light
         -- [86669] = "PALADIN", -- Guardian of Ancient Kings (also true for ret paladins)
-        [82327] = "PALADIN", -- Holy Radiance
-        [85222] = "PALADIN", -- Light of Dawn
+        [082327] = "PALADIN", -- Holy Radiance
+        [085222] = "PALADIN", -- Light of Dawn
+        [088821] = "PALADIN", -- Daybreak
 
         -- Monks
         [115175] = "MONK", -- Soothing Mist
@@ -293,6 +303,7 @@ local function REGISTER_HEALERS_ONLY_SPELLS_ONCE ()
     };
 
     if not HHTD_C.WOD then
+        -- pre WoD only
         Healers_Only_Spells_ByID[000635] = "PALADIN"; -- Holy Light
         Healers_Only_Spells_ByID[050464] = "DRUID";   -- Nourish
         Healers_Only_Spells_ByID[102791] = "DRUID";   -- Wild Mushroom Bloom
@@ -300,6 +311,22 @@ local function REGISTER_HEALERS_ONLY_SPELLS_ONCE ()
         Healers_Only_Spells_ByID[002050] = "PRIEST";  -- Heal
         Healers_Only_Spells_ByID[089485] = "PRIEST";  -- Inner Focus
         Healers_Only_Spells_ByID[116995] = "MONK";    -- Surging mist
+
+        -- WoD only
+        -- priest
+        Healers_Only_Spells_ByID[032546] = nil; -- Binding Heal
+        Healers_Only_Spells_ByID[081749] = nil; -- Atonement
+        Healers_Only_Spells_ByID[110744] = nil; -- Divine Star
+        Healers_Only_Spells_ByID[132157] = nil; -- Holy Nova
+        Healers_Only_Spells_ByID[077485] = nil; -- Echo of Light
+        Healers_Only_Spells_ByID[000139] = nil; -- Renew
+        -- paladins
+        Healers_Only_Spells_ByID[088821] = nil; -- Daybreak
+        -- shaman
+        Healers_Only_Spells_ByID[001064] = nil; -- Chain Heal
+        Healers_Only_Spells_ByID[000331] = nil; -- Healing Wave
+        -- druids
+        Healers_Only_Spells_ByID[000740] = nil; -- Tranquility
     end
 
     HHTD_C.Healers_Only_Spells_ByName = {};
@@ -395,7 +422,10 @@ do
                 end
 
                 tmp[#tmp + 1] = ("%s (|cff00dd00%s|r)%s [|cffbbbbbb%s|r]:  %s\n%s\n"):format(
-                (HHTD:ColorText("#(%s)|r %q", log.isFriend and "FF00FF00" or "FFFF0000")):format(isActive and isActive.rank or '-', HHTD:ColorText(log.name, log.isTrueHeal and HHTD:GetClassHexColor(log.isTrueHeal) or "FFAAAAAA" )),
+                (HHTD:ColorText("#(%s)|r '%s'", log.isFriend and "FF00FF00" or "FFFF0000")):format(
+                    isActive and isActive.rank or '-',
+                    HHTD:ColorText(log.name, log.isTrueHeal and HHTD:GetClassHexColor(log.isTrueHeal) or "FFAAAAAA" )
+                    ),
                 tostring(log.healDone > 0 and log.healDone or L["NO_DATA"]),
                 log.healDone > HHTD.HealThreshold and "" or L["LOG_BELOW_THRESHOLD"],
                 log.isHuman and L["HUMAN"] or L["NPC"],
@@ -710,7 +740,7 @@ local DEFAULT__CONFIGURATION = {
         Pve = true,
         PvpHSpecsOnly = false,
         UHMHAP = true,
-        HMHAP = 0.05,
+        HMHAP = 0.23,
         SetFriendlyHealersRole = true,
         HealerUnderAttackAlerts = true,
     },
