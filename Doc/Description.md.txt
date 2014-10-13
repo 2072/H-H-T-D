@@ -26,6 +26,55 @@ HHTD is PVP and PVE compatible.
 
 Remember to check out available options (/HHTDG)
 
+How it works
+------------
+
+HHTD uses the combat log events to detect friendly and enemy healers that are
+**currently** healing other players (during the last 60s).
+HHTD detects [specialized healers spells][spelllist] (for human players only)
+and differentiates specialized healers from hybrid ones.
+
+HHTD also lets you choose a specified amount of healing healers have to
+reach before being marked as such (23% of your own health by default).
+This threshold is the only criterion used for NPCs.
+
+When a healer is identified it will be marked with a healer symbol above
+his/her nameplate. If the healer is specialized, the symbol's background
+will be colored according to their class. In other cases the background will be
+grey.
+
+In all cases a number in the center of the symbol indicates the rank of the
+healer, the lowest the number the better the healer (ie: '1' represent the
+most effective healer while '9' is the least effective).
+
+You can force HHTD to only report specialized healers through HHTD's options
+(/hhtdg).
+
+Self-Heals and heals to pets are filtered out.
+
+
+Commands
+--------
+
+- /HHTDP (or /hhtdp): Post healers name to the raid channel ordered by
+  effectiveness for all to see.
+  (You need to configure the messages in the announce module options first).
+
+**You can bind this command to a key (WoW key-bindings interface)**
+
+- /HHTDG: Open option panel
+
+- /HHTD: access to command line configuration interface (for changing settings
+  through macros...)
+
+
+Planned features
+----------------
+
+- Detection when a friendly healer is being attacked and alert others through
+  /yell or /say (I would like to make it work for nearby healers only)
+
+
 Compatibility
 -------------
 
@@ -51,15 +100,6 @@ nameplate add-ons.
 - **Do not use SetScript() EVER.** You don't need it. :SetScript() shall only
   be used on frames  YOU create. You can simply replace all your SetScript()
   calls by HookScript().
-
-
-Special commands
-----------------
-
-- /HHTDP (or /hhtdp) : Post healers name to the raid channel for all to see.
-  (You need to configure the messages in the announce module options first).
-
-**You can bind this command to a key (WoW key-bindings interface)**
 
 
 Videos
@@ -90,28 +130,6 @@ have some doubts about the fairness of this add-on!**) :
 Another one by Gevlon:
  [http://greedygoblin.blogspot.com/2011/05/healers-have-to-die.html][article2]
 
-
-How it works
-------------
-
-HHTD uses the combat log events to detect friendly and enemy healers.
-By default, HHTD will detect [specialized healers spells][spelllist] only (for
-human players).
-
-Another option lets you choose a specified amount of healing healers have to
-reach before being marked as such. (this threshold is the only criterion used
-for NPCs)
-
-By default HHTD uses both methods, specialised healers' spells detection AND a
-minimum cumulative healing to reach by the aforementioned spells.
-
-Self-Heals and heals to pets are filtered out.
-
-Planned features
-----------------
-
-- Detection when a friendly healer is being attacked and alert others through
-  /yell or /say (I would like to make it work for nearby healers only)
 
 Debates
 -------

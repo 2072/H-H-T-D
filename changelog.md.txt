@@ -4,21 +4,20 @@ Healers Have To Die
 *Change log*
 ------------
 
-**version 2.3.1_beta_2 (2014-10-12):**
+**version 2.3.1 (2014-10-13):**
 
-- WoD: Added detection for spell which have become healer specific. These
-  are: Atonement, Divine Star, Holy Nova, Binding Heal, Echo of Light,
-  Renew, Chain Heal, Healing Wave, Daybreak and Tranquility.
+- Compatibility fixes for WoD:
+    - Add detection for spells that have become healer specific:
+        Atonement, Divine Star, Holy Nova, Binding Heal, Echo of Light,
+        Renew, Chain Heal, Healing Wave, Daybreak and Tranquility.
+    - Remove detection for spells that no longer exist in WoD.
 
-- Increased healing threshold to 23% of the player's health (up from 5%).
-
-**version 2.3.1_beta_1 (2014-09-21):**
-
-- Compatibility fixes for WoD.
-
-- Fix a rare Lua error.
+- Increased default healing threshold to 23% of the player's health (up from 5%).
 
 - Add new [Gratipay](https://gratipay.com/2072/) and [Bitcoin](https://blockchain.info/address/1JkA5Ns1dMQLM4D8HUsbXyka6yhp312KnN) donation options on Curse and WowAce.
+
+- Added more details on the way HHTD works in the main description (WowAce and
+  Curse)
 
 
 **version 2.3 (2013-12-31):**
