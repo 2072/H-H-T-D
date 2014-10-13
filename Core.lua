@@ -276,7 +276,6 @@ local function REGISTER_HEALERS_ONLY_SPELLS_ONCE ()
         [098008] = "SHAMAN", -- Spirit link totem
         [077130] = "SHAMAN", -- Purify Spirit
         [001064] = "SHAMAN", -- Chain Heal
-        [000331] = "SHAMAN", -- Healing Wave
 
         -- Paladins
         [020473] = "PALADIN", -- Holy Shock
@@ -285,7 +284,7 @@ local function REGISTER_HEALERS_ONLY_SPELLS_ONCE ()
         [053563] = "PALADIN", -- Beacon of Light
         [002812] = "PALADIN", -- Denounce
         [031842] = "PALADIN", -- Divine Favor
-        [082326] = "PALADIN", -- Divine Light
+        [082326] = "PALADIN", -- Divine Light, renamed to Holy Light
         -- [86669] = "PALADIN", -- Guardian of Ancient Kings (also true for ret paladins)
         [082327] = "PALADIN", -- Holy Radiance
         [085222] = "PALADIN", -- Light of Dawn
@@ -311,6 +310,7 @@ local function REGISTER_HEALERS_ONLY_SPELLS_ONCE ()
         Healers_Only_Spells_ByID[002050] = "PRIEST";  -- Heal
         Healers_Only_Spells_ByID[089485] = "PRIEST";  -- Inner Focus
         Healers_Only_Spells_ByID[116995] = "MONK";    -- Surging mist
+        Healers_Only_Spells_ByID[000331] = "SHAMAN";  -- Healing Wave
 
         -- WoD only
         -- priest
