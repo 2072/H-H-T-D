@@ -143,11 +143,11 @@ end -- }}}
 --  function HHTD:Debug(...) {{{
 do
     local Debug_Templates = {
-        [ERROR]     = "|cFFFF2222Debug:|cFFCC4444[%s.%3d]:|r|cFFFF5555",--3
-        [WARNING]   = "|cFFFF2222Debug:|cFFCC4444[%s.%3d]:|r|cFF55FF55",--2
-        [INFO]      = "|cFFFF2222Debug:|cFFCC4444[%s.%3d]:|r|cFF9999FF",--1
-        [INFO2]     = "|cFFFF2222Debug:|cFFCC4444[%s.%3d]:|r|cFFFF9922",--1
-        [false]     = "|cFFFF2222Debug:|cFFCC4444[%s.%3d]:|r",
+        [ERROR]     = "|cFFFF2222Debug:|cFFCC4444[%0.3f]:|r|cFFFF5555",--3
+        [WARNING]   = "|cFFFF2222Debug:|cFFCC4444[%0.3f]:|r|cFF55FF55",--2
+        [INFO]      = "|cFFFF2222Debug:|cFFCC4444[%0.3f]:|r|cFF9999FF",--1
+        [INFO2]     = "|cFFFF2222Debug:|cFFCC4444[%0.3f]:|r|cFFFF9922",--1
+        [false]     = "|cFFFF2222Debug:|cFFCC4444[%0.3f]:|r",
     }
     local Debug_Levels = {
         [INFO2]     = 1,
@@ -156,7 +156,9 @@ do
         [ERROR]     = 3,
         [false]     = 3,
     }
-    local select, type = _G.select, _G.type;
+    local select, type, debugprofilestop = _G.select, _G.type, _G.debugprofilestop;
+
+    local timerStart = debugprofilestop();
     function HHTD:Debug(...)
 
         -- if Decursive is loaded then use its debug report facility...
@@ -175,7 +177,7 @@ do
             return;
         end
 
-        local DebugHeader = (Debug_Templates[template]):format(date("%S"), (GetTime() % 1) * 1000);
+        local DebugHeader = (Debug_Templates[template]):format((debugprofilestop() - timerStart) / 1000);
 
         if template then
             self:Print(DebugHeader, select(2, ...));
