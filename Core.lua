@@ -236,7 +236,6 @@ local function REGISTER_HEALERS_ONLY_SPELLS_ONCE ()
         --      Discipline
         -- [000017] = "PRIEST", -- Power word: Shield -- exists also for shadow priests
         [047540] = "PRIEST", -- Penance
-        [062618] = "PRIEST", -- Power word: Barrier
         [109964] = "PRIEST", -- Spirit shell
         [047515] = "PRIEST", -- Divine Aegis
         [081700] = "PRIEST", -- Archangel
@@ -256,7 +255,8 @@ local function REGISTER_HEALERS_ONLY_SPELLS_ONCE ()
         [088684] = "PRIEST", -- Holy Word: Serenity
         [088685] = "PRIEST", -- Holy Word: Sanctuary
         [032546] = "PRIEST", -- Binding Heal
-        [077485] = "PRIEST", -- Echo of Light
+        [077485] = "PRIEST", -- Mastery: Echo of Light -- the passibe ability
+        [077489] = "PRIEST", -- Echo of Light -- the aura applied by the afformentioned
         [000139] = "PRIEST", -- Renew
 
         -- Druids
@@ -318,7 +318,8 @@ local function REGISTER_HEALERS_ONLY_SPELLS_ONCE ()
         Healers_Only_Spells_ByID[081749] = nil; -- Atonement
         Healers_Only_Spells_ByID[110744] = nil; -- Divine Star
         Healers_Only_Spells_ByID[132157] = nil; -- Holy Nova
-        Healers_Only_Spells_ByID[077485] = nil; -- Echo of Light
+        Healers_Only_Spells_ByID[077485] = nil; -- Mastery: Echo of Light
+        Healers_Only_Spells_ByID[077489] = nil; -- Echo of Light
         Healers_Only_Spells_ByID[000139] = nil; -- Renew
         -- paladins
         Healers_Only_Spells_ByID[088821] = nil; -- Daybreak
@@ -330,6 +331,10 @@ local function REGISTER_HEALERS_ONLY_SPELLS_ONCE ()
     end
 
     HHTD_C.Healers_Only_Spells_ByName = {};
+
+
+    -- /spew _HHTD_DEBUG.Constants.Healers_Only_Spells_ByName
+    -- /spew GetSpellInfo(077485)
 
     for spellID, class in pairs(Healers_Only_Spells_ByID) do
 
@@ -391,16 +396,16 @@ end
 -- == Options and defaults {{{
 do
 
-    local AceOptionAntiSupidity = 0;
+    local AceOptionAntiStupidity = 0;
     local FormattedLogs = "";
 
     local function FormatLogs()
 
-        if GetTime() - AceOptionAntiSupidity < 0.1 then
+        if GetTime() - AceOptionAntiStupidity < 0.1 then
             HHTD:Debug(INFO, "AceOption is stupid");
             return FormattedLogs;
         else
-            AceOptionAntiSupidity = GetTime();
+            AceOptionAntiStupidity = GetTime();
         end
 
         local output        = "";
