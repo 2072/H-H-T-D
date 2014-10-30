@@ -100,6 +100,35 @@ HHTD_C.Healing_Classes = { -- unused
 
 HHTD_C.MaxTOC = tonumber(GetAddOnMetadata("Healers-Have-To-Die", "X-Max-Interface") or math.huge);
 
+-- Build translation table for classes spec to role
+-- needed because WoW API (GetBattlefieldScore) returns a localized specName
+do
+    -- /spew _HHTD_DEBUG.Constants.CLASS_SPEC_TO_ROLE
+    HHTD_C.CLASS_SPEC_TO_ROLE = {}
+
+    local classID, classTag, userSpecNum, specID, specName, role
+
+    for classID = 1, MAX_CLASSES do
+        classTag = select(2, GetClassInfoByID(classID))
+
+        HHTD_C.CLASS_SPEC_TO_ROLE[classTag] = {}
+
+        userSpecNum = 1
+
+        repeat
+            specID, specName = GetSpecializationInfoForClassID(classID, userSpecNum)
+            role = specID and GetSpecializationRoleByID(specID) or nil
+
+            if role then
+                HHTD_C.CLASS_SPEC_TO_ROLE[classTag][specName] = role
+                userSpecNum = userSpecNum + 1
+            end
+        until not role
+        
+    end
+
+end
+
 --HHTD_C.WOD = (tocversion >= 60000);
 
 -- The header for HHTD key bindings
@@ -283,7 +312,7 @@ local function REGISTER_HEALERS_ONLY_SPELLS_ONCE ()
         [082327] = "PALADIN", -- Holy radiance
         [053563] = "PALADIN", -- Beacon of Light
         [002812] = "PALADIN", -- Denounce
-        [031842] = "PALADIN", -- Divine Favor
+        [031842] = "PALADIN", -- Divine Favor -- XXX
         [082326] = "PALADIN", -- Divine Light, renamed to Holy Light
         -- [86669] = "PALADIN", -- Guardian of Ancient Kings (also true for ret paladins)
         [082327] = "PALADIN", -- Holy Radiance
@@ -974,7 +1003,57 @@ do
         end
     end
 
-    
+    local GetNumBattlefieldScores = _G.GetNumBattlefieldScores
+    local GetBattlefieldScore = _G.GetBattlefieldScore
+    local function checkPlayerRealRole(PlayerName, spellName)
+        if GetNumBattlefieldScores() == 0 then
+            return nil
+        end
+
+        -- find the player name (so dirty...)
+        local playerIndex = nil
+        for i=1, GetNumBattlefieldScores() do
+            if (GetBattlefieldScore(i)) == PlayerName then
+                playerIndex = i
+                break
+            end
+        end
+
+        if not playerIndex then
+            --@alpha@
+            HHTD:Debug(ERROR, "Failed to find player name in scoreboard", PlayerName)
+            --@end-alpha@
+            return nil
+        end
+
+        local spec = select(16, GetBattlefieldScore(playerIndex))
+        local classTag = select(9, GetBattlefieldScore(playerIndex))
+
+        -- since GetBattlefieldScore() returns so many values, we can be sure it won't
+        -- stay stable so make sure it won't break this add-on
+        if spec and HHTD_C.CLASS_SPEC_TO_ROLE[classTag] then
+
+            --@alpha@
+            if HHTD_C.Healers_Only_Spells_ByName[spellName] ~= classTag then
+                HHTD:Debug(ERROR, "Bad spell class for:", spellName, 'detected:', HHTD_C.Healers_Only_Spells_ByName[spellName], 'real:', classTag)
+            end
+            --@end-alpha@
+
+            if HHTD_C.CLASS_SPEC_TO_ROLE[classTag][spec] ~= "HEALER" then
+                --@alpha@
+                HHTD:Debug(ERROR, "Invalid healer spec spell (spell removed):", spellName, HHTD_C.CLASS_SPEC_TO_ROLE[classTag][spec], spec)
+                --@end-alpha@
+                HHTD_C.Healers_Only_Spells_ByName[spellName] = nil
+                return false
+            else
+                return true
+            end
+        else
+            HHTD:Debug(ERROR, "GetBattlefieldScore() API changed (HHTD update required)", GetBattlefieldScore(playerIndex))
+            
+            return nil
+        end
+    end
 
     -- Neatly add them to our little registry and keep an eye on them
     local record, name;
@@ -1032,6 +1111,14 @@ do
         -- detect a true healer
         if not record.isTrueHeal then
             record.isTrueHeal = HHTD_C.Healers_Only_Spells_ByName[spellName] or false;
+
+            -- guard against WoW patches or spell translation issues and if
+            -- possible verify that this player is indeed a true healer using
+            -- the scoreboard
+
+            if isHuman and record.isTrueHeal and false == checkPlayerRealRole(sourceName, spellName) then
+                record.isTrueHeal = false
+            end
         end
 
         if configRef.Log then -- {{{
@@ -1157,7 +1244,7 @@ do
         end
     
         local class = select(2, UnitClass(unit));
-        local dummySpell = ({["DRUID"] = GetSpellInfo(033891), ["SHAMAN"] = GetSpellInfo(00974), ["PRIEST"] = GetSpellInfo(047515), ["PALADIN"] = GetSpellInfo(53563), ["MONK"] = GetSpellInfo(115175)})[class] or GetSpellInfo(3273);
+        local dummySpell = ({["DRUID"] = GetSpellInfo(33891), ["SHAMAN"] = GetSpellInfo(974), ["PRIEST"] = GetSpellInfo(047515), ["PALADIN"] = GetSpellInfo(82326), ["MONK"] = GetSpellInfo(115175)})[class] or GetSpellInfo(3273);
         self:COMBAT_LOG_EVENT_UNFILTERED(nil, 0, "DUMMY_HEAL", false, UnitGUID(unit), (UnitName(unit)), flags, 0, destGUID, destName, flags, 0, 0, dummySpell, "", HHTD.HealThreshold + 1);
     end
 
