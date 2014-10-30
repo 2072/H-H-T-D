@@ -98,9 +98,9 @@ HHTD_C.Healing_Classes = { -- unused
 };
 --]=]
 
-HHTD_C.MaxTOC = tonumber(GetAddOnMetadata("Healers-Have-To-Die", "X-Max-Interface") or math.huge); -- once GetAddOnMetadata() was bugged and returned nil...
+HHTD_C.MaxTOC = tonumber(GetAddOnMetadata("Healers-Have-To-Die", "X-Max-Interface") or math.huge);
 
-HHTD_C.WOD = (tocversion >= 60000);
+--HHTD_C.WOD = (tocversion >= 60000);
 
 -- The header for HHTD key bindings
 BINDING_HEADER_HHTD = "Healers Have To Die";
@@ -300,35 +300,6 @@ local function REGISTER_HEALERS_ONLY_SPELLS_ONCE ()
         [119611] = "MONK", -- Renewing mist
         [132120] = "MONK", -- Envelopping Mist
     };
-
-    if not HHTD_C.WOD then
-        -- pre WoD only
-        Healers_Only_Spells_ByID[000635] = "PALADIN"; -- Holy Light
-        Healers_Only_Spells_ByID[050464] = "DRUID";   -- Nourish
-        Healers_Only_Spells_ByID[102791] = "DRUID";   -- Wild Mushroom Bloom
-        Healers_Only_Spells_ByID[054428] = "PALADIN"; -- Divine Plea
-        Healers_Only_Spells_ByID[002050] = "PRIEST";  -- Heal
-        Healers_Only_Spells_ByID[089485] = "PRIEST";  -- Inner Focus
-        Healers_Only_Spells_ByID[116995] = "MONK";    -- Surging mist
-        Healers_Only_Spells_ByID[000331] = "SHAMAN";  -- Healing Wave
-
-        -- WoD only
-        -- priest
-        Healers_Only_Spells_ByID[032546] = nil; -- Binding Heal
-        Healers_Only_Spells_ByID[081749] = nil; -- Atonement
-        Healers_Only_Spells_ByID[110744] = nil; -- Divine Star
-        Healers_Only_Spells_ByID[132157] = nil; -- Holy Nova
-        Healers_Only_Spells_ByID[077485] = nil; -- Mastery: Echo of Light
-        Healers_Only_Spells_ByID[077489] = nil; -- Echo of Light
-        Healers_Only_Spells_ByID[000139] = nil; -- Renew
-        -- paladins
-        Healers_Only_Spells_ByID[088821] = nil; -- Daybreak
-        -- shaman
-        Healers_Only_Spells_ByID[001064] = nil; -- Chain Heal
-        Healers_Only_Spells_ByID[000331] = nil; -- Healing Wave
-        -- druids
-        Healers_Only_Spells_ByID[000740] = nil; -- Tranquility
-    end
 
     HHTD_C.Healers_Only_Spells_ByName = {};
 

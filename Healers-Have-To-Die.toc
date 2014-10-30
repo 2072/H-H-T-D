@@ -1,6 +1,6 @@
 ## Interface: 60000
 ## X-Max-Interface: 60000
-## X-Min-Interface: 50200
+## X-Min-Interface: 60000
 
 ## Title: Healers Have To Die
 
