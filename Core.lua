@@ -1029,23 +1029,20 @@ do
         -- stay stable so make sure it won't break this add-on
         if spec and HHTD_C.CLASS_SPEC_TO_ROLE[classTag] then
 
-            --@alpha@
             if HHTD_C.Healers_Only_Spells_ByName[spellName] ~= classTag then
-                HHTD:Debug(ERROR, "Bad spell class for:", spellName, 'detected:', HHTD_C.Healers_Only_Spells_ByName[spellName], 'real:', classTag)
+                HHTD:Debug(ERROR, "(HHTD update required) Bad spell class for:", spellName, '(removed) detected:', HHTD_C.Healers_Only_Spells_ByName[spellName], 'real:', classTag)
+                HHTD_C.Healers_Only_Spells_ByName[spellName] = nil
             end
-            --@end-alpha@
 
             if HHTD_C.CLASS_SPEC_TO_ROLE[classTag][spec] ~= "HEALER" then
-                --@alpha@
-                HHTD:Debug(ERROR, "Invalid healer spec spell (spell removed):", spellName, HHTD_C.CLASS_SPEC_TO_ROLE[classTag][spec], spec)
-                --@end-alpha@
+                HHTD:Debug(ERROR, "(HHTD update required) Invalid healer spec spell (spell removed):", spellName, HHTD_C.CLASS_SPEC_TO_ROLE[classTag][spec], spec)
                 HHTD_C.Healers_Only_Spells_ByName[spellName] = nil
                 return false
             else
                 return true
             end
         else
-            HHTD:Debug(ERROR, "GetBattlefieldScore() API changed (HHTD update required)", GetBattlefieldScore(playerIndex))
+            HHTD:Debug(ERROR, "(HHTD update required) GetBattlefieldScore() API changed", GetBattlefieldScore(playerIndex))
             
             return nil
         end
