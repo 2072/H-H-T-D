@@ -263,7 +263,6 @@ local function REGISTER_HEALERS_ONLY_SPELLS_ONCE ()
 
         -- Priests
         --      Discipline
-        -- [000017] = "PRIEST", -- Power word: Shield -- exists also for shadow priests
         [047540] = "PRIEST", -- Penance
         [109964] = "PRIEST", -- Spirit shell
         [047515] = "PRIEST", -- Divine Aegis
@@ -308,13 +307,10 @@ local function REGISTER_HEALERS_ONLY_SPELLS_ONCE ()
 
         -- Paladins
         [020473] = "PALADIN", -- Holy Shock
-        -- [85673] = "PALADIN", -- Word of Glory (also true for prot paladins)
         [082327] = "PALADIN", -- Holy radiance
         [053563] = "PALADIN", -- Beacon of Light
         [002812] = "PALADIN", -- Denounce
-        [031842] = "PALADIN", -- Divine Favor -- XXX
-        [082326] = "PALADIN", -- Divine Light, renamed to Holy Light
-        -- [86669] = "PALADIN", -- Guardian of Ancient Kings (also true for ret paladins)
+        [082326] = "PALADIN", -- Holy Light
         [082327] = "PALADIN", -- Holy Radiance
         [085222] = "PALADIN", -- Light of Dawn
         [088821] = "PALADIN", -- Daybreak
