@@ -324,6 +324,16 @@ local function REGISTER_HEALERS_ONLY_SPELLS_ONCE ()
         [116849] = "MONK", -- Life Cocoon
         [119611] = "MONK", -- Renewing mist
         [132120] = "MONK", -- Envelopping Mist
+
+        -- @debug@
+        -- test bad spell mitigation
+        -- those are not healer specific
+        [031842] = "PALADIN", -- Avenging Wrath
+        [085673] = "PALADIN", -- WOrd of Glory
+        [019750] = "PALADIN", -- Flash of light
+        [002061] = "PRIEST",  -- Flash Heal
+        [005185] = "DRUID",   -- Healing Touch
+        -- @end-debug@
     };
 
     HHTD_C.Healers_Only_Spells_ByName = {};
@@ -1026,11 +1036,21 @@ do
         local classTag = select(9, GetBattlefieldScore(playerIndex))
 
         -- since GetBattlefieldScore() returns so many values, we can be sure it won't
-        -- stay stable so make sure it won't break this add-on
+        -- stay stable so make sure it won't break HHTD
         if spec and HHTD_C.CLASS_SPEC_TO_ROLE[classTag] then
 
+            -- is this spell correctly classified?
             if HHTD_C.Healers_Only_Spells_ByName[spellName] ~= classTag then
+                -- special case for DK's Dark Simulacrum
+                if classTag == "DEATHKNIGHT" then
+                    -- @debug@
+                    HHTD:Debug(ERROR, "Dark Simulacrum detected for", PlayerName)
+                    -- @end-debug@
+                    return false
+                end
+
                 HHTD:Debug(ERROR, "(HHTD update required) Bad spell class for:", spellName, '(removed) detected:', HHTD_C.Healers_Only_Spells_ByName[spellName], 'real:', classTag)
+
                 HHTD_C.Healers_Only_Spells_ByName[spellName] = nil
             end
 
@@ -1081,7 +1101,8 @@ do
                 healDone    =  0, -- updated later
                 rank        = -1, -- updated later
                 _lastSort   =  0, -- updated later
-                lastMove  =  0, -- updated later
+                lastMove    =  0, -- updated later
+                isFake      =  nil,
             };
 
             Private_registry_by_GUID[isFriend][guid] = record;
@@ -1102,15 +1123,22 @@ do
         record.lastMove = time;
 
         -- detect a true healer
-        if not record.isTrueHeal then
+        if not record.isTrueHeal and not record.isFake then
             record.isTrueHeal = HHTD_C.Healers_Only_Spells_ByName[spellName] or false;
 
-            -- guard against WoW patches or spell translation issues and if
+            -- Guard against WoW patches or spell translation issues and if
             -- possible verify that this player is indeed a true healer using
-            -- the scoreboard
+            -- the scoreboard.
+            -- There is also problems with certain abilities such as DK's Dark
+            -- Simulacrum which can mimmic other classes' abilities...
 
             if isHuman and record.isTrueHeal and false == checkPlayerRealRole(sourceName, spellName) then
                 record.isTrueHeal = false
+                record.isFake = true
+                -- if PvpHSpecsOnly is true then we return but we log first if necessary
+                if configRef.PvpHSpecsOnly and not configRef.Log then
+                    return
+                end
             end
         end
 
@@ -1149,6 +1177,11 @@ do
                 log.spells[spellName] = log.spells[spellName] + 1;
             end
 
+            -- we may get here despite PvpHSpecsOnly if a fake healer was found and
+            -- discarded by the scoreboard check. We do log them though
+            if not record.isTrueHeal and configRef.PvpHSpecsOnly then
+                return
+            end
         end -- }}}
 
         if configRef.UHMHAP and record.healDone < HHTD.HealThreshold then

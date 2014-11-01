@@ -4,6 +4,19 @@ Healers Have To Die
 *Change log*
 ------------
 
+**version 2.3.2 (2014-11-01):**
+
+- Add protection and mitigation to avoid false-positives (ie: when a DPS/TANK
+  spec is detected as HEALER due to internal bad spell classification or special
+  game mechanics such as 'Dark Simulacrum'). This is only possible in situations
+  where the scoreboard is available.
+
+  This fixes a false positive on Retribution Paladins using 'Avenging Wrath'
+  and prevent Death knights using Dark Simulacrum from being flagged as healer.
+
+NOTE: The spells HHTD uses to detect specialized healers is [available here][spelllist].
+Leave a comment there if you see inconsistencies.
+
 **version 2.3.1 (2014-10-13):**
 
 - Compatibility fixes for WoD:
