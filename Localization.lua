@@ -125,7 +125,7 @@ do
         L["OPT_PVE"] = "Enable for PVE"
         L["OPT_PVE_DESC"] = "HHTD will also work for NPCs."
         L["OPT_PVPHEALERSSPECSONLY"] = "Healer specialization detection"
-        L["OPT_PVPHEALERSSPECSONLY_DESC"] = "Only detect players specialized in healing. (this disables minimum heal amount filter for PVP)"
+        L["OPT_PVPHEALERSSPECSONLY_DESC"] = "Only detect players specialized in healing."
         L["OPT_SET_FRIENDLY_HEALERS_ROLE"] = "Set friendly healers role"
         L["OPT_SET_FRIENDLY_HEALERS_ROLE_DESC"] = "Will automatically set the raid HEALER role to friendly healers upon detection (if possible)"
         L["OPT_SOUNDS"] = "Sound alerts"

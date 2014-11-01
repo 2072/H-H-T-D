@@ -6,8 +6,8 @@ Healers Have To Die
 
 **version 2.3.2 (2014-11-01):**
 
-- Add protection and mitigation to avoid false-positives (ie: when a DPS/TANK
-  spec is detected as HEALER due to internal bad spell classification or special
+- Add protections and mitigations to avoid false-positives (ie: when a DPS/TANK
+  spec is detected as healer due to internal bad spell classification or special
   game mechanics such as 'Dark Simulacrum'). This is only possible in situations
   where the scoreboard is available.
 
@@ -16,6 +16,13 @@ Healers Have To Die
 
 NOTE: The spells HHTD uses to detect specialized healers is [available here][spelllist].
 Leave a comment there if you see inconsistencies.
+
+- Changed default heal threshold a healer must reach to 50% of the player's
+  maximum health and allow this threshold to be set to up to 300%.
+
+- Contrary to what "Specialized players only"'s tooltip said, checking this
+  does not disable the heal threshold filter. (The tooltip has been fixed)
+
 
 **version 2.3.1 (2014-10-13):**
 
