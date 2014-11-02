@@ -4,6 +4,11 @@ Healers Have To Die
 *Change log*
 ------------
 
+**version 2.3.3 (2014-11-02):**
+
+- On certain locals (such as ruRU), HHTD could fail to add its symbols on
+  cross-realm players.
+
 **version 2.3.2 (2014-11-01):**
 
 - Add protections and mitigations to avoid false-positives (ie: when a DPS/TANK
