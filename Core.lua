@@ -325,7 +325,7 @@ local function REGISTER_HEALERS_ONLY_SPELLS_ONCE ()
         [119611] = "MONK", -- Renewing mist
         [132120] = "MONK", -- Envelopping Mist
 
-        -- @debug@
+        --@debug@
         -- test bad spell mitigation
         -- those are not healer specific
         [031842] = "PALADIN", -- Avenging Wrath
@@ -333,7 +333,7 @@ local function REGISTER_HEALERS_ONLY_SPELLS_ONCE ()
         [019750] = "PALADIN", -- Flash of light
         [002061] = "PRIEST",  -- Flash Heal
         [005185] = "DRUID",   -- Healing Touch
-        -- @end-debug@
+        --@end-debug@
     };
 
     HHTD_C.Healers_Only_Spells_ByName = {};
@@ -1043,9 +1043,9 @@ do
             if HHTD_C.Healers_Only_Spells_ByName[spellName] ~= classTag then
                 -- special case for DK's Dark Simulacrum
                 if classTag == "DEATHKNIGHT" then
-                    -- @debug@
+                    --@debug@
                     HHTD:Debug(ERROR, "Dark Simulacrum detected for", PlayerName)
-                    -- @end-debug@
+                    --@end-debug@
                     return false
                 end
 
