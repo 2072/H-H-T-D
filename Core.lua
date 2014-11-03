@@ -273,7 +273,6 @@ local function REGISTER_HEALERS_ONLY_SPELLS_ONCE ()
         [000596] = "PRIEST", -- Prayer of Healing
         [000527] = "PRIEST", -- Purify
         [081749] = "PRIEST", -- Atonement
-        [110744] = "PRIEST", -- Divine Star
         [132157] = "PRIEST", -- Holy Nova
         --      Holy
         [034861] = "PRIEST", -- Circle of Healing
