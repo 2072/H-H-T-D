@@ -301,7 +301,6 @@ local function REGISTER_HEALERS_ONLY_SPELLS_ONCE ()
         [061295] = "SHAMAN", -- Riptide
         [077472] = "SHAMAN", -- Greater Healing Wave
         [098008] = "SHAMAN", -- Spirit link totem
-        [077130] = "SHAMAN", -- Purify Spirit
         [001064] = "SHAMAN", -- Chain Heal
 
         -- Paladins
