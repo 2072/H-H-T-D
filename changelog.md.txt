@@ -4,6 +4,11 @@ Healers Have To Die
 *Change log*
 ------------
 
+**version 2.3.4 (2014-11-09):**
+
+- Fix two minor cases of severe false-positives (where the scoreboard is not
+  available).
+
 **version 2.3.3 (2014-11-02):**
 
 - On certain locals (such as ruRU), HHTD could fail to add its symbols on
