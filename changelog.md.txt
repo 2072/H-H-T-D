@@ -4,6 +4,10 @@ Healers Have To Die
 *Change log*
 ------------
 
+**version 2.3.5 (2015-02-26):**
+
+- Bump TOC to 60100
+
 **version 2.3.4 (2014-11-09):**
 
 - Fix two minor cases of severe false-positives (where the scoreboard is not

@@ -158,7 +158,7 @@ do
         L["OPT_NPH_MARKER_SETTINGS"]         = "Markers' settings"
 
         L["OPT_NPH_MARKER_SCALE"]           = "Markers' scaling"
-        L["OPT_NPH_MARKER_SCALE_DESC"]      = "Change markers' size"
+        L["OPT_NPH_MARKER_SCALE_DESC"]      = "Multiply markers' size by # i.e. 1 = normal size, 0.5 = half size, 2 = double size, etc..."
         L["OPT_NPH_MARKER_X_OFFSET"]        = "Horizontal offset"
         L["OPT_NPH_MARKER_X_OFFSET_DESC"]   = "Move markers horizontally"
         L["OPT_NPH_MARKER_Y_OFFSET"]        = "Vertical offset"

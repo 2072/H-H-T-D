@@ -29,13 +29,13 @@ Remember to check out available options (/HHTDG)
 How it works
 ------------
 
-HHTD uses the combat log events to detect friendly and enemy healers that are
+HHTD uses the combat log events to detect friendly and enemy healers who are
 **currently** healing other players (during the last 60s).
 HHTD detects [specialized healers spells][spelllist] (for human players only)
 and differentiates specialized healers from hybrid ones.
 
 HHTD also lets you choose a specified amount of healing healers have to
-reach before being marked as such (23% of your own health by default).
+reach before being marked as such (50% of your own health by default).
 This threshold is the only criterion used for NPCs.
 
 When a healer is identified it will be marked with a healer symbol above
