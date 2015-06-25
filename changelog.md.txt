@@ -4,6 +4,10 @@ Healers Have To Die
 *Change log*
 ------------
 
+**version 2.3.6 (2015-06-25):**
+
+- Bump TOC to 60200
+
 **version 2.3.5 (2015-02-26):**
 
 - Bump TOC to 60100
