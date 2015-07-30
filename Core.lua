@@ -1025,7 +1025,7 @@ do
 
         if not playerIndex then
             --@alpha@
-            HHTD:Debug(ERROR, "Failed to find player name in scoreboard", PlayerName, " - Last name seen:", GetBattlefieldScore(i))
+            HHTD:Debug(ERROR, "Failed to find player name in scoreboard", PlayerName, " - GBSL:", GetNumBattlefieldScores()," - fns:", GetNumBattlefieldScores() and GetBattlefieldScore(1))
             --@end-alpha@
             return nil
         end
