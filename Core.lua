@@ -793,6 +793,7 @@ function HHTD:OnEnable()
     REGISTER_HEALERS_ONLY_SPELLS_ONCE ();
 
     self:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED");
+    self:RegisterEvent("UPDATE_BATTLEFIELD_SCORE");
     self:RegisterEvent("UPDATE_MOUSEOVER_UNIT", "TestUnit");
     self:RegisterEvent("PLAYER_TARGET_CHANGED", "TestUnit");
     self:RegisterEvent("PLAYER_ALIVE"); -- talents SHOULD be available
@@ -907,14 +908,24 @@ do
 
     --up values
     
-    local str_match                 = _G.string.match;
-    local GetTime                   = _G.GetTime;
+    local str_match                   = _G.string.match;
+    local GetTime                     = _G.GetTime;
+    local RequestBattlefieldScoreData = _G.RequestBattlefieldScoreData;
 
     local pairs                     = _G.pairs;
     local ipairs                    = _G.ipairs;
     local TableWipe                 = _G.table.wipe;
     local TableSort                 = _G.table.sort;
 
+    local WIPRBSD = {false, nil};
+
+    function HHTD:UPDATE_BATTLEFIELD_SCORE()
+        --@alpha@
+        self:Debug(INFO, "UPDATE_BATTLEFIELD_SCORE")
+        --@end-alpha@
+
+        WIPRBSD[1] = false
+    end
 
     -- Healer management {{{
 
@@ -1023,10 +1034,23 @@ do
             end
         end
 
-        if not playerIndex then
-            --@alpha@
-            HHTD:Debug(ERROR, "Failed to find player name in scoreboard", PlayerName, " - GBSL:", GetNumBattlefieldScores()," - fns:", GetNumBattlefieldScores() and GetBattlefieldScore(1))
-            --@end-alpha@
+        -- We didn't find that player and there is no async data query in progress
+        if not playerIndex and not WIPRBSD[1] then
+
+            -- print an error message if the async query is supposed to have
+            -- succeeded for that player
+            if WIPRBSD[2] == PlayerName then
+                HHTD:Debug(ERROR, "RqBttfldScrDt FAILED", PlayerName, " - GBSL:", GetNumBattlefieldScores()," - fns:", GetNumBattlefieldScores() and GetBattlefieldScore(1))
+            end
+
+            -- async data query
+            RequestBattlefieldScoreData()
+
+            WIPRBSD[1] = true;
+            WIPRBSD[2] = PlayerName;
+
+            self:Debug(WARNING, "RequestBattlefieldScoreData()")
+
             return nil
         end
 
