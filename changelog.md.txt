@@ -4,6 +4,14 @@ Healers Have To Die
 *Change log*
 ------------
 
+
+**version 2.3.7 (2015-08-02):**
+
+- Sounds were no longer played.
+
+- Invalid healer spell mitigation may have failed for some players.
+
+
 **version 2.3.6 (2015-06-25):**
 
 - Bump TOC to 60200
@@ -32,7 +40,7 @@ Healers Have To Die
   This fixes a false positive on Retribution Paladins using 'Avenging Wrath'
   and prevent Death knights using Dark Simulacrum from being flagged as healer.
 
-NOTE: The spells HHTD uses to detect specialized healers is [available here][spelllist].
+NOTE: The spells HHTD uses to detect specialized healers are [listed here][spelllist].
 Leave a comment there if you see inconsistencies.
 
 - Changed default heal threshold a healer must reach to 50% of the player's

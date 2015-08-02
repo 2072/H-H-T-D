@@ -1049,7 +1049,7 @@ do
             WIPRBSD[1] = true;
             WIPRBSD[2] = PlayerName;
 
-            self:Debug(WARNING, "RequestBattlefieldScoreData()")
+            HHTD:Debug(WARNING, "RequestBattlefieldScoreData()")
 
             return nil
         end
