@@ -917,7 +917,7 @@ do
     local TableWipe                 = _G.table.wipe;
     local TableSort                 = _G.table.sort;
 
-    local WIPRBSD = {false, nil};
+    local WIPRBSD = {false, nil, 0};
 
     function HHTD:UPDATE_BATTLEFIELD_SCORE()
         --@alpha@
@@ -1034,22 +1034,30 @@ do
             end
         end
 
-        -- We didn't find that player and there is no async data query in progress
-        if not playerIndex and not WIPRBSD[1] then
+        if not playerIndex then
 
-            -- print an error message if the async query is supposed to have
-            -- succeeded for that player
-            if WIPRBSD[2] == PlayerName then
-                HHTD:Debug(ERROR, "RqBttfldScrDt FAILED", PlayerName, " - GBSL:", GetNumBattlefieldScores()," - fns:", GetNumBattlefieldScores() and GetBattlefieldScore(1))
+            -- there is no async data query in progress
+            if not WIPRBSD[1] then
+                -- print an error message if the async query is supposed to have
+                -- succeeded for that player
+                if WIPRBSD[2] == PlayerName then
+                    HHTD:Debug(ERROR, "RqBttfldScrDt FAILED", PlayerName, " - GBSL:", GetNumBattlefieldScores()," - fns:", GetNumBattlefieldScores() and GetBattlefieldScore(1))
+                end
+
+                -- async data query
+                RequestBattlefieldScoreData()
+
+                WIPRBSD[1] = true;
+                WIPRBSD[2] = PlayerName;
+                WIPRBSD[3] = GetTime();
+
+                HHTD:Debug(WARNING, "RequestBattlefieldScoreData()")
+            elseif GetTime() - WIPRBSD[3] > 30 then
+                RequestBattlefieldScoreData()
+                WIPRBSD[3] = GetTime();
+
+                HHTD:Debug(ERROR, "Still waiting for UPDATE_BATTLEFIELD_SCORE after 30s...")
             end
-
-            -- async data query
-            RequestBattlefieldScoreData()
-
-            WIPRBSD[1] = true;
-            WIPRBSD[2] = PlayerName;
-
-            HHTD:Debug(WARNING, "RequestBattlefieldScoreData()")
 
             return nil
         end
