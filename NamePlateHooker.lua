@@ -166,6 +166,16 @@ function NPH:GetOptions () -- {{{
                             NPH:UpdateTextures();
                         end,
                     },
+                    swapSymbols = {
+                        type = 'toggle',
+                        name = L["OPT_SWAPSYMBOLS"],
+                        desc = L["OPT_SWAPSYMBOLS_DESC"],
+                        order = 35,
+                        set = function (info, value)
+                            HHTD:SetHandler(self, info, value);
+                            NPH:UpdateTextures();
+                        end,
+                    },
             },
         },
     };
@@ -479,15 +489,6 @@ do
     local Guid;
     local HealerClass;
 
-    local ENEMIES_ICONS = {
-        ["PRIEST"]  = "Interface\\AddOns\\Healers-Have-To-Die\\icons\\priest.tga",
-        ["PALADIN"] = "Interface\\AddOns\\Healers-Have-To-Die\\icons\\paladin.tga",
-        ["DRUID"]   = "Interface\\AddOns\\Healers-Have-To-Die\\icons\\druid.tga",
-        ["SHAMAN"]  = "Interface\\AddOns\\Healers-Have-To-Die\\icons\\shaman.tga",
-        ["MONK"]    = "Interface\\AddOns\\Healers-Have-To-Die\\icons\\monk.tga",
-        [false]     = "Interface\\AddOns\\Healers-Have-To-Die\\icons\\black.tga",
-    };
-
     local assert = _G.assert;
     local unpack = _G.unpack;
 
@@ -524,8 +525,13 @@ do
 
     local function AdjustTexCoord(t) -- MUL
 
-        local textureID = ICONS_COORDS[IsFriend][HealerClass];
-        --HHTD:Debug(WARNING, unpack(textureID));
+        local textureID
+
+        if not NPH.db.global.swapSymbols then
+            textureID = ICONS_COORDS[IsFriend][HealerClass];
+        else
+            textureID = ICONS_COORDS[not IsFriend][HealerClass];
+        end
 
         if PlateAdditions.textureID ~= textureID then
             t:SetTexCoord(unpack(textureID));
@@ -599,6 +605,21 @@ do
         PlateAdditions.rankFont:Show();
 
 
+    end
+
+    local function PopulatePlateData(plate) -- set locals Guid, IsFriend, HealerClass
+
+        PlateName       = NPH:GetPlateName(plate);
+        Guid            = NPH:GetPlateGUID(plate);
+        Guid            = (HHTD.Registry_by_GUID[true][Guid] or HHTD.Registry_by_GUID[false][Guid]) and Guid or nil;
+
+        if Guid then
+            IsFriend    = HHTD.Registry_by_GUID[true][Guid] and true or false;
+            HealerClass = HHTD.Registry_by_GUID[IsFriend][Guid].isTrueHeal;
+        else
+            IsFriend    = HHTD.Registry_by_Name[true][PlateName] and true or false;
+            HealerClass = HHTD.Registry_by_Name[IsFriend][PlateName].isTrueHeal;
+        end
     end
 
     function NPH:AddCrossToPlate (plate, isFriend, plateName, guid, healer) -- {{{
@@ -681,8 +702,11 @@ do
 
             PlateAdditions  = plate.HHTD;
             Plate           = plate;
+            PopulatePlateData(plate);
 
             UpdateTextureParams();
+
+            AdjustTexCoord(PlateAdditions.texture);
 
         end
 
@@ -698,24 +722,11 @@ do
 
             Plate           = plate;
             PlateAdditions  = plate.HHTD;
-            PlateName       = self:GetPlateName(plate);
-            Guid            = self:GetPlateGUID(plate);
-            Guid            = (HHTD.Registry_by_GUID[true][Guid] or HHTD.Registry_by_GUID[false][Guid]) and Guid or nil;
-            if Guid then
-                IsFriend    = HHTD.Registry_by_GUID[true][Guid] and true or false;
-                HealerClass = HHTD.Registry_by_GUID[IsFriend][Guid].isTrueHeal;
-            else
-                IsFriend    = HHTD.Registry_by_Name[true][PlateName] and true or false;
-                HealerClass = HHTD.Registry_by_Name[IsFriend][PlateName].isTrueHeal;
-            end
-
+            
+            PopulatePlateData(plate);
             SetRank();
 
-            -- update the icon background color if necessary
-            if HealerClass then
-                AdjustTexCoord(PlateAdditions.texture);
-            end
-
+            AdjustTexCoord(PlateAdditions.texture);
         end
 
         --@alpha@

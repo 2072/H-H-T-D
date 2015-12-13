@@ -164,6 +164,9 @@ do
         L["OPT_NPH_MARKER_Y_OFFSET"]        = "Vertical offset"
         L["OPT_NPH_MARKER_Y_OFFSET_DESC"]   = "Move markers vertically"
 
+        L["OPT_SWAPSYMBOLS"]        = "Swap friends/foes symbols"
+        L["OPT_SWAPSYMBOLS_DESC"]   = "The symbols used for friends and foes are swapped"
+        
         L["INSTANCE_CHAT"]                  = "Instance chat"
 
         --]==]
