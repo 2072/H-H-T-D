@@ -378,7 +378,7 @@ function NPH:LNR_ON_NEW_PLATE(selfevent, plate, data)
         self:AddCrossToPlate(plate, isFriend, plateName, data.guid, HHTD.Registry_by_Name[isFriend][plateName]);
         --@alpha@
     else -- it's not a healer
-        local plateAdditions = plate.HHTD;
+        local plateAdditions = plate.HHTD and plate.HHTD.NPH;
 
         if plateAdditions and (plateAdditions.IsShown or plateAdditions.texture:IsShown() or plateAdditions.rankFont:IsShown()) then -- check if the plate appeared with our additions shown
             self:Debug(ERROR, "Plate prev-recycling hiding failed: ", plateAdditions.IsShown, plateName, isFriend, data.reaction);
@@ -652,13 +652,14 @@ do
         Guid            = HHTD.Registry_by_GUID[IsFriend][Guid] and Guid or nil; -- make sure the Guid is actually usable.
         Plate           = plate;
         PlateName       = plateName;
-        PlateAdditions  = plate.HHTD;
+        PlateAdditions  = plate.HHTD and plate.HHTD.NPH;
         HealerClass     = healer.isTrueHeal;
 
         if not PlateAdditions then
-            plate.HHTD = {};
+            plate.HHTD = plate.HHTD or {};
+            plate.HHTD.NPH = {}
 
-            PlateAdditions = plate.HHTD;
+            PlateAdditions = plate.HHTD.NPH;
 
             AddElements();
 
@@ -700,7 +701,7 @@ do
 
         for plate in pairs(self.DisplayedPlates_byFrameTID) do
 
-            PlateAdditions  = plate.HHTD;
+            PlateAdditions  = plate.HHTD and plate.HHTD.NPH;
             Plate           = plate;
             PopulatePlateData(plate);
 
@@ -721,7 +722,7 @@ do
         for plate in pairs(self.DisplayedPlates_byFrameTID) do
 
             Plate           = plate;
-            PlateAdditions  = plate.HHTD;
+            PlateAdditions  = plate.HHTD and plate.HHTD.NPH;
             
             PopulatePlateData(plate);
             SetRank();
@@ -750,7 +751,7 @@ function NPH:HideCrossFromPlate(plate, plateName, caller) -- {{{
     end
     --@end-alpha@
 
-    local plateAdditions = plate.HHTD;
+    local plateAdditions = plate.HHTD and plate.HHTD.NPH;
 
     --@alpha@
     local testCase1 = false;
