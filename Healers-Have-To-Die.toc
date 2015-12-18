@@ -45,6 +45,7 @@ Core.lua
 utils.lua
 
 NamePlateHooker.lua
+CustomMarks.lua
 
 GraphicalReporter.lua
 

@@ -169,6 +169,25 @@ do
         
         L["INSTANCE_CHAT"]                  = "Instance chat"
 
+        L["CM"] = "Custom Marks"
+        L["OPT_CM_DESCRIPTION"] = "Here you can target a unit and apply a custom mark only you will see, these marks will persist accross sessions."
+        L["OPT_CM_SELECT_MARKER"]           = "Marker"
+        L["OPT_CM_SELECT_MARKER_DESC"]      = "Select a marker to apply to your target"
+        L["OPT_CM_SETTARGETMARKER"]         = "Mark target"
+        L["OPT_CM_SETTARGETMARKER_DESC"]    = "Mark the selected target with the selected marker"
+        L["OPT_CM_CLEARTARGETMARKER"]       = "Clear target"
+        L["OPT_CM_CLEARTARGETMARKER_DESC"]  = "Remove the marker from your target"
+
+        L["OPT_CM_MARKER_CUSTOMIZATION"] = "Marker customization"
+
+        L["OPT_CM_VCr"]       = "Red Shading"
+        L["OPT_CM_VCr_DESC"]  = "Change texture's red component shading"
+        L["OPT_CM_VCg"]       = "Green Shading"
+        L["OPT_CM_VCg_DESC"]  = "Change texture's Green component shading"
+        L["OPT_CM_VCb"]       = "Blue Shading"
+        L["OPT_CM_VCb_DESC"]  = "Change texture's Blue component shading"
+        L["OPT_CM_VCa"]       = "Alpha Shading"
+        L["OPT_CM_VCa_DESC"]  = "Change texture's Alpha component shading"
         --]==]
         --@end-do-not-package@
 
