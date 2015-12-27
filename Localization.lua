@@ -136,6 +136,10 @@ do
         L["OPT_USE_HEALER_MINIMUM_HEAL_AMOUNT_DESC"] = "Healers will have to heal for a specified amount before being tagged as such."
         L["OPT_VERSION"] = "version"
         L["OPT_VERSION_DESC"] = "Display version and release date"
+
+        L["OPT_GUI_DESC"] = "Open the graphical configuration panel"
+        L["OPT_GUI"]      = "Open GUI"
+
         L["PARTY"] = "Party"
         L["AUTO_RAID_PARTY_INSTANCE"] = "Auto: Raid/Party/Instance"
         L["RELEASE_DATE"] = "Release Date:"

@@ -263,7 +263,7 @@ local function REGISTER_HEALERS_ONLY_SPELLS_ONCE ()
 
         -- Priests
         --      Discipline
-        [047540] = "PRIEST", -- Penance
+        [047540] = "PRIEST", -- Penance XXX strange error received from user on 2015-10-15 (this spell was cast by a hunter...)
         [109964] = "PRIEST", -- Spirit shell
         [047515] = "PRIEST", -- Divine Aegis
         [081700] = "PRIEST", -- Archangel
@@ -514,6 +514,14 @@ do
                 guiHidden = true,
                 func = function () HHTD:Print(L["VERSION"], '@project-version@,', L["RELEASE_DATE"], '@project-date-iso@') end,
                 order = -5,
+            },
+            ShowGUI = {
+                type = 'execute',
+                name = L["OPT_GUI"],
+                desc = L["OPT_GUI_DESC"],
+                guiHidden = true,
+                func = function () LibStub("AceConfigDialog-3.0"):Open(tostring(HHTD)) end,
+                order = -6,
             },
             core = {
                 type = 'group',

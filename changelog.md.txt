@@ -7,9 +7,12 @@ Healers Have To Die
 **version 2.4.0 (2015-12-18):**
 
 - New Module: CustomMarks - Allow you to set persistent custom marks on
-targets only seen by you. (type /HHTDG and head to the "Custom Marks" tab)
+  targets only seen by you. (type /HHTDG and head to the "Custom Marks" tab)
 
 - It's now possible to swap the healer symbols.
+
+- Added /hhtd ShowGUI command (in addition to the existing /hhtdg) so that it
+  appears when typing /hhtd
 
 
 **version 2.3.7 (2015-08-02):**
