@@ -14,6 +14,11 @@ Healers Have To Die
 - Added /hhtd ShowGUI command (in addition to the existing /hhtdg) so that it
   appears when typing /hhtd
 
+- The friendly healer under attack alerts ('Protect friendly healers' option)
+  are now only triggered if a healer is hit with an attack that does more damage
+  than the 'Heal amount threshold'. This should make it less likely to react on
+  AOEs and more useful in general.
+
 
 **version 2.3.7 (2015-08-02):**
 

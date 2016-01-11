@@ -641,6 +641,7 @@ do
                         type = 'toggle',
                         name = L["OPT_HEALER_UNDER_ATTACK_ALERTS"],
                         desc = L["OPT_HEALER_UNDER_ATTACK_ALERTS_DESC"],
+                        disabled = function() return not HHTD.db.global.UHMHAP end,
                         order = 670,
                     },
                     Log = {
@@ -1283,41 +1284,56 @@ do
 
 
     function HHTD:MakeDummyEvent(unit)
-        --local flags = 0, destName = 'TestUnit', destGUID = 'TestGuid', destFlags = 0;
-        local flags, destName, destGUID  = 0, 'TestUnit', 'TestGuid';
+        local destFlags;
 
         if UnitIsPlayer(unit) then
             if UnitIsFriend(unit, 'player') then
                 self:Debug(INFO, "target is a friendly player");
-                flags = FRIENDLY_PLAYER;
-                --destName = (UnitName('player'));
-                --destGUID = UnitGUID('player');
-                --destFlags = FRIENDLY_PLAYER;
+                destFlags = FRIENDLY_PLAYER;
             else
-                flags = HOSTILE_OUTSIDER_PLAYER;
+                destFlags = HOSTILE_OUTSIDER_PLAYER;
                 self:Debug(INFO, "target is a hostile player");
             end
         else
             if UnitIsFriend(unit, 'player') then
                 self:Debug(INFO, "target is a friendly NPC");
-                flags = FRIENDLY_NPC;
+                destFlags = FRIENDLY_NPC;
             else
-                flags = HOSTILE_OUTSIDER_NPC;
+                destFlags = HOSTILE_OUTSIDER_NPC;
                 self:Debug(INFO, "target is a hostile NPC");
             end
         end
-    
+
+        local event, srcFlags, srcGUID, srcName
+
+        if IsControlKeyDown() and IsShiftKeyDown() then
+            event    = "DUMMY_DAMAGE"
+            srcFlags = HOSTILE_OUTSIDER_PLAYER
+            srcGUID  = 'hostile unit'
+            srcName  = 'hostile unit'
+            destGUID = UnitGUID(unit);
+            destName = UnitName('player') -- so that CheckInteractDistance('unit name', 1) works
+            self:Debug(ERROR, "mimicking attack on healer", destName, "(your name so that the alert can be triggered and tested)");
+        else
+            event    = "DUMMY_HEAL"
+            srcFlags = destFlags
+            srcGUID  = UnitGUID(unit)
+            srcName  = UnitName(unit)
+            destGUID = "healed unit"
+            destName = "healed unit"
+        end
+
         local class = select(2, UnitClass(unit));
         local dummySpell = ({["DRUID"] = GetSpellInfo(33891), ["SHAMAN"] = GetSpellInfo(974), ["PRIEST"] = GetSpellInfo(047515), ["PALADIN"] = GetSpellInfo(82326), ["MONK"] = GetSpellInfo(115175)})[class] or GetSpellInfo(3273);
-        self:COMBAT_LOG_EVENT_UNFILTERED(nil, 0, "DUMMY_HEAL", false, UnitGUID(unit), (UnitName(unit)), flags, 0, destGUID, destName, flags, 0, 0, dummySpell, "", HHTD.HealThreshold + 1);
+        self:COMBAT_LOG_EVENT_UNFILTERED(nil, 0, event, false, srcGUID, srcName, srcFlags, 0, destGUID, destName, destFlags, 0, 0, dummySpell, "", HHTD.HealThreshold + 1);
     end
 
     -- http://www.wowpedia.org/API_COMBAT_LOG_EVENT
-    function HHTD:COMBAT_LOG_EVENT_UNFILTERED(e, timestamp, event, hideCaster, sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags, _spellID, spellNAME, _spellSCHOOL, healAMOUNT)
+    function HHTD:COMBAT_LOG_EVENT_UNFILTERED(e, timestamp, event, hideCaster, sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags, _spellID, spellNAME, _spellSCHOOL, amount)
  
         --@debug@
         if hideCaster then
-            --self:Debug(INFO, e, timestamp, event, hideCaster, sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags, _spellID, spellNAME, _spellSCHOOL, healAMOUNT);
+            --self:Debug(INFO, e, timestamp, event, hideCaster, sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags, _spellID, spellNAME, _spellSCHOOL, amount);
         end
         --@end-debug@
 
@@ -1374,8 +1390,8 @@ do
         -- if the source is hostile AND if its target is a registered friendly healer
         if (not Source_Is_Friendly) and (configRef.HealerUnderAttackAlerts and (Source_Is_NPC or Source_Is_Human) and Registry_by_GUID[true][destGUID]) then
 
-            if not self.Friendly_Healers_Attacked_by_GUID[destGUID] then
-
+            -- heal threshold is enabled and reached, no rescent alert were sent and it's a damage
+            if configRef.UHMHAP and amount > self.HealThreshold and not self.Friendly_Healers_Attacked_by_GUID[destGUID] and event:sub(-7) == "_DAMAGE" then
                 if PLAYER_GUID == destGUID or CheckInteractDistance(destName, 1) then
 
                     self:SendMessage("HHTD_HEALER_UNDER_ATTACK", sourceName, sourceGUID, destName, destGUID, PLAYER_GUID == destGUID);
@@ -1442,7 +1458,7 @@ do
              return;
          end
 
-         RegisterHealer(GetTime(), Source_Is_Friendly, sourceGUID, sourceName, Source_Is_Human, spellNAME, isHealSpell, healAMOUNT, configRef);
+         RegisterHealer(GetTime(), Source_Is_Friendly, sourceGUID, sourceName, Source_Is_Human, spellNAME, isHealSpell, amount, configRef);
 
      end -- }}}
 
