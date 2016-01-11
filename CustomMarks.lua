@@ -75,6 +75,7 @@ function CM:OnInitialize() -- {{{
     self.db = HHTD.db:RegisterNamespace('CM', {
         global = {
             playerNamesToMark = {},
+            MarkerChoice = 1,
             marker_Scale = 0.45,
             marker_Xoffset = 60,
             marker_Yoffset = 0,
@@ -90,6 +91,11 @@ end -- }}}
 do
 
     local function getRTTStr(rt)
+
+        if not rt then
+            return "no marker"
+        end
+
         local ref = _G.UnitPopupButtons[("RAID_TARGET_%d"):format(rt)]
         local RAID_TARGET_TEXTURE_DIMENSION = _G.RAID_TARGET_TEXTURE_DIMENSION
 
@@ -102,12 +108,32 @@ do
         )
     end
 
+    local function getSelectorAssociations()
+        local sA = {}
+        for name, symbol in pairs(playerNamesToMark) do
+            sA[name] = name .. " " .. getRTTStr(symbol)
+        end
+
+        return sA
+    end
+
+    local function updateMarkDisplay(un, action)
+        for plate, plateData in CM:EachPlateByName(un) do
+            if action == nil or action == 2 then
+                CM:HideMarkerFromPlate(plate, un, "updateMarkDisplay");
+            end
+            if action ~= nil then
+                CM:AddMarkerToPlate(plate, un, "updateMarkDisplay");
+            end
+         end
+    end
+
     function CM:GetOptions () -- {{{
         return {
             [CM:GetName()] = {
                 name = L[CM:GetName()],
                 type = 'group',
-                get = function (info) return CM.db.global[info[#info]]; end,
+                get = function (info) return self.db.global[info[#info]]; end,
                 set = function (info, value) HHTD:SetHandler(self, info, value) end,
                 args = {
                     Info1 = {
@@ -115,11 +141,23 @@ do
                         name = HHTD:ColorText(L["OPT_CM_DESCRIPTION"], "FF00FF00"),
                         order = 0,
                     },
+                    Warning1 = {
+                        type = 'description',
+                        name = HHTD:ColorText(L["OPT_NPH_WARNING1"], "FFFF0000"),
+                        hidden = function () return GetCVarBool("nameplateShowEnemies") end,
+                        order = 1,
+                    },
+                    Warning2 = {
+                        type = 'description',
+                        name = HHTD:ColorText(L["OPT_NPH_WARNING2"], "FFFF0000"),
+                        hidden = function () return GetCVarBool("nameplateShowFriends") end,
+                        order = 2,
+                    },
                     MarkerChoice = {
                         type = 'select',
                         name = L['OPT_CM_SELECT_MARKER'],
                         desc = L['OPT_CM_SELECT_MARKER_DESC'],
-                        values = {getRTTStr(1), getRTTStr(2), getRTTStr(3),getRTTStr(4),getRTTStr(5),getRTTStr(6),getRTTStr(7),getRTTStr(8)},
+                        values = {getRTTStr(1),getRTTStr(2),getRTTStr(3),getRTTStr(4),getRTTStr(5),getRTTStr(6),getRTTStr(7),getRTTStr(8)},
                         order = 3,
                     },
                     MarkTarget = {
@@ -128,19 +166,19 @@ do
                         desc = L["OPT_CM_SETTARGETMARKER_DESC"],
                         func = function ()
                             if (UnitGUID("target")) then
-                                local un = (UnitName("target"));
+                                local un = (UnitName("target"))
+                                local hadMark = self.db.global.playerNamesToMark[un]
 
-                                CM.db.global.playerNamesToMark[un] = CM.db.global.MarkerChoice
+                                self.db.global.playerNamesToMark[un] = self.db.global.MarkerChoice
 
-                                for plate, plateData in self:EachPlateByName(un) do
-                                    self:AddMarkerToPlate(plate, un, false);
-                                end
+                                updateMarkDisplay(un, hadMark and 2 or 1)
 
-                                CM:Debug(INFO, un, 'marked with mark #', CM.db.global.MarkerChoice)
+
+                                self:Debug(INFO, un, 'marked with mark #', self.db.global.MarkerChoice)
+                                return un .. " marked with mark with " .. getRTTStr(self.db.global.MarkerChoice)
                             else
-                                HHTD:Print( L["OPT_TESTONTARGET_ENOTARGET"] );
+                                self:Debug(ERROR, L["OPT_TESTONTARGET_ENOTARGET"] );
                             end
-
                         end,
                         order = 5,
                     },
@@ -154,19 +192,67 @@ do
 
                                 self.db.global.playerNamesToMark[un] = nil
 
-                                for plate, plateData in self:EachPlateByName(un) do
-                                    self:HideMarkerFromPlate(plate, un, "OPT_CM_CLEARTARGETMARKER");
-                                end
+                                updateMarkDisplay(un)
 
-                                CM:Debug(INFO, un, 'mark cleared')
+                                self:Debug(INFO, un, 'mark cleared')
                             else
-                                HHTD:Print( L["OPT_TESTONTARGET_ENOTARGET"] );
+                                self:Debug(ERROR, L["OPT_TESTONTARGET_ENOTARGET"] );
                             end
 
                         end,
                         order = 7,
                     },
                     Header100 = {
+                        type = 'header',
+                        name = L["OPT_CM_MARKER_MANAGEMENT"],
+                        order = 10,
+                    },
+                    existingAssoc = {
+                        type = 'select',
+                        name = L["OPT_CM_EXISTINGASSOC"],
+                        desc = L["OPT_CM_EXISTINGASSOC_DESC"],
+                        width = "double",
+                        values = getSelectorAssociations,
+                        order = 11,
+                    },
+                    ChangeMark = {
+                        type = 'execute',
+                        name = L["OPT_CM_CHANGEMARK"]:format(getRTTStr(self.db.global.MarkerChoice)),
+                        desc = L["OPT_CM_CHANGEMARK_DESC"]:format(L['OPT_CM_SELECT_MARKER']),
+                        disabled = function ()
+                            local un = self.db.global.existingAssoc;
+                            return un == nil or un and self.db.global.playerNamesToMark[un] == self.db.global.MarkerChoice
+                        end,
+                        func = function ()
+                            local un = self.db.global.existingAssoc;
+
+                            self.db.global.playerNamesToMark[un] = self.db.global.MarkerChoice
+
+                            updateMarkDisplay(un, 2)
+
+                            self:Debug(INFO, un, 'marked with mark #', self.db.global.MarkerChoice)
+                        end,
+                        order = 12,
+                    },
+                    ClearAssoc = {
+                        type = 'execute',
+                        name = L["OPT_CM_CLEARASSOC"],
+                        desc = L["OPT_CM_CLEARASSOC_DESC"],
+                        disabled = function () return self.db.global.existingAssoc == nil end,
+                        func = function ()
+                            local un = self.db.global.existingAssoc;
+
+                            self.db.global.playerNamesToMark[un] = nil
+                            self.db.global.existingAssoc = nil
+
+                            updateMarkDisplay(un)
+
+
+                            self:Debug(INFO, un, 'mark cleared (OPT_CM_CLEARASSOC)')
+                        end,
+                        order = 13,
+                    },
+                    Header200 = {
                         type = 'header',
                         name = L["OPT_NPH_MARKER_SETTINGS"],
                         order = 15,
@@ -185,7 +271,7 @@ do
 
                         set = function (info, value)
                             HHTD:SetHandler(self, info, value);
-                            CM:UpdateTextures();
+                            self:UpdateTextures();
                         end,
                     },
                     marker_Xoffset = {
@@ -202,7 +288,7 @@ do
 
                         set = function (info, value)
                             HHTD:SetHandler(self, info, value);
-                            CM:UpdateTextures();
+                            self:UpdateTextures();
                         end,
                     },
                     marker_Yoffset = {
@@ -219,7 +305,7 @@ do
 
                         set = function (info, value)
                             HHTD:SetHandler(self, info, value);
-                            CM:UpdateTextures();
+                            self:UpdateTextures();
                         end,
                     },
                     Header100 = {
@@ -238,7 +324,7 @@ do
 
                         set = function (info, value)
                             HHTD:SetHandler(self, info, value);
-                            CM:UpdateTextures();
+                            self:UpdateTextures();
                         end,
                     },
                     marker_VCg = {
@@ -252,7 +338,7 @@ do
 
                         set = function (info, value)
                             HHTD:SetHandler(self, info, value);
-                            CM:UpdateTextures();
+                            self:UpdateTextures();
                         end,
                     },
                     marker_VCb = {
@@ -266,7 +352,7 @@ do
 
                         set = function (info, value)
                             HHTD:SetHandler(self, info, value);
-                            CM:UpdateTextures();
+                            self:UpdateTextures();
                         end,
                     },
                     marker_VCa = {
@@ -280,7 +366,7 @@ do
 
                         set = function (info, value)
                             HHTD:SetHandler(self, info, value);
-                            CM:UpdateTextures();
+                            self:UpdateTextures();
                         end,
                     }
                 },

@@ -87,9 +87,9 @@ do
         L["OPT_LOGS_DESC"] = "Display HHTD detected healers and statistics"
         L["OPT_LOG_DESC"] = "Enables logging and adds a new 'Logs' tab to HHTD's option panel"
         L["OPT_MODULES"] = "Modules"
-        L["OPT_NPH_WARNING1"] = [=[WARNING: Enemies' name-plates are currently disabled. HHTD cannot add its red cross symbol.
+        L["OPT_NPH_WARNING1"] = [=[WARNING: *Enemies*' name-plates are currently disabled. HHTD cannot add its symbol on enemies.
         You can enable name-plates display through the WoW UI's options or by using the assigned key-stroke.]=]
-        L["OPT_NPH_WARNING2"] = [=[WARNING: Allies' name-plates are currently disabled. HHTD cannot add its healer symbol.
+        L["OPT_NPH_WARNING2"] = [=[WARNING: *Allies*' name-plates are currently disabled. HHTD cannot add its symbol on allies.
         You can enable name-plates display through the WoW UI's options or by using the assigned key-stroke.]=]
         L["OPT_OFF"] = "off"
         L["OPT_OFF_DESC"] = "Disables HHTD"
@@ -181,6 +181,16 @@ do
         L["OPT_CM_SETTARGETMARKER_DESC"]    = "Mark the selected target with the selected marker"
         L["OPT_CM_CLEARTARGETMARKER"]       = "Clear target"
         L["OPT_CM_CLEARTARGETMARKER_DESC"]  = "Remove the marker from your target"
+
+        L["OPT_CM_MARKER_MANAGEMENT"] = "Marker management"
+        L["OPT_CM_EXISTINGASSOC"] = "Existing name-marker associations"
+        L["OPT_CM_EXISTINGASSOC_DESC"] = "Select a name in this list to use with the other buttons of this section"
+        L["OPT_CM_CHANGEMARK"] = "Change to %s"
+        L["OPT_CM_CHANGEMARK_DESC"] = "Change the mark to the one selected in the '%s' selector"
+        L["OPT_CM_CLEARASSOC"] = "Clear"
+        L["OPT_CM_CLEARASSOC_DESC"] = "Clear the selected name from its mark"
+
+
 
         L["OPT_CM_MARKER_CUSTOMIZATION"] = "Marker customization"
 
