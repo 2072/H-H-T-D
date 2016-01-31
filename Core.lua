@@ -1050,7 +1050,7 @@ do
                 -- print an error message if the async query is supposed to have
                 -- succeeded for that player
                 if WIPRBSD[2] == PlayerName then
-                    HHTD:Debug(ERROR, "RqBttfldScrDt FAILED", PlayerName, " - GBSL:", GetNumBattlefieldScores()," - fns:", GetNumBattlefieldScores() and GetBattlefieldScore(1))
+                    HHTD:Debug(WARNING, "RqBttfldScrDt FAILED", PlayerName, " - GBSL:", GetNumBattlefieldScores()," - fns:", GetNumBattlefieldScores() and GetBattlefieldScore(1))
                 end
 
                 -- async data query
@@ -1081,9 +1081,10 @@ do
             -- is this spell correctly classified?
             if HHTD_C.Healers_Only_Spells_ByName[spellName] ~= classTag then
                 -- special case for DK's Dark Simulacrum
-                if classTag == "DEATHKNIGHT" then
+                -- From some debug reports, Hunters seem to have a similar ability...
+                if classTag == "DEATHKNIGHT" or classTag == "HUNTER" then
                     --@debug@
-                    HHTD:Debug(ERROR, "Dark Simulacrum detected for", PlayerName)
+                    HHTD:Debug(ERROR, "Dark Simulacrum-like detected for", PlayerName, classTag)
                     --@end-debug@
                     return false
                 end
