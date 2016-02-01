@@ -81,7 +81,7 @@ do
         L["OPT_HEALER_MINIMUM_HEAL_AMOUNT"] = "Heal amount (|cff00dd00%u|r) threshold"
         L["OPT_HEALER_MINIMUM_HEAL_AMOUNT_DESC"] = "Healers won't be detected until they reach this cumulative amount of healing based on a percentage of your own maximum health."
         L["OPT_HEALER_UNDER_ATTACK_ALERTS"] = "Protect friendly healers"
-        L["OPT_HEALER_UNDER_ATTACK_ALERTS_DESC"] = "Display an alert when a nearby friendly healers is attacked"
+        L["OPT_HEALER_UNDER_ATTACK_ALERTS_DESC"] = "Display an alert when a nearby friendly healers is attacked for more than |cffdd0000%u|r damage"
         L["OPT_LOG"] = "Logging"
         L["OPT_LOGS"] = "Logs"
         L["OPT_LOGS_DESC"] = "Display HHTD detected healers and statistics"

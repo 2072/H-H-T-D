@@ -640,7 +640,7 @@ do
                     HealerUnderAttackAlerts = {
                         type = 'toggle',
                         name = L["OPT_HEALER_UNDER_ATTACK_ALERTS"],
-                        desc = L["OPT_HEALER_UNDER_ATTACK_ALERTS_DESC"],
+                        desc = (L["OPT_HEALER_UNDER_ATTACK_ALERTS_DESC"]):format(HHTD:UpdateHealThreshold() * .5),
                         disabled = function() return not HHTD.db.global.UHMHAP end,
                         order = 670,
                     },
@@ -1283,6 +1283,8 @@ do
 
     local registered;
 
+    local prTime, lastAttack_amount_lastAlert
+
 
     function HHTD:MakeDummyEvent(unit)
         local destFlags;
@@ -1305,7 +1307,7 @@ do
             end
         end
 
-        local event, srcFlags, srcGUID, srcName
+        local event, srcFlags, srcGUID, srcName, destGUID, destName
 
         if IsControlKeyDown() and IsShiftKeyDown() then
             event    = "DUMMY_DAMAGE"
@@ -1330,11 +1332,11 @@ do
     end
 
     -- http://www.wowpedia.org/API_COMBAT_LOG_EVENT
-    function HHTD:COMBAT_LOG_EVENT_UNFILTERED(e, timestamp, event, hideCaster, sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags, _spellID, spellNAME, _spellSCHOOL, amount)
+    function HHTD:COMBAT_LOG_EVENT_UNFILTERED(e, timestamp, event, hideCaster, sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags, _spellID, spellNAME, _spellSCHOOL, _amount)
  
         --@debug@
         if hideCaster then
-            --self:Debug(INFO, e, timestamp, event, hideCaster, sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags, _spellID, spellNAME, _spellSCHOOL, amount);
+            --self:Debug(INFO, e, timestamp, event, hideCaster, sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags, _spellID, spellNAME, _spellSCHOOL, _amount);
         end
         --@end-debug@
 
@@ -1391,13 +1393,45 @@ do
         -- if the source is hostile AND if its target is a registered friendly healer
         if (not Source_Is_Friendly) and (configRef.HealerUnderAttackAlerts and (Source_Is_NPC or Source_Is_Human) and Registry_by_GUID[true][destGUID]) then
 
-            -- heal threshold is enabled and reached, no rescent alert were sent and it's a damage
-            if configRef.UHMHAP and amount > self.HealThreshold and not self.Friendly_Healers_Attacked_by_GUID[destGUID] and event:sub(-7) == "_DAMAGE" then
+
+            if event == "SWING_DAMAGE" then
+               _amount = _spellID 
+            end
+
+            if (configRef.UHMHAP and _amount and event:sub(-7) == "_DAMAGE") then
+
+                -- the healer is nearby
                 if PLAYER_GUID == destGUID or CheckInteractDistance(destName, 1) then
 
-                    self:SendMessage("HHTD_HEALER_UNDER_ATTACK", sourceName, sourceGUID, destName, destGUID, PLAYER_GUID == destGUID);
+                    -- first attack?
+                    if not self.Friendly_Healers_Attacked_by_GUID[destGUID] then
+                        self.Friendly_Healers_Attacked_by_GUID[destGUID] = {0, 0, 0};
+                    end
 
-                    self.Friendly_Healers_Attacked_by_GUID[destGUID] = GetTime();
+                    -- shortcuts
+                    lastAttack_amount_lastAlert  = self.Friendly_Healers_Attacked_by_GUID[destGUID]
+                    prTime = GetTime()
+
+                    -- less than 5s elapsed since last attacked
+                    if prTime - lastAttack_amount_lastAlert[1] < 5 then
+                        lastAttack_amount_lastAlert[2] = lastAttack_amount_lastAlert[2] + _amount
+                    else
+                        lastAttack_amount_lastAlert[2] = _amount
+                    end
+
+                    lastAttack_amount_lastAlert[1] = prTime
+
+
+                    -- last alert was more than 30s ago and threshold is reached
+                    if prTime - lastAttack_amount_lastAlert[3] > 30 and lastAttack_amount_lastAlert[2] > self.HealThreshold * .5 then
+                        self:SendMessage("HHTD_HEALER_UNDER_ATTACK", sourceName, sourceGUID, destName, destGUID, PLAYER_GUID == destGUID);
+
+                        lastAttack_amount_lastAlert[3] = GetTime();
+                    end
+
+                    --@debug@
+                    self:Debug(WARNING, "amount:", _amount, lastAttack_amount_lastAlert[2], event, prTime - lastAttack_amount_lastAlert[3] > 30, lastAttack_amount_lastAlert[2] > self.HealThreshold * .5);
+                    --@end-debug@
 
                 end
             end
@@ -1459,7 +1493,7 @@ do
              return;
          end
 
-         RegisterHealer(GetTime(), Source_Is_Friendly, sourceGUID, sourceName, Source_Is_Human, spellNAME, isHealSpell, amount, configRef);
+         RegisterHealer(GetTime(), Source_Is_Friendly, sourceGUID, sourceName, Source_Is_Human, spellNAME, isHealSpell, _amount, configRef);
 
      end -- }}}
 
@@ -1478,9 +1512,9 @@ do
 
      -- clean attacked healers {{{
      -- should also be cleaned when such healer dies or leave combat XXX -- no event for those...
-     for guid, lastAttack in pairs(self.Friendly_Healers_Attacked_by_GUID) do
+     for guid, lastAttack_amount_lastAlert in pairs(self.Friendly_Healers_Attacked_by_GUID) do
          -- if more than 30s elapsed since the last attack or if it's no longer a registered healer
-         if Time - lastAttack > 30 or not Registry_by_GUID[true][guid] then
+         if Time - lastAttack_amount_lastAlert[1] > 30 or not Registry_by_GUID[true][guid] then
              self.Friendly_Healers_Attacked_by_GUID[guid] = nil;
              self:Debug(INFO2, "removed healer from attack table", guid);
          end

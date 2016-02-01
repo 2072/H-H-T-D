@@ -9,15 +9,15 @@ Healers Have To Die
 - New Module: CustomMarks - Allow you to set persistent custom marks on
   targets only seen by you. (type /HHTDG and head to the "Custom Marks" tab)
 
+- The friendly healer under attack alerts ('Protect friendly healers' option)
+  are now only triggered if a healer is hit with a succession of
+  attacks that do more damage than half the 'Heal amount threshold'. This
+  should make it less likely to react on AOEs and more useful in general.
+
 - It's now possible to swap the healer symbols.
 
 - Added /hhtd ShowGUI command (in addition to the existing /hhtdg) so that it
   appears when typing /hhtd
-
-- The friendly healer under attack alerts ('Protect friendly healers' option)
-  are now only triggered if a healer is hit with an attack that does more damage
-  than the 'Heal amount threshold'. This should make it less likely to react on
-  AOEs and more useful in general.
 
 
 **version 2.3.7 (2015-08-02):**
