@@ -594,7 +594,7 @@ do
                     },
                     Header1 = {
                         type = 'header',
-                        name = '',
+                        name = "|cFFDD0000"..L["OPT_HEADER_GLOBAL_ENEMY_HEALER_OPTIONS"].."|r",
                         order = 400,
                     },
                     HFT = {
@@ -616,7 +616,7 @@ do
                     HMHAP = {
                         type = "range",
                         disabled = function() return not HHTD.db.global.UHMHAP or not HHTD:IsEnabled(); end,
-                        name = function() return (L["OPT_HEALER_MINIMUM_HEAL_AMOUNT"]):format(HHTD:UpdateHealThreshold()) end,
+                        name = function() HHTD:UpdateHealThresholds(); return (L["OPT_HEALER_MINIMUM_HEAL_AMOUNT"]):format(HHTD.HealThreshold) end,
                         desc = L["OPT_HEALER_MINIMUM_HEAL_AMOUNT_DESC"],
                         min = 0.01,
                         max = 6,
@@ -628,8 +628,20 @@ do
 
                         set = function (info, value)
                             HHTD:SetHandler(HHTD, info, value);
-                            HHTD:UpdateHealThreshold();
+                            HHTD:UpdateHealThresholds();
                         end,
+                    },
+                    Log = {
+                        type = 'toggle',
+                        name = L["OPT_LOG"],
+                        desc = L["OPT_LOG_DESC"],
+                        disabled = false,
+                        order = 652,
+                    },
+                    Header2 = {
+                        type = 'header',
+                        name = "|cFF00DD00"..L["OPT_HEADER_GLOBAL_FRIENDLY_HEALER_OPTIONS"].."|r",
+                        order = 655,
                     },
                     SetFriendlyHealersRole = {
                         type = 'toggle',
@@ -640,16 +652,26 @@ do
                     HealerUnderAttackAlerts = {
                         type = 'toggle',
                         name = L["OPT_HEALER_UNDER_ATTACK_ALERTS"],
-                        desc = (L["OPT_HEALER_UNDER_ATTACK_ALERTS_DESC"]):format(HHTD:UpdateHealThreshold() * .5),
-                        disabled = function() return not HHTD.db.global.UHMHAP end,
+                        desc = function() HHTD:UpdateHealThresholds(); return (L["OPT_HEALER_UNDER_ATTACK_ALERTS_DESC"]):format(HHTD.ProtectDamageThreshold) end,
                         order = 670,
                     },
-                    Log = {
-                        type = 'toggle',
-                        name = L["OPT_LOG"],
-                        desc = L["OPT_LOG_DESC"],
-                        disabled = false,
-                        order = 700,
+                    PHMDAP = {
+                        type = "range",
+                        disabled = function() return not HHTD.db.global.HealerUnderAttackAlerts or not HHTD:IsEnabled(); end,
+                        name = function() HHTD:UpdateHealThresholds(); return (L["OPT_PROTECT_HEALER_MINIMUM_DAMAGE_AMOUNT"]):format(HHTD.ProtectDamageThreshold) end,
+                        desc = L["OPT_PROTECT_HEALER_MINIMUM_DAMAGE_AMOUNT_DESC"],
+                        min = 0.01,
+                        max = 6,
+                        softMax = 3,
+                        step = 0.01,
+                        bigStep = 0.03,
+                        order = 675,
+                        isPercent = true,
+
+                        set = function (info, value)
+                            HHTD:SetHandler(HHTD, info, value);
+                            HHTD:UpdateHealThresholds();
+                        end,
                     },
                     Header1000 = {
                         type = 'header',
@@ -759,6 +781,7 @@ local DEFAULT__CONFIGURATION = {
         PvpHSpecsOnly = false,
         UHMHAP = true,
         HMHAP = 0.5,
+        PHMDAP = 0.37,
         SetFriendlyHealersRole = true,
         HealerUnderAttackAlerts = true,
     },
@@ -815,8 +838,8 @@ function HHTD:OnEnable()
     PLAYER_FACTION = UnitFactionGroup("player");
     PLAYER_GUID    = UnitGUID("player");
 
-    self:ScheduleRepeatingTimer(self.Undertaker,          10, self);
-    self:ScheduleRepeatingTimer(self.UpdateHealThreshold, 50, self);
+    self:ScheduleRepeatingTimer(self.Undertaker,           10, self);
+    self:ScheduleRepeatingTimer(self.UpdateHealThresholds, 50, self);
 
 end
 
@@ -825,6 +848,7 @@ function HHTD:PLAYER_ALIVE()
 
     PLAYER_FACTION = UnitFactionGroup("player");
     PLAYER_GUID    = UnitGUID("player");
+    HHTD:UpdateHealThresholds();
 
     self:UnregisterEvent("PLAYER_ALIVE");
 end
@@ -845,13 +869,14 @@ end
 -- }}}
 
 HHTD.HealThreshold = math.huge;
+HHTD.ProtectDamageThreshold = math.huge;
 local UnitHealthMax = _G.UnitHealthMax;
-function HHTD:UpdateHealThreshold()
-    if not self.db.global.UHMHAP then return 0 end
+function HHTD:UpdateHealThresholds()
 
-    self.HealThreshold = math.ceil(self.db.global.HMHAP * UnitHealthMax('player'));
+    local PlayerMaxH = UnitHealthMax('player')
 
-    return self.HealThreshold;
+    self.HealThreshold          = math.ceil(self.db.global.HMHAP  * PlayerMaxH);
+    self.ProtectDamageThreshold = math.ceil(self.db.global.PHMDAP * PlayerMaxH);
 end
 
 
@@ -1398,7 +1423,7 @@ do
                _amount = _spellID 
             end
 
-            if (configRef.UHMHAP and _amount and event:sub(-7) == "_DAMAGE") then
+            if (_amount and event:sub(-7) == "_DAMAGE") then
 
                 -- the healer is nearby
                 if PLAYER_GUID == destGUID or CheckInteractDistance(destName, 1) then
@@ -1412,25 +1437,35 @@ do
                     lastAttack_amount_lastAlert  = self.Friendly_Healers_Attacked_by_GUID[destGUID]
                     prTime = GetTime()
 
-                    -- less than 5s elapsed since last attacked
+                    -- less than 5s elapsed since last attacked (influenced below)
                     if prTime - lastAttack_amount_lastAlert[1] < 5 then
                         lastAttack_amount_lastAlert[2] = lastAttack_amount_lastAlert[2] + _amount
                     else
                         lastAttack_amount_lastAlert[2] = _amount
                     end
 
-                    lastAttack_amount_lastAlert[1] = prTime
+                    -- register last attack time, put it in the future if the
+                    -- attack is more than half the threshold to delay the
+                    -- reset by 10s instead of 5s
+                    if prTime > lastAttack_amount_lastAlert[1] then
+                        lastAttack_amount_lastAlert[1] = prTime + (_amount / self.ProtectDamageThreshold > .5 and 5 or 0)
+                    end
 
+                    --@debug@
+                    if _amount / self.ProtectDamageThreshold > .5 then
+                        self:Debug(WARNING, "amount is huge:", _amount, _amount / self.ProtectDamageThreshold > .5 and 5 or 0);
+                    end
+                    --@end-debug@
 
                     -- last alert was more than 30s ago and threshold is reached
-                    if prTime - lastAttack_amount_lastAlert[3] > 30 and lastAttack_amount_lastAlert[2] > self.HealThreshold * .5 then
+                    if prTime - lastAttack_amount_lastAlert[3] > 30 and lastAttack_amount_lastAlert[2] > self.ProtectDamageThreshold then
                         self:SendMessage("HHTD_HEALER_UNDER_ATTACK", sourceName, sourceGUID, destName, destGUID, PLAYER_GUID == destGUID);
 
                         lastAttack_amount_lastAlert[3] = GetTime();
                     end
 
                     --@debug@
-                    self:Debug(WARNING, "amount:", _amount, lastAttack_amount_lastAlert[2], event, prTime - lastAttack_amount_lastAlert[3] > 30, lastAttack_amount_lastAlert[2] > self.HealThreshold * .5);
+                    self:Debug(WARNING, "amount:", _amount, lastAttack_amount_lastAlert[2], event, prTime - lastAttack_amount_lastAlert[3] > 30, lastAttack_amount_lastAlert[2] > self.ProtectDamageThreshold, _amount / self.ProtectDamageThreshold > .5 and 5 or 0);
                     --@end-debug@
 
                 end
