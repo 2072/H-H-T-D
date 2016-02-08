@@ -4,7 +4,7 @@ Healers Have To Die
 *Change log*
 ------------
 
-**version 2.4.0 (2016-02-07):**
+**version 2.4.0 (2016-02-08):**
 
 - New Module: CustomMarks - Allow you to set persistent custom marks on
   targets only seen by you. (type /HHTDG and head to the "Custom Marks" tab)
