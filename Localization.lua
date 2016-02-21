@@ -100,7 +100,7 @@ do
         L["OPT_ON"] = "on"
         L["OPT_ON_DESC"] = "Enables HHTD"
         L["OPT_POST_ANNOUNCE_CHANNEL"] = "Post channel"
-        L["OPT_POST_ANNOUNCE_CHANNEL_DESC"] = "Decide where your announce will be posted"
+        L["OPT_POST_ANNOUNCE_CHANNEL_DESC"] = "Decide where your announce will be posted.\nNote: unless you want to use 'say' or 'yell' you should leave this to automatic."
         L["OPT_POST_ANNOUNCE_DESCRIPTION"] = [=[|cFFFF0000IMPORTANT:|r Type |cff40ff40/hhtdp|r or bind a key to announce friendly healers to protect and enemy healers to focus.
 
         (see World of Warcraft escape menu binding interface to bind a key)
@@ -145,7 +145,7 @@ do
         L["OPT_GUI"]      = "Open GUI"
 
         L["PARTY"] = "Party"
-        L["AUTO_RAID_PARTY_INSTANCE"] = "Auto: Raid/Party/Instance"
+        L["AUTO_RAID_PARTY_INSTANCE"] = "Auto: Raid Warning / Raid / Instance / Party"
         L["RELEASE_DATE"] = "Release Date:"
         L["SAY"] = "Say"
         L["VERSION"] = "version:"

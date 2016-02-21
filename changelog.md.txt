@@ -4,7 +4,7 @@ Healers Have To Die
 *Change log*
 ------------
 
-**version 2.4.0 (2016-02-08):**
+**version 2.4.0 (2016-02-21):**
 
 - New Module: CustomMarks - Allow you to set persistent custom marks on
   targets only seen by you. (type /HHTDG and head to the "Custom Marks" tab)
@@ -14,6 +14,12 @@ Healers Have To Die
   attacks that do more damage than the 'Damage amount threshold' (new
   setting). This should make it less likely to react on AOEs and more useful
   in general.
+
+- The RAID_WARNING channel will be used if possible in instance groups (BG and
+  LFG groups). The 'Party' and 'Instance chat' channel options have been
+  removed. Use the default 'Auto' instead which will choose the most right
+  channel depending on the current group type. When not in a group the 'SAY'
+  channel will be used.
 
 - It's now possible to swap enemy healer symbols with friendly healer symbols.
 

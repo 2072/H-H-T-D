@@ -58,7 +58,7 @@ function Announcer:OnInitialize() -- {{{
             PostHumansOnly = true,
             ProtectMessage = false,
             KillMessage = false,
-            PostChannel = 'AUTO',
+            AnnounceChannel = 'AUTO',
         },
     });
 
@@ -131,11 +131,12 @@ function Announcer:GetOptions () -- {{{
                             order = 0,
                             name = L["OPT_POST_ANNOUNCE_DESCRIPTION"],
                         },
-                        PostChannel = {
+                        AnnounceChannel = {
                             type = 'select',
+                            width = 'double',
                             name = L['OPT_POST_ANNOUNCE_CHANNEL'],
                             desc = L['OPT_POST_ANNOUNCE_CHANNEL_DESC'],
-                            values = { ['AUTO'] = L['AUTO_RAID_PARTY_INSTANCE'], ['PARTY'] = L['PARTY'], ['SAY'] = L['SAY'], ['YELL'] = L['YELL'], ['INSTANCE_CHAT'] = L['INSTANCE_CHAT']},
+                            values = { ['AUTO'] = L['AUTO_RAID_PARTY_INSTANCE'], ['SAY'] = L['SAY'], ['YELL'] = L['YELL']},
                             order = 30,
                         },
                         -- throttle
@@ -303,28 +304,33 @@ end -- }}}
 
 do
 
+    local function isRaidWarningAuthorized ()
+        return IsInRaid() and (select(2, GetRaidRosterInfo(UnitInRaid("player") or 1))) > 0
+    end
+
     local function GetDistributionChanel()
-        local channel = Announcer.db.global.PostChannel;
+        local channel = Announcer.db.global.AnnounceChannel;
 
         if channel ~= 'AUTO' then
             return channel;
         end
 
-        -- if we are in a battle ground or a LFG/R instance
-        if GetNumGroupMembers(LE_PARTY_CATEGORY_INSTANCE) > 0 then
+        if IsInRaid() then
+            if isRaidWarningAuthorized() then
+                return "RAID_WARNING";
+            elseif GetNumGroupMembers(LE_PARTY_CATEGORY_INSTANCE) > 0 then
+                return "INSTANCE_CHAT";
+            else
+                return "RAID";
+            end
+        elseif GetNumGroupMembers(LE_PARTY_CATEGORY_HOME) > 0 then
+            return "PARTY";
+        elseif GetNumGroupMembers(LE_PARTY_CATEGORY_INSTANCE) > 0 then
+            -- if we are in a battle ground or a LFG/R instance
             return "INSTANCE_CHAT";
         end
 
-        if IsInRaid() then
-            if (select(2, GetRaidRosterInfo(UnitInRaid("player") or 1))) > 0 then
-                return "RAID_WARNING";
-            end
-            return "RAID";
-        elseif GetNumGroupMembers(LE_PARTY_CATEGORY_HOME) > 0 then
-            return "PARTY";
-        end
-
-        return "WHISPER";
+        return "SAY";
     end
 
     local function Post(text)
