@@ -781,7 +781,7 @@ local DEFAULT__CONFIGURATION = {
         PvpHSpecsOnly = false,
         UHMHAP = true,
         HMHAP = 0.5,
-        PHMDAP = 0.37,
+        PHMDAP = 0.20,
         SetFriendlyHealersRole = true,
         HealerUnderAttackAlerts = true,
     },

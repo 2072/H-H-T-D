@@ -11,7 +11,7 @@ Healers Have To Die
 
 - The friendly healer under attack alerts ('Protect friendly healers' option)
   are now only triggered if a healer is hit with a succession of
-  attacks that do more damage than half the 'Damage amount threshold' (new
+  attacks that do more damage than the 'Damage amount threshold' (new
   setting). This should make it less likely to react on AOEs and more useful
   in general.
 
