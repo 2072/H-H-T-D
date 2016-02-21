@@ -541,12 +541,14 @@ do
                     },
                     PvpHSpecsOnly = {
                         type = 'toggle',
+                        width = 'double',
                         name = L["OPT_PVPHEALERSSPECSONLY"],
                         desc = L["OPT_PVPHEALERSSPECSONLY_DESC"],
                         order = 300,
                     },
                     testOnTarget = {
                         type = 'execute',
+                        width = 'double',
                         name = L["OPT_TESTONTARGET"],
                         desc = L["OPT_TESTONTARGET_DESC"],
                         func = function ()
@@ -558,6 +560,13 @@ do
 
                         end,
                         order = 350,
+                    },
+                    Log = {
+                        type = 'toggle',
+                        name = L["OPT_LOG"],
+                        desc = L["OPT_LOG_DESC"],
+                        disabled = false,
+                        order = 355,
                     },
                     Modules = {
                         type = 'group',
@@ -609,12 +618,14 @@ do
                     },
                     UHMHAP = {
                         type = "toggle",
+                        width = 'double',
                         name = L["OPT_USE_HEALER_MINIMUM_HEAL_AMOUNT"],
                         desc = L["OPT_USE_HEALER_MINIMUM_HEAL_AMOUNT_DESC"],
                         order = 600,
                     },
                     HMHAP = {
                         type = "range",
+                        width = 'double',
                         disabled = function() return not HHTD.db.global.UHMHAP or not HHTD:IsEnabled(); end,
                         name = function() HHTD:UpdateHealThresholds(); return (L["OPT_HEALER_MINIMUM_HEAL_AMOUNT"]):format(HHTD.HealThreshold) end,
                         desc = L["OPT_HEALER_MINIMUM_HEAL_AMOUNT_DESC"],
@@ -631,13 +642,6 @@ do
                             HHTD:UpdateHealThresholds();
                         end,
                     },
-                    Log = {
-                        type = 'toggle',
-                        name = L["OPT_LOG"],
-                        desc = L["OPT_LOG_DESC"],
-                        disabled = false,
-                        order = 652,
-                    },
                     Header2 = {
                         type = 'header',
                         name = "|cFF00DD00"..L["OPT_HEADER_GLOBAL_FRIENDLY_HEALER_OPTIONS"].."|r",
@@ -645,6 +649,7 @@ do
                     },
                     SetFriendlyHealersRole = {
                         type = 'toggle',
+                        width = 'double',
                         name = L["OPT_SET_FRIENDLY_HEALERS_ROLE"],
                         desc = L["OPT_SET_FRIENDLY_HEALERS_ROLE_DESC"],
                         order = 660,
@@ -657,6 +662,7 @@ do
                     },
                     PHMDAP = {
                         type = "range",
+                        width = 'double',
                         disabled = function() return not HHTD.db.global.HealerUnderAttackAlerts or not HHTD:IsEnabled(); end,
                         name = function() HHTD:UpdateHealThresholds(); return (L["OPT_PROTECT_HEALER_MINIMUM_DAMAGE_AMOUNT"]):format(HHTD.ProtectDamageThreshold) end,
                         desc = L["OPT_PROTECT_HEALER_MINIMUM_DAMAGE_AMOUNT_DESC"],
