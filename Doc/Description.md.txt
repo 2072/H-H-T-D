@@ -7,24 +7,34 @@ Healers Have To Die
 *Spot those bloody healers instantly and help them accomplish their destiny!
 (PVP and PVE)*
 
-**NOTE: Type /HHTDG to open the configuration panel.**
+**Current features:**
+
+- Automatically add healer symbols on top of players nameplate indicating
+  their class and healing rank. Unlike other add-ons it only takes into account
+  actively healing players. (It uses different symbols for friends and foes).
+
+- Let you apply custom marks on top of any unit's nameplate. These are the
+  same marks as the default raid markers but you can set as many as you want
+  and customize their look.
+  These marks persist across game sessions. (They are only visible to you)
+
+**IMPORTANT NOTE: You have to enable nameplates, else you won't see any healer symbol!**
+
+- Let you announce through a customizable message who the enemy and friendly
+  healers are (using Raid Warning if possible).
+
+- It will also help you protect the healers who are on your side alerting you
+  when they are being attacked (check the option panel for details).
+
+- Helps you target healers easily when they are in a pack.
+
+- All of this applies to PVP and PVE.
+
+**NOTE: Type /HHTDG to open the configuration panel.** There are many settings
+to check!
+
 *HHTD's options are not directly available in the "Interface" panel due to ongoing tainting issues Blizzard is not willing to fix.*
 
-HHTD adds a **red cross** over *enemy* healer's name plates. *You can't miss them!*
- (see the [screen-shot][redcross]).
-
-HHTD also adds a **healer role symbol** above*friendly* healers' name plates.
-*Stop the slaughter!!*
-
-**IMPORTANT NOTE: You have to enable name-plates, else you won't see the healer
-symbols!**
-
-It also rings when you hover or target a hostile unit who healed
-someone else during the last 60 seconds (*can be configured*).
-
-HHTD is PVP and PVE compatible.
-
-Remember to check out available options (/HHTDG)
 
 How it works
 ------------
@@ -39,26 +49,26 @@ reach before being marked as such (50% of your own health by default).
 This threshold is the only criterion used for NPCs.
 
 When a healer is identified it will be marked with a healer symbol above
-his/her nameplate. If the healer is specialized, the symbol's background
+their nameplate. If the healer is specialized, the symbol's background
 will be colored according to their class. In other cases the background will be
 grey.
 
 In all cases a number in the center of the symbol indicates the rank of the
-healer, the lowest the number the better the healer (ie: '1' represent the
+healer, the lowest the number the better the healer (ie: '1' represents the
 most effective healer while '9' is the least effective).
 
-You can force HHTD to only report specialized healers through HHTD's options
-(/hhtdg).
+**You can force HHTD to only report specialized healers through HHTD's options (/hhtdg).**
 
-Self-Heals and heals to pets are filtered out.
+Needless to say that self-heals and heals to pets are filtered out.
 
 
 Commands
 --------
 
 - /HHTDP (or /hhtdp): Post healers name to the raid channel ordered by
-  effectiveness for all to see.
-  (You need to configure the messages in the announce module options first).
+  effectiveness for all to see (Will use the Raid Warning channel if possible).
+  
+  **You need to configure the messages in the announce module options first.**
 
 **You can bind this command to a key (WoW key-bindings interface)**
 
@@ -72,7 +82,7 @@ Planned features
 ----------------
 
 - Detection when a friendly healer is being attacked and alert others through
-  /yell or /say (I would like to make it work for nearby healers only)
+  /yell, /say and emote.
 
 
 Compatibility
