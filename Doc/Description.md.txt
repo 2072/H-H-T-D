@@ -9,19 +9,19 @@ Healers Have To Die
 
 **Current features:**
 
-- Automatically add healer symbols on top of players nameplate indicating
+- HHTD automatically adds healer symbols on top of players nameplate indicating
   their class and healing rank. Unlike other add-ons it only takes into account
-  actively healing players. (It uses different symbols for friends and foes).
+  actively healing players. (**It uses different symbols for friends and foes**).
 
-- Let you apply custom marks on top of any unit's nameplate. These are the
+- HHTD lets you apply custom marks on top of any unit's nameplate. These are the
   same marks as the default raid markers but you can set as many as you want
   and customize their look.
   These marks persist across game sessions. (They are only visible to you)
 
 **IMPORTANT NOTE: You have to enable nameplates, else you won't see any healer symbol!**
 
-- Let you announce through a customizable message who the enemy and friendly
-  healers are (using Raid Warning if possible).
+- Healer Have To Die lets you announce through a customizable message who the
+  enemy and friendly healers are (using the Raid Warning channel if possible).
 
 - It will also help you protect the healers who are on your side alerting you
   when they are being attacked (check the option panel for details).

@@ -4,9 +4,9 @@ Healers Have To Die
 *Change log*
 ------------
 
-**version 2.4.0_beta_1 (2016-02-21):**
+**version 2.4.0 (2016-02-22):**
 
-- New Module: CustomMarks - Allow you to set persistent custom marks on
+- New Module: CustomMarks - Allows you to set persistent custom marks on
   targets only seen by you. Type /HHTDG and head to the new "Custom Marks" tab!
 
 - The friendly healer under attack alerts ('Protect friendly healers' option)
