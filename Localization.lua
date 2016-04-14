@@ -54,7 +54,7 @@ do
         L["CHAT_POST_ANNOUNCE_FEATURE_NOT_CONFIGURED"] = "The announce to raid messages are not configured. Type /HHTDG"
         L["CHAT_POST_ANNOUNCE_TOO_SOON_WAIT"] = "It's too soon (see the announce throttle setting)."
         L["CHAT_POST_NO_HEALERS"] = "No healers on either sides :/ (yet)"
-        L["DESCRIPTION"] = "Spot those bloody healers instantly and help them accomplish their destiny! (PVP and PVE)"
+        L["DESCRIPTION"] = "Healers have to die like anyone else, this is a fact of WoW. This add-on helps you influence this unfortunate destiny in a way or another depending on the healer's side..."
         L["DISABLED"] = [=[hhtd has been disabled!
         Type '/hhtd on' to re-enable it.]=]
         L["ENABLED"] = "enabled! Type /HHTDG for a list of options"

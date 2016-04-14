@@ -1,11 +1,9 @@
 Healers Have To Die
 ===================
 
-[![Gratipay and Bitcoin donation options](http://img.shields.io/gratipay/2072.svg)](https://www.gratipay.com/2072/)
-
-
-*Spot those bloody healers instantly and help them accomplish their destiny!
-(PVP and PVE)*
+*Healers have to die like anyone else, this is a fact of WoW. This add-on helps
+you influence this unfortunate destiny in a way or another depending on the
+healer's side...*
 
 **Current features:**
 
