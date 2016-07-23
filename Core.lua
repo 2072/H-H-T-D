@@ -265,8 +265,8 @@ local function REGISTER_HEALERS_ONLY_SPELLS_ONCE ()
         --      Discipline
         [047540] = "PRIEST", -- Penance XXX strange error received from user on 2015-10-15 (this spell was cast by a hunter...)
         [109964] = "PRIEST", -- Spirit shell
-        [047515] = "PRIEST", -- Divine Aegis
-        [081700] = "PRIEST", -- Archangel
+        -- LEGION GONE        [047515] = "PRIEST", -- Divine Aegis
+        -- LEGION GONE        [081700] = "PRIEST", -- Archangel
         [002060] = "PRIEST", -- Greater Heal
         [014914] = "PRIEST", -- Holy Fire
         [033206] = "PRIEST", -- Pain Suppression
@@ -278,9 +278,9 @@ local function REGISTER_HEALERS_ONLY_SPELLS_ONCE ()
         [034861] = "PRIEST", -- Circle of Healing
         [064843] = "PRIEST", -- Divine Hymn
         [047788] = "PRIEST", -- Guardian Spirit
-        [000724] = "PRIEST", -- Lightwell
-        [088684] = "PRIEST", -- Holy Word: Serenity
-        [088685] = "PRIEST", -- Holy Word: Sanctuary
+        -- LEGION GONE        [000724] = "PRIEST", -- Lightwell
+        -- LEGION GONE        [088684] = "PRIEST", -- Holy Word: Serenity
+        -- LEGION GONE        [088685] = "PRIEST", -- Holy Word: Sanctuary
         [032546] = "PRIEST", -- Binding Heal
         [077485] = "PRIEST", -- Mastery: Echo of Light -- the passibe ability
         [077489] = "PRIEST", -- Echo of Light -- the aura applied by the afformentioned
@@ -297,7 +297,7 @@ local function REGISTER_HEALERS_ONLY_SPELLS_ONCE ()
         [000740] = "DRUID", -- Tranquility
 
         -- Shamans
-        [000974] = "SHAMAN", -- Earth Shield
+        -- LEGION GONE        [000974] = "SHAMAN", -- Earth Shield
         [061295] = "SHAMAN", -- Riptide
         [077472] = "SHAMAN", -- Greater Healing Wave
         [098008] = "SHAMAN", -- Spirit link totem
@@ -305,29 +305,28 @@ local function REGISTER_HEALERS_ONLY_SPELLS_ONCE ()
 
         -- Paladins
         [020473] = "PALADIN", -- Holy Shock
-        [082327] = "PALADIN", -- Holy radiance
+        -- LEGION GONE        [082327] = "PALADIN", -- Holy radiance
         [053563] = "PALADIN", -- Beacon of Light
-        [002812] = "PALADIN", -- Denounce
+        -- LEGION GONE        [002812] = "PALADIN", -- Denounce
         [082326] = "PALADIN", -- Holy Light
-        [082327] = "PALADIN", -- Holy Radiance
         [085222] = "PALADIN", -- Light of Dawn
-        [088821] = "PALADIN", -- Daybreak
+        -- LEGION GONE        [088821] = "PALADIN", -- Daybreak
 
         -- Monks
         [115175] = "MONK", -- Soothing Mist
-        [115294] = "MONK", -- Mana Tea
+        -- LEGION GONE        [115294] = "MONK", -- Mana Tea
         [115310] = "MONK", -- Revival
         [116670] = "MONK", -- Uplift
         [116680] = "MONK", -- Thunder Focus Tea
         [116849] = "MONK", -- Life Cocoon
         [119611] = "MONK", -- Renewing mist
-        [132120] = "MONK", -- Envelopping Mist
+        -- LEGION GONE        [132120] = "MONK", -- Envelopping Mist
 
         --@debug@
         -- test bad spell mitigation
         -- those are not healer specific
         [031842] = "PALADIN", -- Avenging Wrath
-        [085673] = "PALADIN", -- WOrd of Glory
+        -- LEGION GONE        [085673] = "PALADIN", -- WOrd of Glory
         [019750] = "PALADIN", -- Flash of light
         [002061] = "PRIEST",  -- Flash Heal
         [005185] = "DRUID",   -- Healing Touch
@@ -1103,7 +1102,7 @@ do
         end
 
         local spec = select(16, GetBattlefieldScore(playerIndex))
-        local classTag = select(9, GetBattlefieldScore(playerIndex))
+        local classTag = select(9, GetBattlefieldScore(playerIndex)) -- 2016-05-22 seen as nil in one bug report...
 
         -- since GetBattlefieldScore() returns so many values, we can be sure it won't
         -- stay stable so make sure it won't break HHTD
@@ -1358,7 +1357,7 @@ do
         end
 
         local class = select(2, UnitClass(unit));
-        local dummySpell = ({["DRUID"] = GetSpellInfo(33891), ["SHAMAN"] = GetSpellInfo(974), ["PRIEST"] = GetSpellInfo(047515), ["PALADIN"] = GetSpellInfo(82326), ["MONK"] = GetSpellInfo(115175)})[class] or GetSpellInfo(3273);
+        local dummySpell = ({["DRUID"] = GetSpellInfo(33891), ["SHAMAN"] = GetSpellInfo(974), ["PRIEST"] = GetSpellInfo(109964), ["PALADIN"] = GetSpellInfo(82326), ["MONK"] = GetSpellInfo(115175)})[class] or GetSpellInfo(3273);
         self:COMBAT_LOG_EVENT_UNFILTERED(nil, 0, event, false, srcGUID, srcName, srcFlags, 0, destGUID, destName, destFlags, 0, 0, dummySpell, "", HHTD.HealThreshold + 1);
     end
 
