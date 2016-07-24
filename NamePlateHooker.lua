@@ -75,7 +75,7 @@ function NPH:OnInitialize() -- {{{
 
     self.db = HHTD.db:RegisterNamespace('NPH', {
         global = {
-            sPve = false,
+            sPve = true,
             marker_Scale = 0.8,
             marker_Xoffset = 0,
             marker_Yoffset = 0,
@@ -367,15 +367,10 @@ function NPH:LNR_ON_NEW_PLATE(selfevent, plate, data)
 
     -- Check if this name plate is of interest -- XXX
     if HHTD.Registry_by_Name[isFriend][plateName] then
-        
-        -- If there are several plates with the same name and sPve is set then
-        -- we do nothing since there is no way to be sure
-        if NP_Is_Not_Unique[plateName] and self.db.global.sPve then
-            self:Debug(INFO2, "new plate but sPve and not unique");
-            return;
+       
+        if not self.db.global.sPve or HHTD.Registry_by_GUID[isFriend][data.GUID] then
+            self:AddCrossToPlate(plate, isFriend, plateName, data.GUID, HHTD.Registry_by_Name[isFriend][plateName]);
         end
-
-        self:AddCrossToPlate(plate, isFriend, plateName, data.guid, HHTD.Registry_by_Name[isFriend][plateName]);
         --@alpha@
     else -- it's not a healer
         local plateAdditions = plate.HHTD and plate.HHTD.NPH;

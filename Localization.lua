@@ -135,7 +135,7 @@ do
         L["OPT_SOUNDS"] = "Sound alerts"
         L["OPT_SOUNDS_DESC"] = "HHTD will play a specific sound when you hover or target an enemy healer"
         L["OPT_STRICTGUIDPVE"] = "Accurate PVE detection"
-        L["OPT_STRICTGUIDPVE_DESC"] = "When several NPCs share the same name, HHTD will only add a cross over those who actually healed instead of adding a cross to all of them. Note that most of the time, you'll need to target or mouse-over the unit for the cross to appear."
+        L["OPT_STRICTGUIDPVE_DESC"] = "When several NPCs share the same name, HHTD will only add a cross over those who actually healed instead of adding a cross to all of them."
         L["OPT_USE_HEALER_MINIMUM_HEAL_AMOUNT"] = "Use minimum heal amount filter"
         L["OPT_USE_HEALER_MINIMUM_HEAL_AMOUNT_DESC"] = "Healers will have to heal for a specified amount before being tagged as such."
         L["OPT_VERSION"] = "version"
