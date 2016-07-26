@@ -265,8 +265,6 @@ local function REGISTER_HEALERS_ONLY_SPELLS_ONCE ()
         --      Discipline
         [047540] = "PRIEST", -- Penance XXX strange error received from user on 2015-10-15 (this spell was cast by a hunter...)
         [109964] = "PRIEST", -- Spirit shell
-        -- LEGION GONE        [047515] = "PRIEST", -- Divine Aegis
-        -- LEGION GONE        [081700] = "PRIEST", -- Archangel
         [002060] = "PRIEST", -- Greater Heal
         [014914] = "PRIEST", -- Holy Fire
         [033206] = "PRIEST", -- Pain Suppression
@@ -278,9 +276,6 @@ local function REGISTER_HEALERS_ONLY_SPELLS_ONCE ()
         [034861] = "PRIEST", -- Circle of Healing
         [064843] = "PRIEST", -- Divine Hymn
         [047788] = "PRIEST", -- Guardian Spirit
-        -- LEGION GONE        [000724] = "PRIEST", -- Lightwell
-        -- LEGION GONE        [088684] = "PRIEST", -- Holy Word: Serenity
-        -- LEGION GONE        [088685] = "PRIEST", -- Holy Word: Sanctuary
         [032546] = "PRIEST", -- Binding Heal
         [077485] = "PRIEST", -- Mastery: Echo of Light -- the passibe ability
         [077489] = "PRIEST", -- Echo of Light -- the aura applied by the afformentioned
@@ -295,6 +290,8 @@ local function REGISTER_HEALERS_ONLY_SPELLS_ONCE ()
         [033891] = "DRUID", -- Incarnation: Tree of Life
         [048438] = "DRUID", -- Wild Growth
         [000740] = "DRUID", -- Tranquility
+        [145108] = "DRUID", -- Ysera's Gift
+        [000774] = "DRUID", -- Rejuvination
 
         -- Shamans
         -- LEGION GONE        [000974] = "SHAMAN", -- Earth Shield
@@ -305,28 +302,22 @@ local function REGISTER_HEALERS_ONLY_SPELLS_ONCE ()
 
         -- Paladins
         [020473] = "PALADIN", -- Holy Shock
-        -- LEGION GONE        [082327] = "PALADIN", -- Holy radiance
         [053563] = "PALADIN", -- Beacon of Light
-        -- LEGION GONE        [002812] = "PALADIN", -- Denounce
         [082326] = "PALADIN", -- Holy Light
         [085222] = "PALADIN", -- Light of Dawn
-        -- LEGION GONE        [088821] = "PALADIN", -- Daybreak
 
         -- Monks
         [115175] = "MONK", -- Soothing Mist
-        -- LEGION GONE        [115294] = "MONK", -- Mana Tea
         [115310] = "MONK", -- Revival
         [116670] = "MONK", -- Uplift
         [116680] = "MONK", -- Thunder Focus Tea
         [116849] = "MONK", -- Life Cocoon
         [119611] = "MONK", -- Renewing mist
-        -- LEGION GONE        [132120] = "MONK", -- Envelopping Mist
 
         --@debug@
         -- test bad spell mitigation
         -- those are not healer specific
         [031842] = "PALADIN", -- Avenging Wrath
-        -- LEGION GONE        [085673] = "PALADIN", -- WOrd of Glory
         [019750] = "PALADIN", -- Flash of light
         [002061] = "PRIEST",  -- Flash Heal
         [005185] = "DRUID",   -- Healing Touch

@@ -444,7 +444,7 @@ function NPH:LNR_ERROR_FATAL_INCOMPATIBILITY(selfevent, incompatibility_type)
     if T._tocversion > HHTD.Constants.MaxTOC then
         self:Print("|cFFFF0000ERROR:|rHHTD is outdated and no longer compatible with this version of WoW, you need to update HHTD from Curse.com. The Nameplate Hooker module is now disabled.", 'Incompatibility type:', incompatibility_type);
     else
-        self:Print("|cFFFF0000ERROR:|rAn add-on is unduly modifying Blizzard's nameplates in a way preventing other add-ons from using them. HHTD is not compatible with such self-centred add-ons. The Nameplate Hooker module is now disabled.", 'Incompatibility type:', incompatibility_type);
+        self:Print("|cFFFF0000ERROR:|rNameplates tracking as become unreliable for some strange unknown reason. The Nameplate Hooker module is now disabled.", 'Incompatibility type:', incompatibility_type);
     end
 
     HHTD:FatalError("The Nameplate Hooker module had to be disabled due to an incompatibility.\nSee the chat window for more details.");
