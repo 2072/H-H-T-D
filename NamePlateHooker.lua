@@ -263,10 +263,12 @@ end
 function NPH:HHTD_HEALER_GONE(selfevent, isFriend, healer)
     self:Debug(INFO2, "NPH:HHTD_HEALER_GONE", healer.name, healer.guid, isFriend);
 
+    --[=[
     if not isFriend and not GetCVarBool("nameplateShowEnemies") or isFriend and not GetCVarBool("nameplateShowFriends") then
         self:Debug(INFO2, "NPH:HHTD_HEALER_GONE(): bad state, nameplates disabled",  healer.name, healer.guid, isFriend);
         return;
     end
+    --]=]
 
     
     local plateByGuid;
@@ -293,9 +295,11 @@ end
 
 function NPH:HHTD_HEALER_BORN (selfevent, isFriend, healer)
 
+    --[=[
     if not isFriend and not GetCVarBool("nameplateShowEnemies") or isFriend and not GetCVarBool("nameplateShowFriends") then
         return;
     end
+    --]=]
 
 
     local plateByGuid;
