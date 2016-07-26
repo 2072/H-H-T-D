@@ -264,7 +264,7 @@ local function REGISTER_HEALERS_ONLY_SPELLS_ONCE ()
         -- Priests
         --      Discipline
         [047540] = "PRIEST", -- Penance XXX strange error received from user on 2015-10-15 (this spell was cast by a hunter...)
-        [109964] = "PRIEST", -- Spirit shell
+        [109964] = "PRIEST", -- Spirit shell -- not seen in disc
         [002060] = "PRIEST", -- Greater Heal
         [014914] = "PRIEST", -- Holy Fire
         [033206] = "PRIEST", -- Pain Suppression
@@ -282,23 +282,23 @@ local function REGISTER_HEALERS_ONLY_SPELLS_ONCE ()
         [000139] = "PRIEST", -- Renew
 
         -- Druids
-        [018562] = "DRUID", -- Swiftmend
+        --[018562] = "DRUID", -- Swiftmend -- (also available through restoration afinity talent)
         [102342] = "DRUID", -- Ironbark
         [033763] = "DRUID", -- Lifebloom
         [088423] = "DRUID", -- Nature's Cure
-        [008936] = "DRUID", -- Regrowth
+        -- [008936] = "DRUID", -- Regrowth -- (also available through restoration afinity talent)
         [033891] = "DRUID", -- Incarnation: Tree of Life
         [048438] = "DRUID", -- Wild Growth
         [000740] = "DRUID", -- Tranquility
-        [145108] = "DRUID", -- Ysera's Gift
-        [000774] = "DRUID", -- Rejuvination
+        -- [145108] = "DRUID", -- Ysera's Gift -- (also available through restoration afinity talent)
+        -- [000774] = "DRUID", -- Rejuvination -- (also available through restoration afinity talent)
 
         -- Shamans
-        -- LEGION GONE        [000974] = "SHAMAN", -- Earth Shield
         [061295] = "SHAMAN", -- Riptide
-        [077472] = "SHAMAN", -- Greater Healing Wave
+        [077472] = "SHAMAN", -- Healing Wave
         [098008] = "SHAMAN", -- Spirit link totem
         [001064] = "SHAMAN", -- Chain Heal
+        [073920] = "SHAMAN", -- Healing Rain
 
         -- Paladins
         [020473] = "PALADIN", -- Holy Shock
@@ -309,7 +309,7 @@ local function REGISTER_HEALERS_ONLY_SPELLS_ONCE ()
         -- Monks
         [115175] = "MONK", -- Soothing Mist
         [115310] = "MONK", -- Revival
-        [116670] = "MONK", -- Uplift
+        [116670] = "MONK", -- Vivify
         [116680] = "MONK", -- Thunder Focus Tea
         [116849] = "MONK", -- Life Cocoon
         [119611] = "MONK", -- Renewing mist
