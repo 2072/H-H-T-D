@@ -457,7 +457,7 @@ function CM:LNR_ON_NEW_PLATE(selfevent, plate, data)
 
     -- Check if this name plate is of interest -- TODO
     if playerNamesToMark[plateName] then
-        self:AddMarkerToPlate(plate, plateName, data.guid);
+        self:AddMarkerToPlate(plate, plateName, data.GUID);
     end
 end
 
