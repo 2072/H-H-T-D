@@ -4,7 +4,7 @@ Healers Have To Die
 *Change log*
 ------------
 
-**version 2.4.1_beta_2 (2016-07-24):**
+**version 2.4.1 (2016-07-27):**
 
 - WoW 7 (Legion) compatible
 
