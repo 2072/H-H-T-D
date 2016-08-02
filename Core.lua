@@ -809,8 +809,8 @@ function HHTD:OnInitialize()
 
 end
 
-local PLAYER_FACTION = "";
-local PLAYER_GUID    = "";
+HHTD_C.PLAYER_FACTION = "";
+HHTD_C.PLAYER_GUID    = "";
 function HHTD:OnEnable()
 
     if T._DiagStatus == 2 then
@@ -831,8 +831,8 @@ function HHTD:OnEnable()
 
     self:SetModulesStates();
 
-    PLAYER_FACTION = UnitFactionGroup("player");
-    PLAYER_GUID    = UnitGUID("player");
+    HHTD_C.PLAYER_FACTION = UnitFactionGroup("player");
+    HHTD_C.PLAYER_GUID    = UnitGUID("player");
 
     self:ScheduleRepeatingTimer(self.Undertaker,           10, self);
     self:ScheduleRepeatingTimer(self.UpdateHealThresholds, 50, self);
@@ -842,8 +842,8 @@ end
 function HHTD:PLAYER_ALIVE()
     self:Debug(INFO, "PLAYER_ALIVE");
 
-    PLAYER_FACTION = UnitFactionGroup("player");
-    PLAYER_GUID    = UnitGUID("player");
+    HHTD_C.PLAYER_FACTION = UnitFactionGroup("player");
+    HHTD_C.PLAYER_GUID    = UnitGUID("player");
     HHTD:UpdateHealThresholds();
 
     self:UnregisterEvent("PLAYER_ALIVE");
@@ -1422,7 +1422,7 @@ do
             if (_amount and event:sub(-7) == "_DAMAGE") then
 
                 -- the healer is nearby
-                if PLAYER_GUID == destGUID or CheckInteractDistance(destName, 1) then
+                if HHTD_C.PLAYER_GUID == destGUID or CheckInteractDistance(destName, 1) then
 
                     -- first attack?
                     if not self.Friendly_Healers_Attacked_by_GUID[destGUID] then
@@ -1455,7 +1455,7 @@ do
 
                     -- last alert was more than 30s ago and threshold is reached
                     if prTime - lastAttack_amount_lastAlert[3] > 30 and lastAttack_amount_lastAlert[2] > self.ProtectDamageThreshold then
-                        self:SendMessage("HHTD_HEALER_UNDER_ATTACK", sourceName, sourceGUID, destName, destGUID, PLAYER_GUID == destGUID);
+                        self:SendMessage("HHTD_HEALER_UNDER_ATTACK", sourceName, sourceGUID, destName, destGUID, HHTD_C.PLAYER_GUID == destGUID);
 
                         lastAttack_amount_lastAlert[3] = GetTime();
                     end

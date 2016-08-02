@@ -4,6 +4,13 @@ Healers Have To Die
 *Change log*
 ------------
 
+**version 2.4.2_Beta_1 (2016-08-02):**
+
+- Do not add a healer symbol to the player's resource nameplate.
+
+- Attempt to fix a rare issue with nameplate tracking.
+
+
 **version 2.4.1 (2016-07-27):**
 
 - WoW 7 (Legion) compatible

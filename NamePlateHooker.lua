@@ -33,6 +33,7 @@ local INFO2     = 4;
 local ADDON_NAME, T = ...;
 local HHTD = T.Healers_Have_To_Die;
 local L = HHTD.Localized_Text;
+local HHTD_C = HHTD.Constants;
 
 
 if not LibStub:GetLibrary("LibNameplateRegistry-1.0", true) then
@@ -459,7 +460,7 @@ end
 function NPH:LNR_DEBUG(selfevent, level, nrMinor, ...)
     if not HHTD.db.global.Debug and level ~= ERROR then return end;
 
-    self:Debug(level, "|cff50D000LNR", nrMinor, '|r', ...);
+    self:Debug(level, "LNR", nrMinor, '.', ...);
 end
 
 function NPH:LNR_ERROR_GUID_ID_HAMPERED(selfevent, message)
@@ -636,6 +637,11 @@ do
         if isFriend==nil then
             isFriend = (self:GetPlateReaction(plate) == "FRIENDLY") and true or false;
             self:Debug(ERROR, "AddCrossToPlate(), isFriend was not defined", isFriend);
+        end
+
+        if guid == HHTD_C.PLAYER_GUID then
+            self:Debug(INFO2, "AddCrossToPlate(), it's the player, not showing the symbol!");
+            return false;
         end
 
         --@alpha@
