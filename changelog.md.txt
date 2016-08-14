@@ -4,11 +4,32 @@ Healers Have To Die
 *Change log*
 ------------
 
-**version 2.4.2_Beta_1 (2016-08-02):**
+**version 2.4.2 (2016-08-14):**
 
-- Do not add a healer symbol to the player's resource nameplate.
+- Do not add a healer mark to the player's resource nameplate.
 
-- Attempt to fix a rare issue with nameplate tracking.
+- Fix a rare issue with nameplate tracking (incompatibility error message).
+
+- Add a note in the changelog and main description on what to do when a false
+  positive is observed (see below).
+
+That player is not a healer?
+----------------------------
+
+**NOTE**: If you see a player marked as healer that should not be:
+
+1. If their mark's background is NOT grey, check the *'Logging'* option in the
+option panel (/HHTDG) ; then when you see such a player, reopen the option
+panel and check the content of the *'Logs'* tab and report to me
+(<archarodim+hhtd@teaser.fr> or [open a ticket][tickets], avoid comments on
+curse as it's impossible to follow what happens there).
+
+2. If their mark's background is grey then enable the *'Healer specialization
+detection'* option so as to only report specialized healers ignoring others.
+
+Also note that the healer's rank is displayed as a number in the center of the
+displayed mark so you can judge the importance of that player in the healing
+currently being done (the lower the number, the better the healer).
 
 
 **version 2.4.1 (2016-07-27):**
@@ -411,3 +432,4 @@ Until then, just use the command /HHTDG to access HHTD's option panel.
 [localization]: http://www.wowace.com/addons/healers-have-to-die/localization/
 [tidyplates]: http://www.curse.com/addons/wow/tidy-plates
 [LibNamePlateRegistry]: http://www.wowace.com/addons/libnameplateregistry-1-0/
+[tickets]: http://www.wowace.com/addons/healers-have-to-die/tickets/
