@@ -80,6 +80,7 @@ function NPH:OnInitialize() -- {{{
             marker_Scale = 0.8,
             marker_Xoffset = 0,
             marker_Yoffset = 0,
+            marker_VCa = 1,
         },
     })
 end -- }}}
@@ -144,66 +145,81 @@ function NPH:GetOptions () -- {{{
                     order = 15,
                 },
                 marker_Scale = {
-                        type = "range",
-                        name = L["OPT_NPH_MARKER_SCALE"],
-                        desc = L["OPT_NPH_MARKER_SCALE_DESC"],
-                        min = 0.45,
-                        max = 3,
-                        softMax = 2,
-                        step = 0.01,
-                        bigStep = 0.03,
-                        order = 20,
-                        isPercent = true,
+                    type = "range",
+                    name = L["OPT_NPH_MARKER_SCALE"],
+                    desc = L["OPT_NPH_MARKER_SCALE_DESC"],
+                    min = 0.45,
+                    max = 3,
+                    softMax = 2,
+                    step = 0.01,
+                    bigStep = 0.03,
+                    order = 20,
+                    isPercent = true,
 
-                        set = function (info, value)
-                            HHTD:SetHandler(self, info, value);
-                            NPH:UpdateTextures();
-                        end,
-                    },
-                    marker_Xoffset = {
-                        type = "range",
-                        name = L["OPT_NPH_MARKER_X_OFFSET"],
-                        desc = L["OPT_NPH_MARKER_X_OFFSET_DESC"],
-                        min = -100,
-                        max = 100,
-                        softMin = -60,
-                        softMax = 60,
-                        step = 0.01,
-                        bigStep = 1,
-                        order = 30,
+                    set = function (info, value)
+                        HHTD:SetHandler(self, info, value);
+                        self:UpdateTextures();
+                    end,
+                },
+                marker_Xoffset = {
+                    type = "range",
+                    name = L["OPT_NPH_MARKER_X_OFFSET"],
+                    desc = L["OPT_NPH_MARKER_X_OFFSET_DESC"],
+                    min = -100,
+                    max = 100,
+                    softMin = -60,
+                    softMax = 60,
+                    step = 0.01,
+                    bigStep = 1,
+                    order = 30,
 
-                        set = function (info, value)
-                            HHTD:SetHandler(self, info, value);
-                            NPH:UpdateTextures();
-                        end,
-                    },
-                    marker_Yoffset = {
-                        type = "range",
-                        name = L["OPT_NPH_MARKER_Y_OFFSET"],
-                        desc = L["OPT_NPH_MARKER_Y_OFFSET_DESC"],
-                        min = -100,
-                        max = 100,
-                        softMin = -60,
-                        softMax = 60,
-                        step = 0.01,
-                        bigStep = 1,
-                        order = 30,
+                    set = function (info, value)
+                        HHTD:SetHandler(self, info, value);
+                        self:UpdateTextures();
+                    end,
+                },
+                marker_Yoffset = {
+                    type = "range",
+                    name = L["OPT_NPH_MARKER_Y_OFFSET"],
+                    desc = L["OPT_NPH_MARKER_Y_OFFSET_DESC"],
+                    min = -100,
+                    max = 100,
+                    softMin = -60,
+                    softMax = 60,
+                    step = 0.01,
+                    bigStep = 1,
+                    order = 30,
 
-                        set = function (info, value)
-                            HHTD:SetHandler(self, info, value);
-                            NPH:UpdateTextures();
-                        end,
-                    },
-                    swapSymbols = {
-                        type = 'toggle',
-                        name = L["OPT_SWAPSYMBOLS"],
-                        desc = L["OPT_SWAPSYMBOLS_DESC"],
-                        order = 35,
-                        set = function (info, value)
-                            HHTD:SetHandler(self, info, value);
-                            NPH:UpdateTextures();
-                        end,
-                    },
+                    set = function (info, value)
+                        HHTD:SetHandler(self, info, value);
+                        self:UpdateTextures();
+                    end,
+                },
+                marker_VCa = {
+                    type = "range",
+                    name = L["OPT_CM_VCa"],
+                    desc = L["OPT_CM_VCa_DESC"],
+                    min = 0,
+                    max = 1,
+                    step = 0.01,
+                    order = 33,
+
+                    set = function (info, value)
+                        HHTD:SetHandler(self, info, value);
+                        self:UpdateTextures();
+                    end,
+                },
+                swapSymbols = {
+                    type = 'toggle',
+                    name = L["OPT_SWAPSYMBOLS"],
+                    desc = L["OPT_SWAPSYMBOLS_DESC"],
+                    width = 'double',
+                    order = 35,
+                    set = function (info, value)
+                        HHTD:SetHandler(self, info, value);
+                        NPH:UpdateTextures();
+                    end,
+                },
             },
         },
     };
@@ -524,6 +540,7 @@ do
 
         t:SetSize(64 * profile.marker_Scale, 64 * profile.marker_Scale);
         t:SetPoint("BOTTOM", Plate, "TOP", profile.marker_Xoffset, profile.marker_Yoffset);
+        t:SetAlpha(profile.marker_VCa);
     end
 
     local function getIconCoords (x, y)
