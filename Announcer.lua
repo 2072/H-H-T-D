@@ -59,6 +59,8 @@ function Announcer:OnInitialize() -- {{{
             ProtectMessage = false,
             KillMessage = false,
             AnnounceChannel = 'AUTO',
+            HUDWarning = true,
+            ChatWarning = false,
         },
     });
 
@@ -118,6 +120,35 @@ function Announcer:GetOptions () -- {{{
                         Announcer.db.global.PostToChat = v;
                     end,
                     order = 30,
+                },
+                Header100 = {
+                    type = 'header',
+                    name = L["OPT_A_HEALER_PROTECTION"],
+                    order = 35,
+                },
+                HealerUnderAttackAlerts = {
+                    type = 'toggle',
+                    name = L["OPT_HEALER_UNDER_ATTACK_ALERTS"],
+                    desc = function() HHTD:UpdateHealThresholds(); return (L["OPT_HEALER_UNDER_ATTACK_ALERTS_DESC"]):format(HHTD.ProtectDamageThreshold) end,
+                    order = 35.1,
+                    set = function (info, value)
+                        HHTD:SetHandler(HHTD, info, value);
+                    end,
+                    get = function () return HHTD.db.global.HealerUnderAttackAlerts; end,
+                },
+                HUDWarning = {
+                    type = 'toggle',
+                    name = L["OPT_A_HUD_WARNING"],
+                    desc = L["OPT_A_HUD_WARNING_DESC"],
+                    disabled = function() return not HHTD.db.global.HealerUnderAttackAlerts; end,
+                    order = 35.2,
+                },
+                ChatWarning = {
+                    type = 'toggle',
+                    name = L["OPT_A_CHAT_WARNING"],
+                    desc = L["OPT_A_CHAT_WARNING_DESC"],
+                    disabled = function() return not HHTD.db.global.HealerUnderAttackAlerts; end,
+                    order = 35.3,
                 },
                 PostToChatOptions = {
                     type = 'group',
@@ -278,6 +309,8 @@ end
 
 function Announcer:HHTD_HEALER_UNDER_ATTACK (selfevent, sourceName, sourceGUID, destName, destGUID, isCurrentPlayer)
 
+    local config = self.db.global;
+
         -- TODO: add an option to change the frequency of the alerts
         -- TODO: add an option to display alert only if the source is human
     if isCurrentPlayer then
@@ -288,9 +321,13 @@ function Announcer:HHTD_HEALER_UNDER_ATTACK (selfevent, sourceName, sourceGUID, 
 
     local message = HHTD:ColorText("HHTD: ", '88555555') .. (L["HEALER_UNDER_ATTACK"]):format(HHTD:ColorText(HHTD:MakePlayerName(destName), 'FF00DD00'), HHTD:ColorText(HHTD:MakePlayerName(sourceName), 'FFDD0000'));
 
-    RaidNotice_AddMessage( RaidWarningFrame, message, ChatTypeInfo["RAID_WARNING"] );
+    if config.HUDWarning then
+        RaidNotice_AddMessage( RaidWarningFrame, message, ChatTypeInfo["RAID_WARNING"] );
+    end
 
-    self:Print(message);
+    if config.ChatWarning then
+        self:Print(message);
+    end
 end
 
 -- }}}
@@ -303,6 +340,8 @@ function Announcer:Announce(...) -- {{{
 end -- }}}
 
 do
+
+    local table = _G.table;
 
     local function isRaidWarningAuthorized ()
         return IsInRaid() and (select(2, GetRaidRosterInfo(UnitInRaid("player") or 1))) > 0
