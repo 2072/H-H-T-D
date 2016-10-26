@@ -111,11 +111,38 @@ function NPH:GetOptions () -- {{{
                     disabled = function() return not HHTD.db.global.Pve or not HHTD:IsEnabled(); end,
                     order = 10,
                 },
+                Header50 = {
+                    type = 'header',
+                    name = L["OPT_NPH_MARKER_WOW_SETTINGS"],
+                    order = 13,
+                },
+                enemyNameplates = {
+                    type = 'toggle',
+                    name = L["OPT_NPH_ENEMY_NAMEPLATE"],
+                    order = 13.1,
+                    set = function (info, value)
+                        SetCVar("nameplateShowEnemies", value and 1 or 0);
+                    end,
+                    get = function()
+                        return GetCVarBool("nameplateShowEnemies");
+                    end,
+                },
+                friendyNameplates = {
+                    type = 'toggle',
+                    name = L["OPT_NPH_FRIENDLY_NAMEPLATE"],
+                    order = 13.2,
+                    set = function (info, value)
+                        SetCVar("nameplateShowFriends", value and 1 or 0);
+                    end,
+                    get = function()
+                        return GetCVarBool("nameplateShowFriends");
+                    end,
+                },
                 Header100 = {
-                        type = 'header',
-                        name = L["OPT_NPH_MARKER_SETTINGS"],
-                        order = 15,
-                    },
+                    type = 'header',
+                    name = L["OPT_NPH_MARKER_SETTINGS"],
+                    order = 15,
+                },
                 marker_Scale = {
                         type = "range",
                         name = L["OPT_NPH_MARKER_SCALE"],
