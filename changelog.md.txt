@@ -4,6 +4,21 @@ Healers Have To Die
 *Change log*
 ------------
 
+**version 2.4.3 (2016-10-27):**
+
+- Add an option in Custom Marker's panel to show nameplates on friendly NPCs
+  (defaults to off since WoW 7.1).
+
+- Add options to show friendly/enemy nameplates in Nameplate Hooker's panel.
+
+- Add options to Announcer's panel to choose where attack alert messages are
+  displayed (HUD and/or chat). The display to chat option is now off by default.
+
+- Add an option to set the alpha of healers' markers in Nameplate Hooker's panel.
+
+- Localization updates.
+
+
 **version 2.4.2 (2016-08-14):**
 
 - Do not add a healer mark to the player's resource nameplate.
