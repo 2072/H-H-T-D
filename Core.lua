@@ -1356,15 +1356,25 @@ do
     function HHTD:COMBAT_LOG_EVENT_UNFILTERED(e, timestamp, event, hideCaster, sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags, _spellID, spellNAME, _spellSCHOOL, _amount)
  
         --@debug@
-        if hideCaster then
-            --self:Debug(INFO, e, timestamp, event, hideCaster, sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags, _spellID, spellNAME, _spellSCHOOL, _amount);
-        end
+        --if hideCaster then
+        --    self:Debug(ERROR, e, timestamp, event, hideCaster, sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags, _spellID, spellNAME, _spellSCHOOL, _amount);
+        --end
         --@end-debug@
 
 
         -- escape if no source {{{
         -- untraceable events are useless
-        if not sourceGUID or hideCaster then return end
+        if not sourceGUID or hideCaster then
+
+            if event == "UNIT_DIED" and self.Friendly_Healers_Attacked_by_GUID[destGUID] then
+                self.Friendly_Healers_Attacked_by_GUID[destGUID] = nil;
+        --@debug@
+            self:Debug(ERROR, e, timestamp, event, hideCaster, sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags, _spellID, spellNAME, _spellSCHOOL, _amount);
+        --@end-debug@
+            end
+
+            return
+        end
         -- }}}
 
         -- Escape if bad target (not human nor npc) {{{
@@ -1387,7 +1397,7 @@ do
         Source_Is_Friendly = false;
 
         if band(sourceFlags, HOSTILE_OUTSIDER_NPC) == HOSTILE_OUTSIDER_NPC then
-            -- leave here if we don't care about pve healers | caveats: if a friendly healear is attacked by an NPC we won't know about it
+            -- leave here if we don't care about pve healers | caveat: if a friendly healear is attacked by an NPC we won't know about it
             if not configRef.Pve then
                 return;
             end
@@ -1398,7 +1408,7 @@ do
             Source_Is_Human = true;
             Source_Is_Friendly = true;
         elseif band (sourceFlags, FRIENDLY_NPC) == FRIENDLY_NPC then
-            -- leave here if we don't care about pve healers | caveats: none I can think of
+            -- leave here if we don't care about pve healers | caveat: none I can think of
             if not configRef.Pve then
                 return;
             end
@@ -1542,7 +1552,7 @@ do
      --@end-debug@
 
      -- clean attacked healers {{{
-     -- should also be cleaned when such healer dies or leave combat XXX -- no event for those...
+     -- should also be cleaned when such healer leaves combat -- no event for those...
      for guid, lastAttack_amount_lastAlert in pairs(self.Friendly_Healers_Attacked_by_GUID) do
          -- if more than 30s elapsed since the last attack or if it's no longer a registered healer
          if Time - lastAttack_amount_lastAlert[1] > 30 or not Registry_by_GUID[true][guid] then
