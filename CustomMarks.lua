@@ -252,6 +252,25 @@ do
                         end,
                         order = 13,
                     },
+                    -- nameplateShowFriendlyNPCs
+                    Header150 = {
+                        type = 'header',
+                        name = L["OPT_NPH_MARKER_HIDDEN_WOW_SETTINGS"],
+                        order = 14,
+                    },
+                    FNPC_Nameplate = {
+                        type = 'toggle',
+                        name = L["OPT_CM_FNPC_NAMEPLATE"],
+                        desc = L["OPT_CM_FNPC_NAMEPLATE_DESC"],
+                        width = 'double',
+                        order = 14.1,
+                        set = function (info, value)
+                            SetCVar("nameplateShowFriendlyNPCs", value and 1 or 0);
+                        end,
+                        get = function()
+                            return GetCVarBool("nameplateShowFriendlyNPCs");
+                        end,
+                    },
                     Header200 = {
                         type = 'header',
                         name = L["OPT_NPH_MARKER_SETTINGS"],
