@@ -64,8 +64,8 @@ do
         L["IS_A_HEALER"] = "%s is a healer!"
         L["NO_DATA"] = "No data"
         L["NPC"] = "NPC"
-        L["NPH"] = "Name Plate Hooker"
-        L["NPH_DESC"] = "This module adds a red cross to enemy healers' name plates"
+        L["NPH"] = "Nameplate Hooker"
+        L["NPH_DESC"] = "This module adds a red cross to enemy healers' nameplates"
         L["OPT_ANNOUNCE"] = "Show messages"
         L["OPT_ANNOUNCE_DESC"] = "HHTD will display messages when you target or mouse-over an enemy healer."
         L["OPT_CLEAR_LOGS"] = "Clear logs"
@@ -91,10 +91,10 @@ do
         L["OPT_LOGS_DESC"] = "Display HHTD detected healers and statistics"
         L["OPT_LOG_DESC"] = "Enables logging and adds a new 'Logs' tab to HHTD's option panel"
         L["OPT_MODULES"] = "Modules"
-        L["OPT_NPH_WARNING1"] = [=[WARNING: *Enemies*' name-plates are currently disabled. HHTD cannot add its symbol on enemies.
-        You can enable name-plates display through the WoW UI's options or by using the assigned key-stroke.]=]
-        L["OPT_NPH_WARNING2"] = [=[WARNING: *Allies*' name-plates are currently disabled. HHTD cannot add its symbol on allies.
-        You can enable name-plates display through the WoW UI's options or by using the assigned key-stroke.]=]
+        L["OPT_NPH_WARNING1"] = [=[WARNING: *Enemies*' nameplates are currently disabled. HHTD cannot add its symbol on enemies.
+        You can enable nameplates display through the WoW UI's options or by using the assigned key-stroke.]=]
+        L["OPT_NPH_WARNING2"] = [=[WARNING: *Allies*' nameplates are currently disabled. HHTD cannot add its symbol on allies.
+        You can enable nameplates display through the WoW UI's options or by using the assigned key-stroke.]=]
         L["OPT_OFF"] = "off"
         L["OPT_OFF_DESC"] = "Disables HHTD"
         L["OPT_ON"] = "on"
@@ -161,6 +161,21 @@ do
         L["LOG_BELOW_THRESHOLD"] = " (below threshold)"
         L["LOG_ACTIVE"] = "Active!"
         L["LOG_IDLE"] = "Idle"
+
+
+        L["OPT_NPH_MARKER_HIDDEN_WOW_SETTINGS"] = "Hidden WoW settings"
+        L["OPT_NPH_MARKER_WOW_SETTINGS"] = "WoW settings"
+        L["OPT_CM_FNPC_NAMEPLATE"] = "Friendly NPC nameplates"
+        L["OPT_CM_FNPC_NAMEPLATE_DESC"] = "Show nameplates on friendly NPCs\nThis is necessary for markers to be shown on these units."
+
+        L["OPT_NPH_ENEMY_NAMEPLATE"] = "Enemy nameplates"
+        L["OPT_NPH_FRIENDLY_NAMEPLATE"] = "Friendly nameplates"
+
+        L["OPT_A_HEALER_PROTECTION"] = "Healer protection settings"
+        L["OPT_A_HUD_WARNING"] = "HUD Warning"
+        L["OPT_A_HUD_WARNING_DESC"] = "Display a heads-up warning when a friendly healer is under attack"
+        L["OPT_A_CHAT_WARNING"] = "Chat Warning"
+        L["OPT_A_CHAT_WARNING_DESC"] = "Display a chat warning when a friendly healer is under attack"
 
 
         L["OPT_NPH_MARKER_SETTINGS"]         = "Markers' settings"
