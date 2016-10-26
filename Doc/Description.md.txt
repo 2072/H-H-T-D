@@ -80,17 +80,17 @@ Needless to say that self-heals and heals to pets are filtered out.
 Commands
 --------
 
-- /HHTDP (or /hhtdp): Post healers name to the raid channel ordered by
+- /HHTDP (or /hhtdp) posts healers name to the raid channel ordered by
   effectiveness for all to see (Will use the Raid Warning channel if possible).
   
   **You need to configure the messages in the announce module options first.**
 
-**You can bind this command to a key (WoW key-bindings interface)**
+**You can bind the above command to a key (WoW key-bindings interface)**
 
-- /HHTDG: Open option panel
+- /HHTDG opens option panel
 
-- /HHTD: access to command line configuration interface (for changing settings
-  through macros...)
+- /HHTD gives you access to the command line configuration interface (useful
+  for changing settings through macros...)
 
 
 Planned features
