@@ -1,21 +1,18 @@
 --[=[
-HealersHaveToDie World of Warcraft Add-on
-Copyright (c) 2009-2015 by John Wellesz (Archarodim@teaser.fr)
+H.H.T.D. World of Warcraft Add-on
+Copyright (c) 2009-2017 by John Wellesz (Archarodim@teaser.fr)
 All rights reserved
 
 Version @project-version@
 
-This is a very simple and light add-on that rings when you hover or target a
-unit of the opposite faction who healed someone during the last 60 seconds (can
-be configured).
-Now you can spot those nasty healers instantly and help them to accomplish their destiny!
+In World of Warcraft healers have to die. This is a cruel truth that you're
+taught very early in the game. This add-on helps you influence this unfortunate
+destiny in a way or another depending on the healer's side...
 
-This add-on uses the Ace3 framework.
-
-type /hhtd to get a list of existing options.
+More information: https://www.wowace.com/projects/h-h-t-d
 
 -----
-    NamePlateHooker.lua
+    CustomMarks.lua
 -----
 
 This component hooks the name plates above characters and allow users to set custom marks only they can see.
@@ -30,7 +27,7 @@ local INFO2     = 4;
 
 
 local ADDON_NAME, T = ...;
-local HHTD = T.Healers_Have_To_Die;
+local HHTD = T.HHTD;
 local L = HHTD.Localized_Text;
 
 

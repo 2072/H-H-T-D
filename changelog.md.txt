@@ -1,8 +1,29 @@
-Healers Have To Die
-===================
+H.H.T.D.
+========
 
 *Change log*
 ------------
+
+**version 2.4.4 (2017-01-15):**
+
+- "Healers Have To Die" is now known as H.H.T.D.
+
+I originally chose that name as a provocation to make one of the basic cruel
+truths of World of Warcraft perfectly obvious to everyone. Now I find the
+original name too harsh, too long and mostly not specific enough to WoW.
+
+As an author I could not stand that name anymore. This add-on does have an
+existence (and meaning) both in WoW and in the real world where obviously we
+don't want the death of our beloved healers...
+
+While H.H.T.D. is just an acronym of the original name, it will stay in World
+of Warcraft where it belongs.
+
+
+For technical reasons the add-on is still packaged using the original name.
+This might change in the future if I find a way to make a clean transition.
+
+
 
 **version 2.4.3 (2016-10-27):**
 
@@ -239,7 +260,7 @@ Leave a comment there if you see inconsistencies.
 - Fix a problem which could lead into healer symbols not being hidden.
 
 - Special thanks to Cegthlhekz who helped a lot by testing the numerous alpha
-  versions leading to this release of Healers Have To Die.
+  versions leading to this release of HHTD.
 
 
 **version 2.1.0 (2013-03-06):**
@@ -425,7 +446,7 @@ Until then, just use the command /HHTDG to access HHTD's option panel.
  - Massive code cleanup and re-organization, now using modules for the different add-on parts.
  - Added support for AddonLoader.
 
- - Localization is needed, if you want to contribute: [http://www.wowace.com/addons/healers-have-to-die/localization/][localization]
+ - Localization is needed, if you want to contribute: [http://www.wowace.com/addons/h-h-t-d/localization/][localization]
 
 **version 1.5.1 (2010-10-26):**
 
@@ -443,8 +464,8 @@ Until then, just use the command /HHTDG to access HHTD's option panel.
 
 
 
-[spelllist]: http://www.wowace.com/addons/healers-have-to-die/pages/specialized-healers-spells/
-[localization]: http://www.wowace.com/addons/healers-have-to-die/localization/
+[spelllist]: http://www.wowace.com/addons/h-h-t-d/pages/specialized-healers-spells/
+[localization]: http://www.wowace.com/addons/h-h-t-d/localization/
 [tidyplates]: http://www.curse.com/addons/wow/tidy-plates
 [LibNamePlateRegistry]: http://www.wowace.com/addons/libnameplateregistry-1-0/
-[tickets]: http://www.wowace.com/addons/healers-have-to-die/tickets/
+[tickets]: http://www.wowace.com/addons/h-h-t-d/tickets/

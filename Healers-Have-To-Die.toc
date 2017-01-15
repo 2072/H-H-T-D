@@ -2,7 +2,7 @@
 ## X-Max-Interface: 70100
 ## X-Min-Interface: 70000
 
-## Title: Healers Have To Die
+## Title: H.H.T.D.
 
 ## Notes: @localization(locale="enUS", key="DESCRIPTION")@
 ## Notes-frFR: @localization(locale="frFR", key="DESCRIPTION")@

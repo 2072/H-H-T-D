@@ -1,4 +1,6 @@
 # vim:syntax=YAML:expandtab
+package-as: Healers-Have-To-Die
+
 externals:
     
     Libs/LibStub: svn://svn.wowace.com/wow/libstub/mainline/trunk

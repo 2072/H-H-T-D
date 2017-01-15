@@ -1,18 +1,15 @@
 --[=[
-HealersHaveToDie World of Warcraft Add-on
-Copyright (c) 2009-2016 by John Wellesz (Archarodim@teaser.fr)
+H.H.T.D. World of Warcraft Add-on
+Copyright (c) 2009-2017 by John Wellesz (Archarodim@teaser.fr)
 All rights reserved
 
 Version @project-version@
 
-This is a very simple and light add-on that rings when you hover or target a
-unit of the opposite faction who healed someone during the last 60 seconds (can
-be configured).
-Now you can spot those nasty healers instantly and help them to accomplish their destiny!
+In World of Warcraft healers have to die. This is a cruel truth that you're
+taught very early in the game. This add-on helps you influence this unfortunate
+destiny in a way or another depending on the healer's side...
 
-This add-on uses the Ace3 framework.
-
-type /hhtd to get a list of existing options.
+More information: https://www.wowace.com/projects/h-h-t-d
 
 -----
     Core.lua
@@ -74,14 +71,14 @@ local _, _, _, tocversion = GetBuildInfo();
 T._tocversion = tocversion;
 
 -- === Add-on basics and variable declarations {{{
-T.Healers_Have_To_Die = LibStub("AceAddon-3.0"):NewAddon("Healers Have To Die", "AceConsole-3.0", "AceEvent-3.0", "AceTimer-3.0");
-local HHTD = T.Healers_Have_To_Die;
+T.HHTD = LibStub("AceAddon-3.0"):NewAddon("H.H.T.D.", "AceConsole-3.0", "AceEvent-3.0", "AceTimer-3.0");
+local HHTD = T.HHTD;
 
 --@debug@
 _HHTD_DEBUG = HHTD;
 --@end-debug@
 
-HHTD.Localized_Text = LibStub("AceLocale-3.0"):GetLocale("HealersHaveToDie", true);
+HHTD.Localized_Text = LibStub("AceLocale-3.0"):GetLocale("H.H.T.D.", true);
 
 local L = HHTD.Localized_Text;
 
@@ -132,7 +129,7 @@ end
 --HHTD_C.WOD = (tocversion >= 60000);
 
 -- The header for HHTD key bindings
-BINDING_HEADER_HHTD = "Healers Have To Die";
+BINDING_HEADER_HHTD = "H.H.T.D.";
 BINDING_NAME_HHTDP = L["OPT_POST_ANNOUNCE_ENABLE"];
 
 
@@ -450,7 +447,7 @@ do
         set = function (info, value) HHTD:SetHandler(HHTD, info, value) end,
         disabled = function () return not HHTD:IsEnabled(); end,
         childGroups = 'tab',
-        name = "Healers Have To Die",
+        name = "H.H.T.D.",
         args = {
             Description = {
                 type = 'description',
@@ -797,7 +794,7 @@ function HHTD:OnInitialize()
 
     self.db = LibStub("AceDB-3.0"):New("Healers_Have_To_Die", DEFAULT__CONFIGURATION);
 
-    LibStub("AceConfig-3.0"):RegisterOptionsTable(tostring(self), self.GetOptions, {"HealersHaveToDie", "hhtd"});
+    LibStub("AceConfig-3.0"):RegisterOptionsTable(tostring(self), self.GetOptions, {"hhtd", "H.H.T.D."});
     --LibStub("AceConfigDialog-3.0"):AddToBlizOptions(tostring(self));
     
     self:RegisterChatCommand('hhtdg', function() LibStub("AceConfigDialog-3.0"):Open(tostring(self)) end, true);
@@ -827,7 +824,7 @@ function HHTD:OnEnable()
     self:RegisterEvent("PLAYER_ALIVE"); -- talents SHOULD be available
     -- self:RegisterEvent("PARTY_MEMBER_DISABLE"); -- useless event, no argument...
     
-    self:Print(L["ENABLED"]);
+    self:Print(L["ENABLED"]); -- TODO: add an option for this
 
     self:SetModulesStates();
 
