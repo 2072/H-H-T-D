@@ -45,7 +45,7 @@ T._FatalError = function (TheError)
 
     if not StaticPopupDialogs["HHTD_ERROR_FRAME"] then
         StaticPopupDialogs["HHTD_ERROR_FRAME"] = {
-            text = "|cFFFF0000HHTD Fatal Error:|r\n%s",
+            text = "|cFFFF0000HHTD Fatal Error:|r\n\n%s",
             button1 = "OK",
             OnAccept = function()
                 T._FatalError_Diaplayed = false;
@@ -64,6 +64,30 @@ T._FatalError = function (TheError)
         if T._DiagStatus then
             T._FatalError_Diaplayed = true;
         end
+    end
+end
+
+T._MessageBox = function (message)
+
+    if not StaticPopupDialogs["HHTD_MESSAGE_FRAME"] then
+        StaticPopupDialogs["HHTD_MESSAGE_FRAME"] = {
+            text = "|cFFFF1020H.H.T.D. Message|r\n\n%s",
+            button1 = "OK",
+            OnAccept = function()
+                T._MessageBox_Diaplayed = false;
+                return false;
+            end,
+            timeout = 0,
+            whileDead = 1,
+            hideOnEscape = 0,
+            showAlert = true,
+            preferredIndex = 3,
+        };
+    end
+
+    if not T._MessageBox_Diaplayed then
+        StaticPopup_Show ("HHTD_MESSAGE_FRAME", message);
+
     end
 end
 
@@ -95,7 +119,7 @@ HHTD_C.Healing_Classes = { -- unused
 };
 --]=]
 
-HHTD_C.MaxTOC = tonumber(GetAddOnMetadata("Healers-Have-To-Die", "X-Max-Interface") or math.huge);
+HHTD_C.MaxTOC = tonumber(GetAddOnMetadata("HHTD", "X-Max-Interface") or math.huge);
 
 -- Build translation table for classes spec to role
 -- needed because WoW API (GetBattlefieldScore) returns a localized specName
@@ -763,7 +787,7 @@ local DEFAULT__CONFIGURATION = {
         },
         HFT = 60,
         Enabled = true,
-        Debug = false,
+        Debug = true,
         DebugLevel = 1,
         --@alpha@
         Debug = true,
@@ -782,28 +806,138 @@ local DEFAULT__CONFIGURATION = {
 -- }}}
 
 -- = Add-on Management functions {{{
-function HHTD:OnInitialize()
--- Catch people updating add-ons while WoW is running before they post "it doesn't work!!!!" comments.
-    local versionInTOC = GetAddOnMetadata("Healers-Have-To-Die", "Version");
+do
+    local oldName = "Healers-Have-To-Die"
+    local oldAce3Name = "Healers Have To Die"
+    local oldSV   = "Healers_Have_To_Die"
 
-    if versionInTOC and versionInTOC ~= VERSION and versionInTOC ~= UNPACKAGED and VERSION ~= UNPACKAGED then
-        T._DiagStatus = 2;
-        T._Diagmessage = "You have updated Healers-Have-To-Die while WoW was still running in the background.\n\nYou need to restart WoW completely or you might experience various issues with your add-ons until you do.";
-        T._FatalError(T._Diagmessage);
+    local function transmuteSettings() 
+
+        -- I've chosen to rename this add-on, let's handle this decision properly
+        -- so that it'll be transparent to the users.
+
+        local function disableOldName()
+            local old = LibStub("AceAddon-3.0"):GetAddon(oldAce3Name, true);
+
+            if old then
+                old:Disable();
+                -- disable oldName only on the current character
+                DisableAddOn(oldName);
+                HHTD:Debug(WARNING, "the old " .. oldName .. " has been disabled for this character");
+            end
+        end
+
+        --
+        -- 1 - check if the old name is loaded and running
+        -- 2 - import its settings
+        -- 3 - disable it
+        if type(_G[oldSV]) == 'table' then
+
+            -- have we already transferred the settings?
+            if not HHTD_SavedVariables or not HHTD_SavedVariables.global or not HHTD_SavedVariables.global.settingsMigrated
+                or not _G[oldSV].global or not _G[oldSV].global.settingsTransmuted then
+                HHTD:Debug(WARNING, "Getting settings from " .. oldName .. "...");
+
+                if not HHTD_SavedVariables then
+                    HHTD_SavedVariables = {};
+                end
+
+                if not _G[oldSV].global then
+                    _G[oldSV].global = {};
+                end
+
+                HHTD:tcopy(HHTD_SavedVariables, _G[oldSV]);
+
+                HHTD_SavedVariables.global.settingsMigrated = true;
+                HHTD_SavedVariables.global.Enabled = true;
+    
+                HHTD:tcopy(_G[oldSV].global, {["settingsTransmuted"] = "settings switched to new H.H.T.D add-on", ["Enabled"] = false})
+
+                HHTD:Debug(WARNING, "done. Now disabling " .. oldName .. "...");
+                disableOldName();
+            elseif _G[oldSV].global and _G[oldSV].global.settingsTransmuted then
+                HHTD:Debug(WARNING, "Settings already tranferred from " .. oldName);
+                disableOldName();
+            end
+
+            return true;
+
+        else
+            return false;
+        end
+
     end
 
-    self.db = LibStub("AceDB-3.0"):New("Healers_Have_To_Die", DEFAULT__CONFIGURATION);
 
-    LibStub("AceConfig-3.0"):RegisterOptionsTable(tostring(self), self.GetOptions, {"hhtd", "H.H.T.D."});
-    --LibStub("AceConfigDialog-3.0"):AddToBlizOptions(tostring(self));
-    
-    self:RegisterChatCommand('hhtdg', function() LibStub("AceConfigDialog-3.0"):Open(tostring(self)) end, true);
+    function HHTD:OnInitialize()
+        -- Catch people updating add-ons while WoW is running before they post "it doesn't work!!!!" comments.
+        local versionInTOC = GetAddOnMetadata("HHTD", "Version");
+        if versionInTOC and versionInTOC ~= VERSION and versionInTOC ~= UNPACKAGED and VERSION ~= UNPACKAGED then
+            T._DiagStatus = 2;
+            T._Diagmessage = "You have updated H.H.T.D while WoW was still running in the background.\n\nYou need to restart WoW completely or you might experience various issues with your add-ons until you do.";
+            T._FatalError(T._Diagmessage);
+        end
 
 
-    self:CreateClassColorTables();
+        local oldNameGState = select(5, GetAddOnInfo(oldName));
+        local oldNameLState = GetAddOnEnableState(UnitName("player"), oldName);
+        local TSsuccess, TSstatus = pcall(transmuteSettings);
 
-    self:SetEnabledState(self.db.global.Enabled);
+        if not TSsuccess then
+            T._DiagStatus = 2;
+            T._Diagmessage = "Settings transfer from '" .. oldName .. "' to '" .. ADDON_NAME .. "' failed. " .. ADDON_NAME ..
+            " will stay disabled. Error was: " .. TSstatus .. "\n\n" .. debugstack(2,1,1);
 
+            T._FatalError(T._Diagmessage);
+            return false;
+        elseif TSstatus then
+            self:Debug(WARNING, "Previous settings were successfully transferred.");
+
+        end
+
+        self.db = LibStub("AceDB-3.0"):New("HHTD_SavedVariables", DEFAULT__CONFIGURATION);
+
+        if TSstatus and not self.db.char.settingsMigrated then
+            T._MessageBox((L["HHTD_IS_NOW_KNOWN_AS_H.H.T.D."]):format(oldName, oldName));
+            self.db.char.settingsMigrated = true;
+        end
+
+        LibStub("AceConfig-3.0"):RegisterOptionsTable(tostring(self), self.GetOptions, {"hhtd", "H.H.T.D."});
+        --LibStub("AceConfigDialog-3.0"):AddToBlizOptions(tostring(self));
+        self:RegisterChatCommand('hhtdg', function() LibStub("AceConfigDialog-3.0"):Open(tostring(self)) end, true);
+        self:CreateClassColorTables();
+
+        -- if the user previously disabled the oldName then we don't want to intrude
+        if oldNameGState == "DISABLED" and not self.db.global.settingsMigrated then
+            self:Debug(WARNING, oldName .. " was already disabled for all characters, quitting.");
+            self:SetEnabledState(false);
+            DisableAddOn(ADDON_NAME, true); -- disable globaly as the oldName was
+            self:Debug(WARNING, "globally disabled");
+        elseif oldNameGState == "DEMAND_LOADED" and oldNameLState == 0 and not self.db.char.settingsMigrated then
+            -- The oldName was already disabled for this specific character
+            self:SetEnabledState(false);
+            self:Debug(WARNING, "disabled for this character as", oldName, "was already disabled for", (UnitName("player")));
+            DisableAddOn(ADDON_NAME);
+        else
+            self:SetEnabledState(self.db.global.Enabled);
+
+            -- if we manage to run once on this character make sure that any action on the
+            -- oldName will not trigger the above code
+            self.db.char.settingsMigrated = true;
+        end
+    end
+
+    function HHTD:ADDON_LOADED(selfEvent, addOnName)
+        if addOnName == oldName then
+            self:Debug(WARNING, oldName .. " was post-loaded... reinitializing!");
+            T._DiagStatus = 1;
+            self:Disable();
+            T._DiagStatus = nil;
+            self.db = nil;
+            self:OnInitialize();
+            self:Enable();
+        end
+    end
 end
 
 HHTD_C.PLAYER_FACTION = "";
@@ -822,6 +956,7 @@ function HHTD:OnEnable()
     self:RegisterEvent("UPDATE_MOUSEOVER_UNIT", "TestUnit");
     self:RegisterEvent("PLAYER_TARGET_CHANGED", "TestUnit");
     self:RegisterEvent("PLAYER_ALIVE"); -- talents SHOULD be available
+    self:RegisterEvent("ADDON_LOADED");
     -- self:RegisterEvent("PARTY_MEMBER_DISABLE"); -- useless event, no argument...
     
     self:Print(L["ENABLED"]); -- TODO: add an option for this
@@ -852,7 +987,9 @@ end
 
 function HHTD:OnDisable()
 
-    self:Print(L["DISABLED"]);
+    if not T._DiagStatus then
+        self:Print(L["DISABLED"]);
+    end
 
     if T._DiagStatus == 2 then
         self:Print("|cFFD00000"..T._Diagmessage.."|r");

@@ -166,7 +166,7 @@ do
             DecursiveRootTable._AddDebugText(unpack(message));
         end
 
-        if not HHTD.db.global.Debug then return end;
+        if not HHTD.db or not HHTD.db.global.Debug then return end;
 
         local template = type((...)) == "number" and (...) or false;
 
@@ -330,7 +330,7 @@ function HHTD:GetBAddon (StackLevel)
         and not stack:find("[/\\]AceHook")
         and not stack:find("[/\\]AceEvent") then
 
-        if stack:find("[/\\]Healers-Have-To-Die") then
+        if stack:find("[/\\]"..ADDON_NAME) then
             self:Debug(ERROR, "GetBAddon failed!"); -- XXX to test
             return false;
         end
@@ -341,3 +341,27 @@ function HHTD:GetBAddon (StackLevel)
         return false;
     end
 end
+
+-- tcopy: recursively copy contents of one table to another
+function HHTD:tcopy(to, from)   -- "to" must be a table (possibly empty)
+    if (type(from) ~= "table") then 
+        return error(("HHTD:tcopy: bad argument #2 'from' must be a table, got '%s' instead"):format(type(from)),2);
+    end
+
+    if (type(to) ~= "table") then 
+        return error(("HHTD:tcopy: bad argument #1 'to' must be a table, got '%s' instead"):format(type(to)),2);
+    end
+    for k,v in pairs(from) do
+        if(type(v)=="table") then
+            if not to[k] then
+                to[k] = {}; -- this generates garbage
+            elseif type(to[k]) ~= 'table' then
+                self:Debug(ERROR, k, to[k], 'is not a table');
+            end
+            self:tcopy(to[k], v);
+        else
+            to[k] = v;
+        end
+    end
+end
+

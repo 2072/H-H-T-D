@@ -43,6 +43,12 @@ local PlaySoundFile = _G.PlaySoundFile;
 local select        = _G.select;
 
 function Announcer:OnInitialize() -- {{{
+
+    -- if core failed to load...
+    if T._DiagStatus == 2 then
+        return;
+    end
+
     self:Debug(INFO, "OnInitialize called!");
     self.db = HHTD.db:RegisterNamespace('Announcer', {
         global = {

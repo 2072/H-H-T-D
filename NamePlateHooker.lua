@@ -64,6 +64,12 @@ local GetTexCoordsForRole   = _G.GetTexCoordsForRole;
 -- }}}
 
 function NPH:OnInitialize() -- {{{
+
+    -- if core failed to load...
+    if T._DiagStatus == 2 then
+        return;
+    end
+
     self:Debug(INFO, "OnInitialize called!");
 
     if (select(2, LibStub:GetLibrary("LibNameplateRegistry-1.0"))) < 8 then
@@ -632,7 +638,7 @@ do
 
     local function AddElements () -- ONCEx
         local texture  = Plate:CreateTexture();
-        texture:SetTexture("Interface\\AddOns\\Healers-Have-To-Die\\Artwork\\healers_icons.tga");
+        texture:SetTexture("Interface\\AddOns\\"..ADDON_NAME.."\\Artwork\\healers_icons.tga");
         AdjustTexCoord(texture);
         SetTextureParams(texture);
         

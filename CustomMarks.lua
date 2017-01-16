@@ -60,6 +60,12 @@ local GetTexCoordsForRole   = _G.GetTexCoordsForRole;
 -- }}}
 
 function CM:OnInitialize() -- {{{
+
+    -- if core failed to load...
+    if T._DiagStatus == 2 then
+        return;
+    end
+
     self:Debug(INFO, "OnInitialize called!");
 
     if (select(2, LibStub:GetLibrary("LibNameplateRegistry-1.0"))) < 8 then

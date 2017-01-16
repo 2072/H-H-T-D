@@ -25,7 +25,7 @@
 ## X-LoadOn-Always: delayed
 
 
-## SavedVariables: Healers_Have_To_Die
+## SavedVariables: HHTD_SavedVariables
 
 ## X-License: All Rights Reserved
 
