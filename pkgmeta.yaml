@@ -19,6 +19,12 @@ externals:
 ignore:
     - Artwork/healers_icons.psd
 
+
+move-folders:
+    HHTD/HHTD: HHTD
+    HHTD/Healers-Have-To-Die: Healers-Have-To-Die    
+
+
 manual-changelog:
     filename: changelog.md.txt
     markup-type: markdown
