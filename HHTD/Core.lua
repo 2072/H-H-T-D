@@ -787,7 +787,7 @@ local DEFAULT__CONFIGURATION = {
         },
         HFT = 60,
         Enabled = true,
-        Debug = true,
+        Debug = false,
         DebugLevel = 1,
         --@alpha@
         Debug = true,
@@ -820,11 +820,13 @@ do
             local old = LibStub("AceAddon-3.0"):GetAddon(oldAce3Name, true);
 
             if old then
+                -- if it's the full add-on turn it off properly
                 old:Disable();
-                -- disable oldName only on the current character
-                DisableAddOn(oldName);
-                HHTD:Debug(WARNING, "the old " .. oldName .. " has been disabled for this character");
             end
+
+            HHTD:Debug(WARNING, "the old " .. oldName .. " has been disabled for this character");
+            -- disable oldName only on the current character
+            DisableAddOn(oldName);
         end
 
         --
