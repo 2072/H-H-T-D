@@ -4,7 +4,7 @@ H.H.T.D.
 *Change log*
 ------------
 
-**version 2.4.4_beta_2 (2017-01-16):**
+**version 2.4.4 (2017-01-19):**
 
 - "Healers Have To Die" is now known as H.H.T.D.
 
@@ -16,19 +16,17 @@ As an author I could not stand that name anymore. This add-on does have an
 existence (and meaning) both in WoW and in the real world where obviously we
 don't want the death of our beloved healers...
 
-While H.H.T.D. is just an acronym of the original name, it will stay in World
+While H.H.T.D is just an acronym of the original name, it will stay in World
 of Warcraft where it belongs.
 
-This is an alpha version packaged with the new name. There may be some issues
-for alpha and beta testers but that why you're here for, isn't it?
 
-----
-NOTE TO ALPHA AND BETA TESTERS: With the name change HHTD is just like a new
-add-on and the old add-on will still be here. Settings should be automatically
-migrated to the new H.H.T.D. and the old add-on automatically disabled... So
-everything should be completely transparent from your side. Please do contact
-me if you have any issue.
-----
+To make this name change completely hassle free the new package contains a
+mock add-on with the old name so that your previous settings can be
+automatically imported without any intervention on your part.
+
+Even if you install this new version alongside the previous one, the later
+will be properly turned off and disabled automatically.
+
 
 **version 2.4.3 (2016-10-27):**
 

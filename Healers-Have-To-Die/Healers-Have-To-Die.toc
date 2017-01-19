@@ -1,15 +1,6 @@
 ## Interface: 70100
-## X-Max-Interface: 70100
-## X-Min-Interface: 70000
-
 ## Title: Healers Have To... (see H.H.T.D.)
 ## Notes: This version is deprecated see the add-on H.H.T.D. below. Just load this item to transfer your settings automatically.
-
-
-## Author: John Wellesz
-## Version: @project-version@-old
-
+## Version: @project-version@-deprecated
 ## SavedVariables: Healers_Have_To_Die
-
-## X-License: All Rights Reserved
 

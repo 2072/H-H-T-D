@@ -15,11 +15,8 @@ As an author I could not stand that name anymore. This add-on does have an
 existence (and meaning) both in WoW and in the real world where obviously we
 don't want the death of our beloved healers...
 
-While H.H.T.D. is just an acronym of the original name, it will stay in World
-of Warcraft where it belongs.
-
-For technical reasons the add-on is still packaged using the original name.
-This might change in the future if I find a way to make a clean transition.
+While H.H.T.D is just an acronym of the original name, it will stay in World of
+Warcraft where it belongs.
 
 
 **Current features:**
@@ -164,13 +161,11 @@ Articles
 Here are two excellent articles about HHTD by Cynwise (**A must read if you
 have some doubts about the fairness of this add-on!**) :
 
- [Healers Have To Die and the PvP Addons Arms Race][article1]
+ [HHTD and the PvP Addons Arms Race][article1]
 
- [Using Healers Have To Die to Protect Friendly Healers][article3]
+ [Using HHTD to Protect Friendly Healers][article3]
 
-
-Another one by Gevlon:
- [http://greedygoblin.blogspot.com/2011/05/healers-have-to-die.html][article2]
+Here is [another article written by Gevlon][article2] (a PVP healer).
 
 
 Debates
@@ -180,16 +175,16 @@ An 'interesting' debate about this add-on is also happening on Blizzard's offici
 
 - [Break the HHTD mod already. (UI and Macro forum)][debate4] (full),
 
-- [Healers Have To Die, part I (UI and Macro forum)][debate1] (full),
+- [HHTD, part I (UI and Macro forum)][debate1] (full),
 
-- [Healers Have to Die, part III (General discussion)][debate3] (full),
+- [HHTD, part III (General discussion)][debate3] (full),
 
 
 Sadly, as a European I cannot participate but I'm reading those threads with great interest.
 
 The funniest part about all those 26 pages discussions is that only about
 **16,000 people were actually using HHTD at the time** (from the Curse Client
-popularity statistics)... Now over **80,000** players have it installed!
+popularity statistics)... Now over **180,000** players have it installed!
 
 In those discussions it's also rarely noted that HHTD is also very helpful to
 protect healers on your side.  This debate is leading nowhere though... I won't
@@ -212,7 +207,6 @@ Bitcoin donation address: [1JkA5Ns1dMQLM4D8HUsbXyka6yhp312KnN](https://blockchai
 [tickets]: http://www.wowace.com/addons/h-h-t-d/tickets/
 [dev]: http://www.2072productions.com/to/hhtd_dev
 [forum]: http://www.wowace.com/addons/h-h-t-d/forum/
-[redcross]: http://www.wowace.com/addons/h-h-t-d/images/3-healers-have-to-die-on-the-battlefield-1/
 
 
 [debate1]: http://us.battle.net/wow/en/forum/topic/2211922815

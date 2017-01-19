@@ -221,13 +221,13 @@ do
         L["OPT_CM_VCa"]       = "Alpha Shading"
         L["OPT_CM_VCa_DESC"]  = "Change texture's Alpha component shading"
 
-        L["HHTD_IS_NOW_KNOWN_AS_H.H.T.D."] = [[%s is now known as H.H.T.D. (see the changelog for more information)
+        L["HHTD_IS_NOW_KNOWN_AS_H.H.T.D."] = [['%s' is now known as H.H.T.D. (see the change log for more information)
 
 Your previous settings were successfully transferred and the old version disabled on this character.
 
-If you had previously disabled HHTD for some of your characters, you should login to each one once before deleting or disabling globaly the old '%s' so that this preference can also be kept.
+If you had previously disabled HHTD for some of your characters, you should login to each one once before deleting or disabling globally the old '%s' add-on so that this preference can also be kept.
 
-This nessage will be displayed only once per character where HHTD's previous version was enabled.]]
+This message will be displayed only once per character where HHTD's previous version was enabled.]]
 
         --]==]
         --@end-do-not-package@
