@@ -833,39 +833,42 @@ do
         -- 1 - check if the old name is loaded and running
         -- 2 - import its settings
         -- 3 - disable it
-        if type(_G[oldSV]) == 'table' then
+        if GetAddOnEnableState(UnitName("player"), oldName) == 2 then
+            if type(_G[oldSV]) == 'table' then
 
-            -- have we already transferred the settings?
-            if not HHTD_SavedVariables or not HHTD_SavedVariables.global or not HHTD_SavedVariables.global.settingsMigrated
-                or not _G[oldSV].global or not _G[oldSV].global.settingsTransmuted then
-                HHTD:Debug(WARNING, "Getting settings from " .. oldName .. "...");
+                -- have we already transferred the settings?
+                if not HHTD_SavedVariables or not HHTD_SavedVariables.global or not HHTD_SavedVariables.global.settingsMigrated
+                    or not _G[oldSV].global or not _G[oldSV].global.settingsTransmuted then
+                    HHTD:Debug(WARNING, "Getting settings from " .. oldName .. "...");
 
-                if not HHTD_SavedVariables then
-                    HHTD_SavedVariables = {};
+                    if not HHTD_SavedVariables then
+                        HHTD_SavedVariables = {};
+                    end
+
+                    if not _G[oldSV].global then
+                        _G[oldSV].global = {};
+                    end
+
+                    HHTD:tcopy(HHTD_SavedVariables, _G[oldSV]);
+
+                    HHTD_SavedVariables.global.settingsMigrated = true;
+                    HHTD_SavedVariables.global.Enabled = true;
+
+                    HHTD:tcopy(_G[oldSV].global, {["settingsTransmuted"] = "settings switched to new H.H.T.D add-on", ["Enabled"] = false})
+
+                    HHTD:Debug(WARNING, "done. Now disabling " .. oldName .. "...");
+                    disableOldName();
+                elseif _G[oldSV].global and _G[oldSV].global.settingsTransmuted then
+                    HHTD:Debug(WARNING, "Settings already tranferred from " .. oldName);
+                    disableOldName();
                 end
-
-                if not _G[oldSV].global then
-                    _G[oldSV].global = {};
-                end
-
-                HHTD:tcopy(HHTD_SavedVariables, _G[oldSV]);
-
-                HHTD_SavedVariables.global.settingsMigrated = true;
-                HHTD_SavedVariables.global.Enabled = true;
-    
-                HHTD:tcopy(_G[oldSV].global, {["settingsTransmuted"] = "settings switched to new H.H.T.D add-on", ["Enabled"] = false})
-
-                HHTD:Debug(WARNING, "done. Now disabling " .. oldName .. "...");
-                disableOldName();
-            elseif _G[oldSV].global and _G[oldSV].global.settingsTransmuted then
-                HHTD:Debug(WARNING, "Settings already tranferred from " .. oldName);
-                disableOldName();
+            else
+                -- oldName was enabled but no settings were found
+                -- either there are none or oldName has not been loaded yet
+                return false;
             end
 
             return true;
-
-        else
-            return false;
         end
 
     end
@@ -910,22 +913,36 @@ do
         self:CreateClassColorTables();
 
         -- if the user previously disabled the oldName then we don't want to intrude
-        if oldNameGState == "DISABLED" and not self.db.global.settingsMigrated then
+        -- NOTE: once the old add-on is disabled on all characters and the user
+        -- reset their settings then this code will be triggered :/
+        -- Just make sure that it can be triggered only once...
+        -- maybe add a delay?
+        if oldNameGState == "DISABLED" and self.db.global.settingsMigrated == nil then
             self:Debug(WARNING, oldName .. " was already disabled for all characters, quitting.");
             self:SetEnabledState(false);
             DisableAddOn(ADDON_NAME, true); -- disable globaly as the oldName was
             self:Debug(WARNING, "globally disabled");
-        elseif oldNameGState == "DEMAND_LOADED" and oldNameLState == 0 and not self.db.char.settingsMigrated then
+        elseif oldNameGState ~= "DISABLED" and oldNameLState == 0 and self.db.char.settingsMigrated == nil then
             -- The oldName was already disabled for this specific character
             self:SetEnabledState(false);
             self:Debug(WARNING, "disabled for this character as", oldName, "was already disabled for", (UnitName("player")));
             DisableAddOn(ADDON_NAME);
         else
             self:SetEnabledState(self.db.global.Enabled);
+        end
 
-            -- if we manage to run once on this character make sure that any action on the
-            -- oldName will not trigger the above code
-            self.db.char.settingsMigrated = true;
+
+        -- if we manage to run once on this character make sure that any
+        -- disable action on the oldName will not trigger the above code
+        if self.db.char.settingsMigrated == nil then
+            self.db.char.settingsMigrated = false;
+        end
+
+        if self.db.global.settingsMigrated == nil then
+            -- if we're here it means that no setting were transferred but
+            -- that we found no reason to auto-disable make sure not to find
+            -- one in the future
+            self.db.global.settingsMigrated = false;
         end
     end
 

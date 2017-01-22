@@ -1,6 +1,6 @@
 ## Interface: 70100
 ## Title: Healers Have To... (see H.H.T.D.)
-## Notes: This version is deprecated see the add-on H.H.T.D. below. Just load this item to transfer your settings automatically.
+## Notes: This version is deprecated see the add-on H.H.T.D. Just load this item to transfer your settings automatically.
 ## Version: @project-version@-deprecated
 ## SavedVariables: Healers_Have_To_Die
 
