@@ -4,7 +4,7 @@ H.H.T.D.
 *Change log*
 ------------
 
-**version 2.4.4 (2017-01-19):**
+**version 2.4.4 (2017-01-23):**
 
 - "Healers Have To Die" is now known as H.H.T.D.
 
@@ -25,7 +25,9 @@ mock add-on with the old name so that your previous settings can be
 automatically imported without any intervention on your part.
 
 Even if you install this new version alongside the previous one, the later
-will be properly turned off and disabled automatically.
+will be properly turned off automatically.
+
+Your per-character enable/disable settings will also be preserved.
 
 
 **version 2.4.3 (2016-10-27):**

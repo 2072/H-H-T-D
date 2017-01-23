@@ -826,7 +826,10 @@ do
 
             HHTD:Debug(WARNING, "the old " .. oldName .. " has been disabled for this character");
             -- disable oldName only on the current character
-            DisableAddOn(oldName);
+            -- DisableAddOn(oldName); -- on a second thought it's best to do
+            -- nothing here, it's soft disabled already, that's enough, this
+            -- allows to retain the enable/disable state through settings
+            -- resets without causing strange unexpected things...
         end
 
         --
@@ -836,17 +839,17 @@ do
         if GetAddOnEnableState(UnitName("player"), oldName) == 2 then
             if type(_G[oldSV]) == 'table' then
 
+                if not _G[oldSV].global then
+                    _G[oldSV].global = {};
+                end
+
                 -- have we already transferred the settings?
                 if not HHTD_SavedVariables or not HHTD_SavedVariables.global or not HHTD_SavedVariables.global.settingsMigrated
-                    or not _G[oldSV].global or not _G[oldSV].global.settingsTransmuted then
+                    or not _G[oldSV].global.settingsTransmuted then
                     HHTD:Debug(WARNING, "Getting settings from " .. oldName .. "...");
 
                     if not HHTD_SavedVariables then
                         HHTD_SavedVariables = {};
-                    end
-
-                    if not _G[oldSV].global then
-                        _G[oldSV].global = {};
                     end
 
                     HHTD:tcopy(HHTD_SavedVariables, _G[oldSV]);
@@ -861,10 +864,11 @@ do
                 elseif _G[oldSV].global and _G[oldSV].global.settingsTransmuted then
                     HHTD:Debug(WARNING, "Settings already tranferred from " .. oldName);
                     disableOldName();
+                    _G[oldSV].global.Enabled = false;
                 end
             else
-                -- oldName was enabled but no settings were found
-                -- either there are none or oldName has not been loaded yet
+                -- oldName was enabled but no settings were found.
+                -- Either there are none or oldName has not been loaded yet...
                 return false;
             end
 
@@ -885,6 +889,7 @@ do
 
 
         local oldNameGState = select(5, GetAddOnInfo(oldName));
+        local oldNameGEnableState = GetAddOnEnableState(nil, oldName);
         local oldNameLState = GetAddOnEnableState(UnitName("player"), oldName);
         local TSsuccess, TSstatus = pcall(transmuteSettings);
 
@@ -901,6 +906,11 @@ do
         end
 
         self.db = LibStub("AceDB-3.0"):New("HHTD_SavedVariables", DEFAULT__CONFIGURATION);
+
+        -- store once the status of the oldName
+        if self.db.global.oldNameEnableState == nil then
+            self.db.global.oldNameEnableState = oldNameGEnableState; -- 0 == disabled everywhere, 1 partially, 2 globally enabled
+        end
 
         if TSstatus and not self.db.char.settingsMigrated then
             T._MessageBox((L["HHTD_IS_NOW_KNOWN_AS_H.H.T.D."]):format(oldName, oldName));
@@ -922,7 +932,9 @@ do
             self:SetEnabledState(false);
             DisableAddOn(ADDON_NAME, true); -- disable globaly as the oldName was
             self:Debug(WARNING, "globally disabled");
-        elseif oldNameGState ~= "DISABLED" and oldNameLState == 0 and self.db.char.settingsMigrated == nil then
+        elseif oldNameGState ~= "DISABLED" and oldNameLState == 0 and self.db.char.settingsMigrated == nil 
+            -- and there was actually a per character emable/disable setting
+            and self.db.global.oldNameEnableState == 1 then
             -- The oldName was already disabled for this specific character
             self:SetEnabledState(false);
             self:Debug(WARNING, "disabled for this character as", oldName, "was already disabled for", (UnitName("player")));
@@ -951,10 +963,10 @@ do
             self:Debug(WARNING, oldName .. " was post-loaded... reinitializing!");
             T._DiagStatus = 1;
             self:Disable();
-            T._DiagStatus = nil;
             self.db = nil;
             self:OnInitialize();
             self:Enable();
+            T._DiagStatus = nil;
         end
     end
 end
@@ -977,8 +989,10 @@ function HHTD:OnEnable()
     self:RegisterEvent("PLAYER_ALIVE"); -- talents SHOULD be available
     self:RegisterEvent("ADDON_LOADED");
     -- self:RegisterEvent("PARTY_MEMBER_DISABLE"); -- useless event, no argument...
-    
-    self:Print(L["ENABLED"]); -- TODO: add an option for this
+   
+    if not T._DiagStatus then
+        self:Print(L["ENABLED"]); -- TODO: add an option for this
+    end
 
     self:SetModulesStates();
 
