@@ -37,7 +37,6 @@
 ## X-eMail: archarodim@teaser.fr
 ## X-Website: http://www.2072productions.com/to/healers-have-to-die.php
 
-
 embeds.xml
 
 Localization.lua
