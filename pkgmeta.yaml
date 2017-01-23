@@ -37,5 +37,5 @@ move-folders:
 
 
 manual-changelog:
-    filename: changelog.md.txt
+    filename: HHTD/changelog.md
     markup-type: markdown
