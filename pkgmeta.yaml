@@ -29,6 +29,7 @@ externals:
 
 ignore:
     - Artwork/healers_icons.psd
+    - Artwork/healers_icons_minimal.psd
 
 
 move-folders:
@@ -36,6 +37,6 @@ move-folders:
     HHTD/Healers-Have-To-Die: Healers-Have-To-Die    
 
 
-manual-changelog:
-    filename: HHTD/changelog.md
-    markup-type: markdown
+#manual-changelog:
+#    filename: HHTD/changelog.md
+#    markup-type: markdown
