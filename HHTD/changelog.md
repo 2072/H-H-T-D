@@ -4,6 +4,14 @@ H.H.T.D.
 *Change log*
 ------------
 
+**version 2.4.5 (2017-03-28):**
+
+- Add minimal theme for markers created by Mark Sutton. 
+  (A new option is available in the NamePlate Hooker option tab)
+
+- Link rank alpha to symbol alpha.
+
+
 **version 2.4.4 (2017-01-23):**
 
 - "Healers Have To Die" is now known as H.H.T.D.
