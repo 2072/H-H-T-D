@@ -1290,6 +1290,7 @@ do
                 return true
             end
         else
+            -- got a few error reports getting here where the classTag was nil on a Paladin... not sure what to do yet, seems rare.
             HHTD:Debug(ERROR, "(HHTD update required) GetBattlefieldScore() API changed", GetBattlefieldScore(playerIndex))
             
             return nil
