@@ -33,5 +33,5 @@ ignore:
 
 
 manual-changelog:
-    filename: HHTD/changelog.md
+    filename: changelog.md
     markup-type: markdown
