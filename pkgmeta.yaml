@@ -32,6 +32,6 @@ ignore:
     - Artwork/healers_icons_minimal.psd
 
 
-#manual-changelog:
-#    filename: HHTD/changelog.md
-#    markup-type: markdown
+manual-changelog:
+    filename: HHTD/changelog.md
+    markup-type: markdown

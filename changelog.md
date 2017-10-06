@@ -4,6 +4,16 @@ H.H.T.D.
 *Change log*
 ------------
 
+**version 2.4.6 (2017-10-06):**
+
+- Add access to the new 'Always show nameplates' WoW option
+  from HHTD's 'Custom Marks' option panel.
+
+- Remove the old name mock add-on.
+
+- TOC update.
+
+
 **version 2.4.5 (2017-03-28):**
 
 - Add minimal theme for markers created by Mark Sutton. 
@@ -14,11 +24,11 @@ H.H.T.D.
 
 **version 2.4.4 (2017-01-23):**
 
-- "Healers Have To Die" is now known as H.H.T.D.
+- This add-on is now known as H.H.T.D.
 
-I originally chose that name as a provocation to make one of the basic cruel
-truths of World of Warcraft perfectly obvious to everyone. Now I find the
-original name too harsh, too long and mostly not specific enough to WoW.
+I originally chose the original name as a provocation to make one of the basic
+cruel truths of World of Warcraft perfectly obvious to everyone. Now I find
+this name too harsh, too long and mostly not specific enough to WoW.
 
 As an author I could not stand that name anymore. This add-on does have an
 existence (and meaning) both in WoW and in the real world where obviously we

@@ -5,11 +5,11 @@ H.H.T.D.
 taught very early in the game. This add-on helps you influence this unfortunate
 destiny in a way or another depending on the healer's side...*
 
-**"Healers Have To Die" is now known as H.H.T.D.**
+**This add-on is now known as H.H.T.D.**
 
-I originally chose that name as a provocation to make one of the basic cruel
-truths of World of Warcraft perfectly obvious to everyone. Now I find the
-original name too harsh, too long and mostly not specific enough to WoW.
+I originally chose the original name as a provocation to make one of the basic
+cruel truths of World of Warcraft perfectly obvious to everyone. Now I find
+this name too harsh, too long and mostly not specific enough to WoW.
 
 As an author I could not stand that name anymore. This add-on does have an
 existence (and meaning) both in WoW and in the real world where obviously we
