@@ -274,6 +274,19 @@ do
                             return GetCVarBool("nameplateShowFriendlyNPCs");
                         end,
                     },
+                    AlwaysShowNameplates = {
+                        type = 'toggle',
+                        name = _G.UNIT_NAMEPLATES_AUTOMODE or L["OPT_ALWAYS_SHOW_NAMEPLATES"],
+                        desc = _G.OPTION_TOOLTIP_UNIT_NAMEPLATES_AUTOMODE or L["OPT_ALWAYS_SHOW_NAMEPLATES_DESC"],
+                        width = 'double',
+                        order = 14.2,
+                        set = function (info, value)
+                            SetCVar("nameplateShowAll", value and 1 or 0);
+                        end,
+                        get = function()
+                            return GetCVarBool("nameplateShowAll");
+                        end,
+                    },
                     Header200 = {
                         type = 'header',
                         name = L["OPT_NPH_MARKER_SETTINGS"],

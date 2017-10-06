@@ -165,6 +165,9 @@ do
         L["OPT_CM_FNPC_NAMEPLATE"] = "Friendly NPC nameplates"
         L["OPT_CM_FNPC_NAMEPLATE_DESC"] = "Show nameplates on friendly NPCs\nThis is necessary for markers to be shown on these units."
 
+        L["OPT_ALWAYS_SHOW_NAMEPLATES"] = "Always show nameplates"
+        L["OPT_ALWAYS_SHOW_NAMEPLATES_DESC"] = "By default nameplates are hidden outside of combat"
+
         L["OPT_NPH_ENEMY_NAMEPLATE"] = "Enemy nameplates"
         L["OPT_NPH_FRIENDLY_NAMEPLATE"] = "Friendly nameplates"
 
