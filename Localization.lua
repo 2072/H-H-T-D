@@ -87,6 +87,10 @@ do
         L["OPT_LOGS"] = "Logs"
         L["OPT_LOGS_DESC"] = "Display HHTD detected healers and statistics"
         L["OPT_LOG_DESC"] = "Enables logging and adds a new 'Logs' tab to HHTD's option panel"
+
+        L["OPT_SHOW_CHAT_COMMAND_REMINDER"] = "Show /HHTDG chat command reminder"
+        L["OPT_SHOW_CHAT_COMMAND_REMINDER_DESC"] = "Print a message in the chat every time HHTD is enabled."
+
         L["OPT_MODULES"] = "Modules"
         L["OPT_NPH_WARNING1"] = [=[WARNING: *Enemies*' nameplates are currently disabled. HHTD cannot add its symbol on enemies.
         You can enable nameplates display through the WoW UI's options or by using the assigned key-stroke.]=]

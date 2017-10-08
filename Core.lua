@@ -557,6 +557,20 @@ do
                         desc = L["OPT_PVPHEALERSSPECSONLY_DESC"],
                         order = 300,
                     },
+                    Log = {
+                        type = 'toggle',
+                        name = L["OPT_LOG"],
+                        desc = L["OPT_LOG_DESC"],
+                        disabled = false,
+                        order = 350,
+                    },
+                    ShowChatCommandReminder = {
+                        type = 'toggle',
+                        name = L["OPT_SHOW_CHAT_COMMAND_REMINDER"],
+                        desc = L["OPT_SHOW_CHAT_COMMAND_REMINDER_DESC"],
+                        width = 'double',
+                        order = 352,
+                    },
                     testOnTarget = {
                         type = 'execute',
                         width = 'double',
@@ -570,13 +584,6 @@ do
                             end
 
                         end,
-                        order = 350,
-                    },
-                    Log = {
-                        type = 'toggle',
-                        name = L["OPT_LOG"],
-                        desc = L["OPT_LOG_DESC"],
-                        disabled = false,
                         order = 355,
                     },
                     Modules = {
@@ -801,6 +808,7 @@ local DEFAULT__CONFIGURATION = {
         PHMDAP = 0.20,
         SetFriendlyHealersRole = true,
         HealerUnderAttackAlerts = true,
+        ShowChatCommandReminder = true,
     },
 };
 -- }}}
@@ -990,8 +998,8 @@ function HHTD:OnEnable()
     self:RegisterEvent("ADDON_LOADED");
     -- self:RegisterEvent("PARTY_MEMBER_DISABLE"); -- useless event, no argument...
    
-    if not T._DiagStatus then
-        self:Print(L["ENABLED"]); -- TODO: add an option for this
+    if not T._DiagStatus and self.db.global.ShowChatCommandReminder then
+        self:Print(L["ENABLED"]);
     end
 
     self:SetModulesStates();
