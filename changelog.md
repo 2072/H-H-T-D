@@ -4,14 +4,16 @@ H.H.T.D.
 *Change log*
 ------------
 
-**version 2.4.6 (2017-10-06):**
+**version 2.4.6 (2017-10-08):**
 
 - Add access to the new 'Always show nameplates' WoW option
   from HHTD's 'Custom Marks' option panel.
 
 - Remove the old name mock add-on.
 
-- TOC update.
+- Add a toggle option to show/hide the chat reminder about the /HHTDG command. (Ticket #43)
+
+- Add a toggle option to show/hide healers' rank. (Ticket #44)
 
 
 **version 2.4.5 (2017-03-28):**
