@@ -86,6 +86,7 @@ function NPH:OnInitialize() -- {{{
     self.db = HHTD.db:RegisterNamespace('NPH', {
         global = {
             sPve = true,
+            displayHealerRanks = true,
             marker_Scale = 0.8,
             marker_Xoffset = 0,
             marker_Yoffset = 0,
@@ -121,6 +122,16 @@ function NPH:GetOptions () -- {{{
                     desc = L["OPT_STRICTGUIDPVE_DESC"],
                     disabled = function() return not HHTD.db.global.Pve or not HHTD:IsEnabled(); end,
                     order = 10,
+                },
+                displayHealerRanks = {
+                    type = 'toggle',
+                    name = L["OPT_NPH_DISPLAY_HEALER_RANK"],
+                    desc = L["OPT_NPH_DISPLAY_HEALER_RANK_DESC"],
+                    set = function (info, value)
+                        HHTD:SetHandler(self, info, value);
+                        self:UpdateRanks();
+                    end,
+                    order = 10.1,
                 },
                 Header50 = {
                     type = 'header',
@@ -627,19 +638,23 @@ do
         assert(IsFriend == true or IsFriend == false, "IsFriend is invalid"); -- to diagnose issue repoted on 2012-09-07
         --@end-alpha@
 
-         if not Guid then
+        if NPH.db.global.displayHealerRanks then
+            if not Guid then
 
-             if not HHTD.Registry_by_Name[IsFriend][PlateName] then
-                 NPH:Debug(ERROR, "HHTD.Registry_by_Name[IsFriend][PlateName] is invalid for plate:", PlateName, "isfriend:", IsFriend, "PlateAdditions.plateName:", PlateAdditions.plateName);
-                 --assert(HHTD.Registry_by_Name[IsFriend][PlateName], "HHTD.Registry_by_Name[IsFriend][PlateName] is invalid for plate:" .. tostring(PlateName).. " isfriend:"..tostring(IsFriend).."  PlateAdditions.plateName:" .. tostring(PlateAdditions.plateName)); -- to diagnose issue repoted on 2012-09-07 and 2013-03-11 - and now on 2013-03-19 when player is mind controlled...
-             end
-             PlateAdditions.rankFont:SetText(NP_Is_Not_Unique[PlateName] and '?' or HHTD.Registry_by_Name[IsFriend][PlateName].rank);
-         else
-             if not HHTD.Registry_by_GUID[IsFriend][Guid] then
-                 NPH:Debug(ERROR, "HHTD.Registry_by_GUID[IsFriend][Guid] is not defined for plate:", PlateName, "isfriend:", IsFriend, "Found with Name:", HHTD.Registry_by_Name[IsFriend][PlateName] and true or false);
-                 --assert(HHTD.Registry_by_GUID[IsFriend][Guid], "HHTD.Registry_by_GUID[IsFriend][Guid] is not defined for plate:" .. tostring(PlateName).. " isfriend:"..tostring(IsFriend) .. " Found with Name:"..tostring(HHTD.Registry_by_Name[IsFriend][PlateName] and true or false)); -- to diagnose issue repoted on 2012-10-17 and 2013-03-08
-             end
-            PlateAdditions.rankFont:SetText(HHTD.Registry_by_GUID[IsFriend][Guid].rank);
+                if not HHTD.Registry_by_Name[IsFriend][PlateName] then
+                    NPH:Debug(ERROR, "HHTD.Registry_by_Name[IsFriend][PlateName] is invalid for plate:", PlateName, "isfriend:", IsFriend, "PlateAdditions.plateName:", PlateAdditions.plateName);
+                end
+                PlateAdditions.rankFont:SetText(NP_Is_Not_Unique[PlateName] and '?' or HHTD.Registry_by_Name[IsFriend][PlateName].rank);
+            else
+                if not HHTD.Registry_by_GUID[IsFriend][Guid] then
+                    NPH:Debug(ERROR, "HHTD.Registry_by_GUID[IsFriend][Guid] is not defined for plate:", PlateName, "isfriend:", IsFriend, "Found with Name:", HHTD.Registry_by_Name[IsFriend][PlateName] and true or false);
+                end
+                PlateAdditions.rankFont:SetText(HHTD.Registry_by_GUID[IsFriend][Guid].rank);
+            end
+
+            PlateAdditions.rankFont:Show();
+        else
+            PlateAdditions.rankFont:Hide();
         end
     end
 
@@ -665,10 +680,6 @@ do
         PlateAdditions.IsShown = true; -- set it as soon as we show something
 
         SetRank();
-       
-        PlateAdditions.rankFont:Show();
-
-
     end
 
     local function PopulatePlateData(plate) -- set locals Guid, IsFriend, HealerClass
@@ -741,8 +752,6 @@ do
             PlateAdditions.IsShown = true;
 
             SetRank();
-
-            PlateAdditions.rankFont:Show();
 
         elseif guid and NP_Is_Not_Unique[plateName] then
             AdjustTexCoord(PlateAdditions.texture);

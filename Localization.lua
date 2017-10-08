@@ -192,6 +192,9 @@ do
         L["OPT_NPH_MARKER_THEME_DEFAULT"]   = "Default"
         L["OPT_NPH_MARKER_THEME_MINIMAL"]   = "Minimalist"
 
+        L["OPT_NPH_DISPLAY_HEALER_RANK"]           = "Display healers' rank"
+        L["OPT_NPH_DISPLAY_HEALER_RANK_DESC"]      = "Add a number representing each healer's rank.\nThe lower the number the better the healer."
+
         L["OPT_SWAPSYMBOLS"]        = "Swap friends/foes symbols"
         L["OPT_SWAPSYMBOLS_DESC"]   = "The symbols used for friends and foes are swapped"
         
