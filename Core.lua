@@ -108,6 +108,7 @@ local L = HHTD.Localized_Text;
 
 HHTD.Constants = {};
 local HHTD_C = HHTD.Constants;
+HHTD_C.WOW8 = (tocversion >= 80000);
 
 --[=[
 HHTD_C.Healing_Classes = { -- unused
@@ -130,7 +131,11 @@ do
     local classID, classTag, userSpecNum, specID, specName, role
 
     for classID = 1, MAX_CLASSES do
-        classTag = select(2, GetClassInfoByID(classID))
+        if not HHTD_C.WOW8 then
+            classTag = select(2, GetClassInfoByID(classID))
+        else
+            classTag = C_CreatureInfo.GetClassInfo(classID).classFile
+        end
 
         HHTD_C.CLASS_SPEC_TO_ROLE[classTag] = {}
 
@@ -150,7 +155,6 @@ do
 
 end
 
---HHTD_C.WOD = (tocversion >= 60000);
 
 -- The header for HHTD key bindings
 BINDING_HEADER_HHTD = "H.H.T.D.";
@@ -338,10 +342,10 @@ local function REGISTER_HEALERS_ONLY_SPELLS_ONCE ()
         --@debug@
         -- test bad spell mitigation
         -- those are not healer specific
-        [031842] = "PALADIN", -- Avenging Wrath
+        -- [031842] = "PALADIN", -- Avenging Wrath - removed in WOW8
         [019750] = "PALADIN", -- Flash of light
         [002061] = "PRIEST",  -- Flash Heal
-        [005185] = "DRUID",   -- Healing Touch
+        -- [005185] = "DRUID",   -- Healing Touch - removed in WOW8
         --@end-debug@
     };
 
@@ -1530,13 +1534,16 @@ do
 
     -- http://www.wowpedia.org/API_COMBAT_LOG_EVENT
     function HHTD:COMBAT_LOG_EVENT_UNFILTERED(e, timestamp, event, hideCaster, sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags, _spellID, spellNAME, _spellSCHOOL, _amount)
- 
+
         --@debug@
         --if hideCaster then
-        --    self:Debug(ERROR, e, timestamp, event, hideCaster, sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags, _spellID, spellNAME, _spellSCHOOL, _amount);
+           --self:Debug(ERROR, e, timestamp, event, hideCaster, sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags, _spellID, spellNAME, _spellSCHOOL, _amount);
         --end
         --@end-debug@
 
+        if HHTD_C.WOW8 and event == nil then
+            timestamp, event, hideCaster, sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags, _spellID, spellNAME, _spellSCHOOL, _amount = CombatLogGetCurrentEventInfo()
+        end
 
         -- escape if no source {{{
         -- untraceable events are useless
