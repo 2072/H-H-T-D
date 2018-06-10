@@ -54,9 +54,9 @@ If you see a player marked as healer that should not be:
 
 1. If their mark's background is NOT grey, check the *'Logging'* option in the
 option panel (/HHTDG) ; then when you see such a player, reopen the option
-panel and check the content of the *'Logs'* tab and report to me
-(<archarodim+hhtd@teaser.fr> or [open a ticket][tickets]. Please avoid comments on
-Curse.com as it's impossible to follow what happens there).
+panel and check the content of the *'Logs'* tab and report to me by [opening a ticket][tickets].
+Please avoid comments on Curse.com as it's impossible to follow what happens
+there).
 
 2. If their mark's background is grey then enable the *'Healer specialization
 detection'* option so as to only report specialized healers ignoring others.

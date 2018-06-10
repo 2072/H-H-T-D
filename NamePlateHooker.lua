@@ -1,6 +1,6 @@
 --[=[
 H.H.T.D. World of Warcraft Add-on
-Copyright (c) 2009-2017 by John Wellesz (Archarodim@teaser.fr)
+Copyright (c) 2009-2018 by John Wellesz (hhtd@2072productions.com)
 All rights reserved
 
 Version @project-version@
