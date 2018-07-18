@@ -4,6 +4,13 @@ H.H.T.D.
 *Change log*
 ------------
 
+**version 2.4.7 (2018-07-18):**
+
+- WoW 8 compatibility fixes.
+
+- Change of author's email address: from now on it's HHTD {AT} 2072productions.com
+
+
 **version 2.4.6 (2017-10-08):**
 
 - Add access to the new 'Always show nameplates' WoW option
