@@ -60,6 +60,7 @@ local Marker_Textures = {
 
 -- upvalues {{{
 local GetCVarBool           = _G.GetCVarBool;
+local GetCVar               = _G.GetCVar;
 local GetTime               = _G.GetTime;
 local pairs                 = _G.pairs;
 local ipairs                = _G.ipairs;
@@ -160,6 +161,39 @@ function NPH:GetOptions () -- {{{
                         return GetCVarBool("nameplateShowFriends");
                     end,
                 },
+                FNPC_Nameplate = {
+                        type = 'toggle',
+                        name = L["OPT_CM_FNPC_NAMEPLATE"],
+                        desc = L["OPT_CM_FNPC_NAMEPLATE_DESC"],
+                        width = 'double',
+                        order = 13.3,
+                        set = function (info, value)
+                            SetCVar("nameplateShowFriendlyNPCs", value and 1 or 0);
+                        end,
+                        get = function()
+                            return GetCVarBool("nameplateShowFriendlyNPCs");
+                        end,
+                    },
+                NamePlateMaxDistance = {
+                        type = "range",
+                        name = L["OPT_NPH_MAX_NAMEPLATE_DISTANCE"],
+                        desc = L["OPT_NPH_MAX_NAMEPLATE_DISTANCE_DESC"],
+                        min = 1,
+                        max = 100,
+                        softMax = 100,
+                        step = 1,
+                        bigStep = 1,
+                        order = 13.4,
+                        isPercent = false,
+                        width=1.5,
+
+                        set = function (info, value)
+                            SetCVar("nameplateMaxDistance", value);
+                        end,
+                        get = function (info)
+                            return tonumber(GetCVar("nameplateMaxDistance"));
+                        end,
+                    },
                 Header100 = {
                     type = 'header',
                     name = L["OPT_NPH_MARKER_SETTINGS"],

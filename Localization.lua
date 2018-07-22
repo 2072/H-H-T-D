@@ -169,6 +169,9 @@ do
         L["OPT_CM_FNPC_NAMEPLATE"] = "Friendly NPC nameplates"
         L["OPT_CM_FNPC_NAMEPLATE_DESC"] = "Show nameplates on friendly NPCs\nThis is necessary for markers to be shown on these units."
 
+        L["OPT_NPH_MAX_NAMEPLATE_DISTANCE"] = "Maximum distance of nameplates"
+        L["OPT_NPH_MAX_NAMEPLATE_DISTANCE_DESC"] = "Set the maximum distance at which to display nameplates.\n\n(H.H.T.D. requires nameplates in order to display its symbols on top of them)\n\nThis setting might have an impact on performances depending on your computer."
+
         L["OPT_ALWAYS_SHOW_NAMEPLATES"] = "Always show nameplates"
         L["OPT_ALWAYS_SHOW_NAMEPLATES_DESC"] = "By default nameplates are hidden outside of combat"
 
