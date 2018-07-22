@@ -174,7 +174,20 @@ function NPH:GetOptions () -- {{{
                             return GetCVarBool("nameplateShowFriendlyNPCs");
                         end,
                     },
-                NamePlateMaxDistance = {
+                    AlwaysShowNameplates = {
+                        type = 'toggle',
+                        name = _G.UNIT_NAMEPLATES_AUTOMODE or L["OPT_ALWAYS_SHOW_NAMEPLATES"],
+                        desc = _G.OPTION_TOOLTIP_UNIT_NAMEPLATES_AUTOMODE or L["OPT_ALWAYS_SHOW_NAMEPLATES_DESC"],
+                        width = 'double',
+                        order = 13.4,
+                        set = function (info, value)
+                            SetCVar("nameplateShowAll", value and 1 or 0);
+                        end,
+                        get = function()
+                            return GetCVarBool("nameplateShowAll");
+                        end,
+                    },
+                    NamePlateMaxDistance = {
                         type = "range",
                         name = L["OPT_NPH_MAX_NAMEPLATE_DISTANCE"],
                         desc = L["OPT_NPH_MAX_NAMEPLATE_DISTANCE_DESC"],

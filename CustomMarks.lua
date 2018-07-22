@@ -261,6 +261,17 @@ do
                         name = L["OPT_NPH_MARKER_HIDDEN_WOW_SETTINGS"],
                         order = 14,
                     },
+                    enemyNameplates = {
+                        type = 'toggle',
+                        name = L["OPT_NPH_ENEMY_NAMEPLATE"],
+                        order = 14.01,
+                        set = function (info, value)
+                            SetCVar("nameplateShowEnemies", value and 1 or 0);
+                        end,
+                        get = function()
+                            return GetCVarBool("nameplateShowEnemies");
+                        end,
+                    },
                     friendyNameplates = {
                         type = 'toggle',
                         name = L["OPT_NPH_FRIENDLY_NAMEPLATE"],
