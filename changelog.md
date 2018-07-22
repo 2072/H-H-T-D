@@ -4,6 +4,12 @@ H.H.T.D.
 *Change log*
 ------------
 
+**version 2.4.8 (2018-07-22):**
+
+- Add a setting to set the maximum display distance of nameplates in both
+  nameplate related modules. (This is a WoW setting only available through chat command)
+
+
 **version 2.4.7 (2018-07-18):**
 
 - WoW 8 compatibility fixes.
