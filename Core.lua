@@ -334,7 +334,7 @@ local function REGISTER_HEALERS_ONLY_SPELLS_ONCE ()
         -- Monks
         [115175] = "MONK", -- Soothing Mist
         [115310] = "MONK", -- Revival
-        [116670] = "MONK", -- Vivify
+        --[116670] = "MONK", -- Vivify all monks have it in WoW8
         [116680] = "MONK", -- Thunder Focus Tea
         [116849] = "MONK", -- Life Cocoon
         [119611] = "MONK", -- Renewing mist
