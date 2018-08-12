@@ -313,7 +313,7 @@ local function REGISTER_HEALERS_ONLY_SPELLS_ONCE ()
         [088423] = "DRUID", -- Nature's Cure
         -- [008936] = "DRUID", -- Regrowth -- (also available through restoration afinity talent)
         [033891] = "DRUID", -- Incarnation: Tree of Life
-        [048438] = "DRUID", -- Wild Growth
+        -- [048438] = "DRUID", -- Wild Growth -- disabled in WoW8: In the feral talents, level 45, you can choose Restoration Affinity, which includes Rejuv, Swiftmend, Wild Growth.
         [000740] = "DRUID", -- Tranquility
         -- [145108] = "DRUID", -- Ysera's Gift -- (also available through restoration afinity talent)
         -- [000774] = "DRUID", -- Rejuvination -- (also available through restoration afinity talent)
