@@ -4,6 +4,12 @@ H.H.T.D.
 *Change log*
 ------------
 
+**version 2.4.9 (2018-08-12):**
+
+- Remove `Vivify` and `Wild Growth` from the [specialized healer spell list][spelllist].
+  (If you see any  inconsistencies in this list please [open a new ticket][tickets])
+
+
 **version 2.4.8 (2018-07-22):**
 
 - Add a setting to set the maximum display distance of nameplates in both
@@ -505,8 +511,8 @@ Until then, just use the command /HHTDG to access HHTD's option panel.
 
 
 
-[spelllist]: http://www.wowace.com/addons/h-h-t-d/pages/specialized-healers-spells/
-[localization]: http://www.wowace.com/addons/h-h-t-d/localization/
-[tidyplates]: http://www.curse.com/addons/wow/tidy-plates
-[LibNamePlateRegistry]: http://www.wowace.com/addons/libnameplateregistry-1-0/
-[tickets]: http://www.wowace.com/addons/h-h-t-d/tickets/
+[spelllist]: https://www.wowace.com/projects/h-h-t-d/pages/specialized-healers-spells
+[localization]: https://www.wowace.com/projects/h-h-t-d/localization
+[tidyplates]: https://www.curseforge.com/wow/addons/tidy-plates
+[LibNamePlateRegistry]: https://www.wowace.com/projects/libnameplateregistry-1-0
+[tickets]: https://www.wowace.com/projects/h-h-t-d/issues
