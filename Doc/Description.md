@@ -202,28 +202,28 @@ To report issues or ask for new features, use the [ticket system][tickets].
 
 Bitcoin donation address: [1JkA5Ns1dMQLM4D8HUsbXyka6yhp312KnN](https://blockchain.info/address/1JkA5Ns1dMQLM4D8HUsbXyka6yhp312KnN)
 
-![stats](http://www.2072productions.com/to/hhtdcursedisplaystat.gif)
+![stats](https://www.2072productions.com/to/hhtdcursedisplaystat.gif)
 
-[tickets]: http://www.wowace.com/addons/h-h-t-d/tickets/
-[dev]: http://www.2072productions.com/to/hhtd_dev
-[forum]: http://www.wowace.com/addons/h-h-t-d/forum/
-
-
-[debate1]: http://us.battle.net/wow/en/forum/topic/2211922815
-
-[debate3]: http://us.battle.net/wow/en/forum/topic/2228224992
-
-[debate4]: http://us.battle.net/wow/en/forum/topic/2191131447
+[tickets]: https://www.wowace.com/addons/h-h-t-d/tickets/
+[dev]: https://www.2072productions.com/to/hhtd_dev
+[forum]: https://www.wowace.com/addons/h-h-t-d/forum/
 
 
+[debate1]: https://us.battle.net/wow/en/forum/topic/2211922815
 
-[article1]: http://cynwise.wordpress.com/2011/03/22/healers-have-to-die-and-the-pvp-addons-arms-race/
-[article2]: http://greedygoblin.blogspot.com/2011/05/healers-have-to-die.html
-[article3]: http://cynwise.wordpress.com/2011/09/16/using-healers-have-to-die-to-protect-friendly-healers/
+[debate3]: https://us.battle.net/wow/en/forum/topic/2228224992
 
-[interview1]: http://www.curse.com/spotlight/addons/wow/45369-healershavetodie-wow-mod-spotlight
+[debate4]: https://us.battle.net/wow/en/forum/topic/2191131447
 
-[video1]: http://www.youtube.com/watch?v=bDdmD6Lx87g
 
-[mop]: http://www.2072productions.com/images/ah-mop-75x75-11-4-11.jpg "Mist of Pandaria Beta"
-[spelllist]: http://www.wowace.com/addons/h-h-t-d/pages/specialized-healers-spells/
+
+[article1]: https://cynwise.wordpress.com/2011/03/22/healers-have-to-die-and-the-pvp-addons-arms-race/
+[article2]: https://greedygoblin.blogspot.com/2011/05/healers-have-to-die.html
+[article3]: https://cynwise.wordpress.com/2011/09/16/using-healers-have-to-die-to-protect-friendly-healers/
+
+[interview1]: https://www.curse.com/spotlight/addons/wow/45369-healershavetodie-wow-mod-spotlight
+
+[video1]: https://www.youtube.com/watch?v=bDdmD6Lx87g
+
+[mop]: https://www.2072productions.com/images/ah-mop-75x75-11-4-11.jpg "Mist of Pandaria Beta"
+[spelllist]: https://www.wowace.com/addons/h-h-t-d/pages/specialized-healers-spells/
