@@ -4,10 +4,15 @@ H.H.T.D.
 *Change log*
 ------------
 
+**version 2.4.9.1 (2019-01-07):**
+
+- TOC update
+
+
 **version 2.4.9 (2018-08-12):**
 
 - Remove `Vivify` and `Wild Growth` from the [specialized healer spell list][spelllist].
-  (If you see any  inconsistencies in this list please [open a new ticket][tickets])
+  (If you see any inconsistencies in this list please [open a new ticket][tickets])
 
 
 **version 2.4.8 (2018-07-22):**
