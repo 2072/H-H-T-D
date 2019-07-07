@@ -4,6 +4,11 @@ H.H.T.D.
 *Change log*
 ------------
 
+**version 2.4.9.2 (2019-07-07):**
+
+- TOC update
+
+
 **version 2.4.9.1 (2019-01-07):**
 
 - TOC update
