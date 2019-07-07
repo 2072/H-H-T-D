@@ -285,7 +285,7 @@ function Announcer:HHTD_HEALER_MOUSE_OVER(selfevent, isFriend, healerProfile)
         previousUnitGuid = healerProfile.guid;
     end
 
-    self:PlaySoundFile("Sound\\interface\\AlarmClockWarning3.ogg");
+    self:PlaySoundFile(567458);
     -- self:Debug(INFO, "AlarmClockWarning3.ogg played");
 end
 
@@ -295,7 +295,7 @@ function Announcer:HHTD_TARGET_LOCKED (selfevent, isFriend, healerProfile)
         return;
     end
 
-    self:PlaySoundFile("Sound\\interface\\AuctionWindowOpen.ogg");
+    self:PlaySoundFile(567482);
     --self:Debug(INFO, "AuctionWindowOpen.ogg played");
 
     local sex = UnitSex("target");
