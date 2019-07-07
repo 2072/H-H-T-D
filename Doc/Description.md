@@ -202,8 +202,6 @@ To report issues or ask for new features, use the [ticket system][tickets].
 
 Bitcoin donation address: [1JkA5Ns1dMQLM4D8HUsbXyka6yhp312KnN](https://blockchain.info/address/1JkA5Ns1dMQLM4D8HUsbXyka6yhp312KnN)
 
-![stats](https://www.2072productions.com/to/hhtdcursedisplaystat.gif)
-
 [tickets]: https://www.wowace.com/addons/h-h-t-d/tickets/
 [dev]: https://www.2072productions.com/to/hhtd_dev
 [forum]: https://www.wowace.com/addons/h-h-t-d/forum/

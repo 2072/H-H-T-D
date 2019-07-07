@@ -1,6 +1,6 @@
-## Interface: 80100
-## X-Max-Interface: 80100
-## X-Min-Interface: 70000
+## Interface: 80200
+## X-Max-Interface: 80200
+## X-Min-Interface: 80200
 
 ## Title: H.H.T.D.
 
@@ -35,7 +35,7 @@
 ## X-ReleaseDate: "@project-date-iso@"
 ## X-Category: PvP
 ## X-eMail: hhtd@2072productions.com
-## X-Website: http://www.2072productions.com/to/healers-have-to-die.php
+## X-Website: https://www.2072productions.com/to/HHTD.php
 
 embeds.xml
 
