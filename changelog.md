@@ -6,6 +6,7 @@ H.H.T.D.
 
 **version 2.4.9.2 (2019-07-07):**
 
+- Fix sound for WoW 8.2
 - TOC update
 
 
