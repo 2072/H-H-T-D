@@ -25,11 +25,19 @@ externals:
     Libs/AceLocale-3.0:
         url: https://repos.wowace.com/wow/ace3/trunk/AceLocale-3.0
     Libs/LibNameplateRegistry-1.0:
-        url: https://github.com/2072/LibNameplateRegistry-1.0.git/LibNameplateRegistry-1.0
+        url: git://github.com/2072/LibNameplateRegistry-1.0.git
 
 ignore:
     - Artwork/healers_icons.psd
     - Artwork/healers_icons_minimal.psd
+    - Libs/LibNameplateRegistry-1.0/*.toc
+    - Libs/LibNameplateRegistry-1.0/*.md
+    - Libs/LibNameplateRegistry-1.0/embeds.xml
+    - Libs/LibNameplateRegistry-1.0/Doc
+    - Libs/LibNameplateRegistry-1.0/example
+
+move-folders:
+    HHTD/Libs/LibNameplateRegistry-1.0/LibNameplateRegistry-1.0: HHTD/Libs/LibNameplateRegistry-1.0
 
 enable-nolib-creation: yes
 
