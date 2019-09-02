@@ -31,7 +31,9 @@ ignore:
     - Artwork/healers_icons.psd
     - Artwork/healers_icons_minimal.psd
 
+enable-nolib-creation: yes
+      
 
-manual-changelog:
-    filename: changelog.md
-    markup-type: markdown
+#manual-changelog:
+#    filename: changelog.md
+#    markup-type: markdown
