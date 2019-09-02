@@ -2,7 +2,7 @@
 package-as: HHTD
 
 externals:
-    
+
     Libs/LibStub:
         url: https://repos.wowace.com/wow/libstub/trunk
     Libs/CallbackHandler-1.0:
@@ -32,7 +32,7 @@ ignore:
     - Artwork/healers_icons_minimal.psd
 
 enable-nolib-creation: yes
-      
+
 
 #manual-changelog:
 #    filename: changelog.md
