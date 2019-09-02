@@ -385,7 +385,7 @@ do
                             self:UpdateTextures();
                         end,
                     },
-                    Header100 = {
+                    Header101 = {
                         type = 'header',
                         name = L["OPT_CM_MARKER_CUSTOMIZATION"],
                         order = 35,
