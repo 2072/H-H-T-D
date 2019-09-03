@@ -46,7 +46,7 @@
 ## X-Website: https://www.2072productions.com/to/HHTD.php
 
 ## X-Curse-Project-ID: 19474
- 
+
 embeds.xml
 
 Localization.lua
