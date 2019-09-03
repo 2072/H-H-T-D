@@ -4,6 +4,13 @@ H.H.T.D.
 *Change log*
 ------------
 
+**version 2.4.9.3 (2019-09-03):**
+
+- Compatible with WoW Classic
+- Using BigWigs' packager, as a result -nolib packages are only available from
+  Github.
+
+
 **version 2.4.9.2 (2019-07-07):**
 
 - Fix sound for WoW 8.2

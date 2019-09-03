@@ -40,6 +40,6 @@ move-folders:
 
 enable-nolib-creation: yes
 
-#manual-changelog:
-#    filename: CHANGELOG-full.md
-#    markup-type: markdown
+manual-changelog:
+    filename: CHANGELOG-full.md
+    markup-type: markdown
