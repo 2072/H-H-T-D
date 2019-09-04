@@ -1309,7 +1309,13 @@ do
                 RequestBattlefieldScoreData()
                 WIPRBSD[3] = GetTime();
 
+                -- I got a few reports where this block is triggered, it seems
+                -- to happen randomly but quite rarely. Letting this for
+                -- unpackaged debug mode only.
+
+                --@debug@
                 HHTD:Debug(ERROR, "Still waiting for UPDATE_BATTLEFIELD_SCORE after 30s...")
+                --@end-debug@
             end
 
             return nil
