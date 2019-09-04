@@ -124,7 +124,7 @@ function HHTD:UnitName(Unit)
             return name.."-"..server;
         else
             return name;
-        end 
+        end
 end
 -- }}}
 
@@ -257,8 +257,8 @@ end
 
 function HHTD:AddDelayedFunctionCall(callID, functionLink, ...)
 
-    
-    if (not self.DelayedFunctionCalls[callID]) then 
+
+    if (not self.DelayedFunctionCalls[callID]) then
         self.DelayedFunctionCalls[callID] =  {["func"] = functionLink, ["args"] =  {...}};
         self.DelayedFunctionCallsCount = self.DelayedFunctionCallsCount + 1;
     elseif select("#",...) > 1 then -- if we had more than the function reference and its object
@@ -351,11 +351,11 @@ end
 
 -- tcopy: recursively copy contents of one table to another
 function HHTD:tcopy(to, from)   -- "to" must be a table (possibly empty)
-    if (type(from) ~= "table") then 
+    if (type(from) ~= "table") then
         return error(("HHTD:tcopy: bad argument #2 'from' must be a table, got '%s' instead"):format(type(from)),2);
     end
 
-    if (type(to) ~= "table") then 
+    if (type(to) ~= "table") then
         return error(("HHTD:tcopy: bad argument #1 'to' must be a table, got '%s' instead"):format(type(to)),2);
     end
     for k,v in pairs(from) do

@@ -67,7 +67,7 @@ function Announcer:OnInitialize() -- {{{
         },
     });
 
-    
+
 
 end -- }}}
 
@@ -78,7 +78,7 @@ function Announcer:GetOptions () -- {{{
 
         local counterpartMessage = info[#info] == 'ProtectMessage' and 'KillMessage' or 'ProtectMessage';
         Announcer:Debug(INFO, 'counterpartMessage:', counterpartMessage);
-      
+
         if not v:find('%[HEALERS%]') then
             return self:Error(L["OPT_POST_ANNOUNCE_MISSING_KEYWORD"]);
         end

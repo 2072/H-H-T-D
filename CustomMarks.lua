@@ -469,7 +469,7 @@ function CM:OnEnable() -- {{{
 
     self:LNR_RegisterCallback("LNR_ERROR_FATAL_INCOMPATIBILITY");
 
- 
+
     for unitName, id in pairs(playerNamesToMark) do
         for plate, plateData in self:EachPlateByName(unitName) do
             self:AddMarkerToPlate(plate, self:GetPlateName(plate), false);
@@ -606,7 +606,7 @@ do
         texture:SetTexture("Interface\\TargetingFrame\\UI-RaidTargetingIcons");
         AdjustTexCoord(texture);
         SetTextureParams(texture);
-        
+
         PlateAdditions.texture = texture;
         PlateAdditions.texture:Show();
         PlateAdditions.IsShown = true; -- set it as soon as we show something
@@ -664,7 +664,7 @@ do
 
         self.DisplayedPlates_byFrameTID[plate] = plate; -- used later to update what was created above
 
-        
+
     end -- }}}
 
     function CM:UpdateTextures ()
@@ -683,7 +683,7 @@ do
 
         end
 
-       
+
     end
 
 

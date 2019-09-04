@@ -58,7 +58,7 @@ H.H.T.D.
 
 **version 2.4.5 (2017-03-28):**
 
-- Add minimal theme for markers created by Mark Sutton. 
+- Add minimal theme for markers created by Mark Sutton.
   (A new option is available in the NamePlate Hooker option tab)
 
 - Link rank alpha to symbol alpha.
@@ -342,7 +342,7 @@ Leave a comment there if you see inconsistencies.
 - Do not display any 'Friendly healer under attack' alert if the healer being
   attacked turns out to be ourself...
 
-- Using AceTimer-3.0 again. 
+- Using AceTimer-3.0 again.
 
 **version 2.0.4 (2012-12-10):**
 
@@ -419,7 +419,7 @@ Until then, just use the command /HHTDG to access HHTD's option panel.
 - Improved healer detection for PVP and PVE (faster and more reliable).
 
 - Better handling of multi-instanced units in PVE (especially with nameplate
-  markers), 
+  markers),
 
 - Many small improvements and bug fixes.
 
