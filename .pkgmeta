@@ -42,6 +42,6 @@ move-folders:
 enable-nolib-creation: yes
 
 
-#manual-changelog:
-#    filename: version-news.md
-#    markup-type: markdown
+manual-changelog:
+    filename: version-news.md
+    markup-type: markdown
