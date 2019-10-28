@@ -4,6 +4,11 @@ H.H.T.D.
 *Change log*
 ------------
 
+**version 2.4.9.4 (2019-10-28):**
+
+- TOC to 80205
+
+
 **version 2.4.9.3 (2019-09-03):**
 
 - Compatible with WoW Classic
