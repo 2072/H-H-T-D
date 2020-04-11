@@ -96,7 +96,7 @@ Commands
 
 - /HHTDP (or /hhtdp) posts healers name to the raid channel ordered by
   effectiveness for all to see (Will use the Raid Warning channel if possible).
-  
+
   **You need to configure the messages in the announce module options first.**
 
 **You can bind the above command to a key (WoW key-bindings interface)**
@@ -149,11 +149,6 @@ battleground:
 
 [YouTube - This makes me a sad Panda][video1]
 
-Interview
----------
-
-Curse.com interviewed me for an 'Add-on Spotlight' article focused on the
-controversy around this add-on, you can find this interview [here][interview1].
 
 Articles
 --------
@@ -168,29 +163,6 @@ have some doubts about the fairness of this add-on!**) :
 Here is [another article written by Gevlon][article2] (a PVP healer).
 
 
-Debates
--------
-
-An 'interesting' debate about this add-on is also happening on Blizzard's official forum:
-
-- [Break the HHTD mod already. (UI and Macro forum)][debate4] (full),
-
-- [HHTD, part I (UI and Macro forum)][debate1] (full),
-
-- [HHTD, part III (General discussion)][debate3] (full),
-
-
-Sadly, as a European I cannot participate but I'm reading those threads with great interest.
-
-The funniest part about all those 26 pages discussions is that only about
-**16,000 people were actually using HHTD at the time** (from the Curse Client
-popularity statistics)... Now over **180,000** players have it installed!
-
-In those discussions it's also rarely noted that HHTD is also very helpful to
-protect healers on your side.  This debate is leading nowhere though... I won't
-post any additional links to those endless threads.
-
-
 ******************************************
 
 *type /hhtdg to open the configuration interface, or /hhtd for command-line access*
@@ -200,28 +172,16 @@ post any additional links to those endless threads.
 
 To report issues or ask for new features, use the [ticket system][tickets].
 
-Bitcoin donation address: [1JkA5Ns1dMQLM4D8HUsbXyka6yhp312KnN](https://blockchain.info/address/1JkA5Ns1dMQLM4D8HUsbXyka6yhp312KnN)
+Bitcoin donation address: [1JkA5Ns1dMQLM4D8HUsbXyka6yhp312KnN](bitcoin:1JkA5Ns1dMQLM4D8HUsbXyka6yhp312KnN)
 
 [tickets]: https://www.wowace.com/addons/h-h-t-d/tickets/
 [dev]: https://www.2072productions.com/to/hhtd_dev
-[forum]: https://www.wowace.com/addons/h-h-t-d/forum/
-
-
-[debate1]: https://us.battle.net/wow/en/forum/topic/2211922815
-
-[debate3]: https://us.battle.net/wow/en/forum/topic/2228224992
-
-[debate4]: https://us.battle.net/wow/en/forum/topic/2191131447
-
 
 
 [article1]: https://cynwise.wordpress.com/2011/03/22/healers-have-to-die-and-the-pvp-addons-arms-race/
 [article2]: https://greedygoblin.blogspot.com/2011/05/healers-have-to-die.html
 [article3]: https://cynwise.wordpress.com/2011/09/16/using-healers-have-to-die-to-protect-friendly-healers/
 
-[interview1]: https://www.curse.com/spotlight/addons/wow/45369-healershavetodie-wow-mod-spotlight
-
 [video1]: https://www.youtube.com/watch?v=bDdmD6Lx87g
 
-[mop]: https://www.2072productions.com/images/ah-mop-75x75-11-4-11.jpg "Mist of Pandaria Beta"
-[spelllist]: https://www.wowace.com/addons/h-h-t-d/pages/specialized-healers-spells/
+[spelllist]: https://www.wowace.com/addons/h-h-t-d/pages/specialized-healers-spells
