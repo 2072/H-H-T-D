@@ -4,7 +4,9 @@ H.H.T.D.
 *Change log*
 ------------
 
-**version 2.4.9.6 (2020-10-18):**
+**version 2.4.9.6 (2020-10-19):**
+
+- Adjust specialization spells list.
 
 - TOC to 90001
 
