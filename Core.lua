@@ -108,8 +108,7 @@ local L = HHTD.Localized_Text;
 
 HHTD.Constants = {};
 local HHTD_C = HHTD.Constants;
-HHTD_C.WOWC = WOW_PROJECT_ID == WOW_PROJECT_CLASSIC
-HHTD_C.WOW8 = (tocversion >= 80000) or HHTD_C.WOWC
+HHTD_C.WOWC = WOW_PROJECT_ID ~= WOW_PROJECT_MAINLINE
 
 --[=[
 HHTD_C.Healing_Classes = { -- unused
@@ -1606,7 +1605,7 @@ do
         --end
         --@end-debug@
 
-        if HHTD_C.WOW8 and event == nil then
+        if event == nil then
             timestamp, event, hideCaster, sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags, _spellID, spellNAME, _spellSCHOOL, _amount = CombatLogGetCurrentEventInfo()
         end
 

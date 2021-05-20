@@ -4,6 +4,10 @@ H.H.T.D.
 *Change log*
 ------------
 
+**version 2.4.9.8 (2021-03-21):**
+
+- Fix WoW Classic detection
+
 **version 2.4.9.7 (2021-03-21):**
 
 - TOC update
