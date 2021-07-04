@@ -181,7 +181,7 @@ do
                                 self:Debug(INFO, un, 'marked with mark #', self.db.global.MarkerChoice)
                                 return un .. " marked with mark with " .. getRTTStr(self.db.global.MarkerChoice)
                             else
-                                self:Debug(ERROR, L["OPT_TESTONTARGET_ENOTARGET"] );
+                                self:Print(L["OPT_TESTONTARGET_ENOTARGET"] );
                             end
                         end,
                         order = 5,
@@ -200,7 +200,7 @@ do
 
                                 self:Debug(INFO, un, 'mark cleared')
                             else
-                                self:Debug(ERROR, L["OPT_TESTONTARGET_ENOTARGET"] );
+                                self:Print(L["OPT_TESTONTARGET_ENOTARGET"] );
                             end
 
                         end,
