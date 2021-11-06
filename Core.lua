@@ -1272,6 +1272,7 @@ do
 
     local GetNumBattlefieldScores = _G.GetNumBattlefieldScores
     local GetBattlefieldScore = _G.GetBattlefieldScore
+    local ApiChangedCounter = 0
     local function checkPlayerRealRole(PlayerName, spellName)
         if GetNumBattlefieldScores() == 0 then
             return nil
@@ -1366,8 +1367,12 @@ do
                 return true
             end
         else
+            ApiChangedCounter = ApiChangedCounter + 1
             -- got a few error reports getting here where the classTag was nil on a Paladin... not sure what to do yet, seems rare.
-            HHTD:Debug(ERROR, "(HHTD update required) GetBattlefieldScore() API changed", spec, classTag, GetBattlefieldScore(playerIndex))
+            -- another one where the spec was nil, probably a spurious bug in the API, using a counter to detect real API changes on the 3rd strike.
+            if ApiChangedCounter > 2 then
+                HHTD:Debug(ERROR, "(HHTD update required) GetBattlefieldScore() API changed", spec, classTag, GetBattlefieldScore(playerIndex))
+            end
 
             return nil
         end
