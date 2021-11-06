@@ -4,6 +4,11 @@ H.H.T.D.
 *Change log*
 ------------
 
+**version 2.4.9.10 (2021-11-06):**
+
+- TOC update
+
+
 **version 2.4.9.9 (2021-07-03):**
 
 - Do not generate a Decursive error report when no target is selected while
