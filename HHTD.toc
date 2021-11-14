@@ -1,9 +1,9 @@
 ## Interface: 90105
 ## Interface-Retail: 90105
-## Interface-Classic: 11400
+## Interface-Classic: 11401
 ## Interface-BCC: 20502
 ## X-Max-Interface: 90105
-## X-Min-Interface: 11400
+## X-Min-Interface: 11401
 
 
 
