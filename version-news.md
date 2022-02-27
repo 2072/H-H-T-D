@@ -4,6 +4,12 @@ H.H.T.D.
 *Change log*
 ------------
 
+**version 2.4.9.11 (2022-02-27):**
+
+- Fix Binding Heal (missing spell ID in WoW 9.2.0)
+- TOC update
+
+
 **version 2.4.9.10 (2021-11-06):**
 
 - TOC update
