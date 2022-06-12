@@ -386,7 +386,7 @@ local function REGISTER_HEALERS_ONLY_SPELLS_ONCE ()
             HHTD_C.Healers_Only_Spells_ByName[(GetSpellInfo(spellID))] = class;
             debug_SpellNumber = debug_SpellNumber + 1;
         else
-            HHTD:Debug(ERROR, "Missing spell:", spellID);
+            HHTD:Debug(ERROR, "Missing spell (you should check if there is an updated version of HHTD):", spellID);
         end
 
     end
