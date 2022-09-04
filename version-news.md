@@ -4,6 +4,11 @@ H.H.T.D.
 *Change log*
 ------------
 
+**version 2.4.9.13 (2022-09-04):**
+
+- TOC updates (+ for WotLK)
+
+
 **version 2.4.9.12 (2022-06-12):**
 
 - Fix /hhtdg option panel for retail (was crashing due to custom marks panel).
