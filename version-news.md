@@ -4,6 +4,11 @@ H.H.T.D.
 *Change log*
 ------------
 
+**version 2.4.9.14 (2022-11-28):**
+
+- TOC update for retail.
+
+
 **version 2.4.9.13 (2022-09-04):**
 
 - TOC updates (+ for WotLK)
