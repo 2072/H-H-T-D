@@ -4,6 +4,12 @@ H.H.T.D.
 *Change log*
 ------------
 
+
+**version 2.4.9.14 (2023-01-03):**
+
+- Update libNameplateRegistry to fix issue with object nameplates.
+
+
 **version 2.4.9.14 (2022-11-28):**
 
 - TOC update for retail.
