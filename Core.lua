@@ -343,6 +343,12 @@ local function REGISTER_HEALERS_ONLY_SPELLS_ONCE ()
         [116849] = "MONK", -- Life Cocoon
         -- [119611] = "MONK", -- Renewing mist
 
+        [364343] = "EVOKER", -- Echo (talent)
+        [355936] = "EVOKER", -- Dream Breath (talent)
+        [363534] = "EVOKER", -- Rewind (talent)
+        [373861] = "EVOKER", -- Temporal Anomaly (talent)
+        [359816] = "EVOKER", -- Dream Flight (talent)
+
         --@debug@
         -- test bad spell mitigation
         -- those are not healer specific
@@ -1597,7 +1603,14 @@ do
         end
 
         local class = select(2, UnitClass(unit));
-        local dummySpell = ({["DRUID"] = GetSpellInfo(33891), ["SHAMAN"] = GetSpellInfo(974), ["PRIEST"] = GetSpellInfo(109964), ["PALADIN"] = GetSpellInfo(82326), ["MONK"] = GetSpellInfo(115175)})[class] or GetSpellInfo(3273);
+        local dummySpell = ({
+            ["DRUID"] = GetSpellInfo(000740),
+            ["SHAMAN"] = GetSpellInfo(077472),
+            ["PRIEST"] = GetSpellInfo(047788),
+            ["PALADIN"] = GetSpellInfo(085222),
+            ["MONK"] = GetSpellInfo(116849),
+            ["EVOKER"] = GetSpellInfo(364343),
+        })[class] or GetSpellInfo(3273);
         self:COMBAT_LOG_EVENT_UNFILTERED(nil, 0, event, false, srcGUID, srcName, srcFlags, 0, destGUID, destName, destFlags, 0, 0, dummySpell, "", HHTD.HealThreshold + 1);
     end
 

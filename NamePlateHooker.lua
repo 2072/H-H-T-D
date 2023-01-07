@@ -640,6 +640,7 @@ do
             ["PALADIN"] = getIconCoords(3,0), --3,0
             ["PRIEST"]  = getIconCoords(0,1), --0,1
             ["SHAMAN"]  = getIconCoords(1,1), --1,1
+            ["EVOKER"]  = getIconCoords(0,3), --0,3
         },
         [false] = {
             [false]     = getIconCoords(2,1), --2,1
@@ -648,6 +649,7 @@ do
             ["PALADIN"] = getIconCoords(1,2), --1,2
             ["PRIEST"]  = getIconCoords(2,2), --2,2
             ["SHAMAN"]  = getIconCoords(3,2), --3,2
+            ["EVOKER"]  = getIconCoords(1,3), --1,3
         }
     };
 
