@@ -5,6 +5,13 @@ H.H.T.D.
 ------------
 
 
+**version 2.4.11 (2023-04-02):**
+
+- TOC updates
+
+- Fix for WoW 10.1 (PTR)
+
+
 **version 2.4.10 (2023-01-07):**
 
 - Update libNameplateRegistry to fix issue with object nameplates.
