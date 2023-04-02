@@ -40,6 +40,8 @@ local UNPACKAGED = "@pro" .. "ject-version@";
 local VERSION = "@project-version@";
 
 local ADDON_NAME, T = ...;
+local GetAddOnMetadata  = _G.C_AddOns and _G.C_AddOns.GetAddOnMetadata or _G.GetAddOnMetadata;
+
 
 T._FatalError = function (TheError)
 
