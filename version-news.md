@@ -5,6 +5,11 @@ H.H.T.D.
 ------------
 
 
+**version 2.4.12 (2023-05-29):**
+
+- TOC update for 10.1.
+
+
 **version 2.4.11 (2023-04-02):**
 
 - TOC updates
