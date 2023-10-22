@@ -35,14 +35,17 @@ jobs:
           args: -qo 011
 
       - name: Package retail
+        if: ${{ !contains(github.event.head_commit.message, '#skipretail') }}
         uses: BigWigsMods/packager@master
 
       - name: Package classic
+        if: ${{ !contains(github.event.head_commit.message, '#skipclassic') }}
         uses: BigWigsMods/packager@master
         with:
           args: -g classic
 
       - name: Package wraith
+        if: ${{ !contains(github.event.head_commit.message, '#skipwrath') }}
         uses: BigWigsMods/packager@master
         with:
           args: -g wrath
