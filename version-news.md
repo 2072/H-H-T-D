@@ -4,6 +4,15 @@ H.H.T.D.
 *Change log*
 ------------
 
+**version 2.4.16 (2023-11-22):**
+
+- Fix ADDON_ACTION_BLOCKED error due to the now forbidden usage of
+  CheckInteractDistance() while in combat. This was used to display an alert
+  when a friendly nearby healer is being attacked. HHTD is now using
+  UnitInRange() instead but this will only work for unit in the players party or
+  raid so no longer for potential NPC healers...
+
+
 **version 2.4.15 (2023-11-08):**
 
 - TOC updates.
