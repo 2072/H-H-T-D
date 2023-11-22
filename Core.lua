@@ -1537,7 +1537,7 @@ do
 
     local band                      = _G.bit.band;
     local sub                       = _G.string.sub;
-    local CheckInteractDistance     = _G.CheckInteractDistance;
+    local UnitInRange               = _G.UnitInRange;
 
     local HOSTILE_OUTSIDER          = bit.bor (COMBATLOG_OBJECT_AFFILIATION_OUTSIDER, COMBATLOG_OBJECT_REACTION_HOSTILE);
     local HOSTILE                   = COMBATLOG_OBJECT_REACTION_HOSTILE;
@@ -1699,7 +1699,7 @@ do
             if (_amount and event:sub(-7) == "_DAMAGE") then
 
                 -- the healer is nearby
-                if HHTD_C.PLAYER_GUID == destGUID or CheckInteractDistance(destName, 1) then
+                if HHTD_C.PLAYER_GUID == destGUID or (UnitInRange(destName)) then
 
                     -- first attack?
                     if not self.Friendly_Healers_Attacked_by_GUID[destGUID] then
