@@ -4,6 +4,11 @@ H.H.T.D.
 *Change log*
 ------------
 
+**version 2.4.17 (2024-01-22):**
+
+- TOC update for 10.2.5.
+
+
 **version 2.4.16 (2023-11-22):**
 
 - Fix ADDON_ACTION_BLOCKED error due to the now forbidden usage of
