@@ -100,7 +100,7 @@ function HHTD:CreateClassColorTables () -- {{{
             if LC[class] then -- thank to a wonderful add-on that adds the wrong translation "Death Knight" to the global RAID_CLASS_COLORS....
                 HHTD:GetClassHexColor(class);
             elseif not (HHTD_C.WOWC and NON_CLASSIC_CLASSES[class]) then
-                RAID_CLASS_COLORS[class] = nil; -- Eat that!
+                --RAID_CLASS_COLORS[class] = nil; -- Eat that!
                 self:Print("|cFFFF0000Stupid value found in _G.RAID_CLASS_COLORS table|r\nThis will cause many issues (tainting), HHTD will display this message until the culprit add-on is fixed or removed, the Stupid value is: '", class, "'");
             end
         end
