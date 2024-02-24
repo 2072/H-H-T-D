@@ -311,7 +311,7 @@ local function REGISTER_HEALERS_ONLY_SPELLS_ONCE ()
         [290112] = "PRIEST", -- Binding Heal
         [077485] = "PRIEST", -- Mastery: Echo of Light -- the passibe ability
         -- [077489] = "PRIEST", -- Echo of Light -- the aura applied by the afformentioned
-        [000139] = "PRIEST", -- Renew
+        -- [000139] = "PRIEST", -- Renew
 
         -- Druids - Restauration
         --[018562] = "DRUID", -- Swiftmend -- (also available through restoration afinity talent)
@@ -338,7 +338,7 @@ local function REGISTER_HEALERS_ONLY_SPELLS_ONCE ()
         [085222] = "PALADIN", -- Light of Dawn
 
         -- Monks - Mistweaver
-        [115175] = "MONK", -- Soothing Mist
+--        [115175] = "MONK", -- Soothing Mist
         [115310] = "MONK", -- Revival
         --[116670] = "MONK", -- Vivify all monks have it in WoW8
         [116680] = "MONK", -- Thunder Focus Tea
