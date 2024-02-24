@@ -300,7 +300,7 @@ local function REGISTER_HEALERS_ONLY_SPELLS_ONCE ()
         [033206] = "PRIEST", -- Pain Suppression
         [000527] = "PRIEST", -- Purify
         [081749] = "PRIEST", -- Atonement
-        [132157] = "PRIEST", -- Holy Nova
+        -- [132157] = "PRIEST", -- Holy Nova -- removed in 10.2.5
         --      Holy
         [000596] = "PRIEST", -- Prayer of Healing
         [014914] = "PRIEST", -- Holy Fire
