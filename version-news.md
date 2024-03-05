@@ -4,6 +4,11 @@ H.H.T.D.
 *Change log*
 ------------
 
+**version 2.4.18 (2024-03-05):**
+
+- Remove Soothing Mist, Renew and Holy Nova from the specialized healer spells list. (WoW 10.2.5 only)
+
+
 **version 2.4.17 (2024-01-22):**
 
 - TOC update for 10.2.5.
