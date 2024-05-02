@@ -371,7 +371,7 @@ local function REGISTER_HEALERS_ONLY_SPELLS_ONCE ()
             [00724] = "PRIEST", -- Lightwell
 
             -- Shaman Restoration
-            [16178] = "SHAMAN", -- Purification
+           -- [16178] = "SHAMAN", -- Purification --ct removed
             [29206] = "SHAMAN", -- Healing way
             [001064] = "SHAMAN", -- Chain Heal
         }
