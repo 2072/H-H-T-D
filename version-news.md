@@ -4,6 +4,11 @@ H.H.T.D.
 *Change log*
 ------------
 
+**version 2.4.20 (2024-05-26):**
+
+- TOC updates for 10.2.7
+
+
 **version 2.4.19 (2024-05-02):**
 
 - TOC updates
