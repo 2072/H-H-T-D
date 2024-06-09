@@ -42,7 +42,6 @@ local VERSION = "@project-version@";
 local ADDON_NAME, T = ...;
 local GetAddOnMetadata  = _G.C_AddOns and _G.C_AddOns.GetAddOnMetadata or _G.GetAddOnMetadata;
 
-
 T._FatalError = function (TheError)
 
     if not StaticPopupDialogs["HHTD_ERROR_FRAME"] then
@@ -855,76 +854,6 @@ local DEFAULT__CONFIGURATION = {
 
 -- = Add-on Management functions {{{
 do
-    local oldName = "Healers-Have-To-Die"
-    local oldAce3Name = "Healers Have To Die"
-    local oldSV   = "Healers_Have_To_Die"
-
-    local function transmuteSettings()
-
-        -- I've chosen to rename this add-on, let's handle this decision properly
-        -- so that it'll be transparent to the users.
-
-        local function disableOldName()
-            local old = LibStub("AceAddon-3.0"):GetAddon(oldAce3Name, true);
-
-            if old then
-                -- if it's the full add-on turn it off properly
-                old:Disable();
-            end
-
-            HHTD:Debug(WARNING, "the old " .. oldName .. " has been disabled for this character");
-            -- disable oldName only on the current character
-            -- DisableAddOn(oldName); -- on a second thought it's best to do
-            -- nothing here, it's soft disabled already, that's enough, this
-            -- allows to retain the enable/disable state through settings
-            -- resets without causing strange unexpected things...
-        end
-
-        --
-        -- 1 - check if the old name is loaded and running
-        -- 2 - import its settings
-        -- 3 - disable it
-        if GetAddOnEnableState(UnitName("player"), oldName) == 2 then
-            if type(_G[oldSV]) == 'table' then
-
-                if not _G[oldSV].global then
-                    _G[oldSV].global = {};
-                end
-
-                -- have we already transferred the settings?
-                if not HHTD_SavedVariables or not HHTD_SavedVariables.global or not HHTD_SavedVariables.global.settingsMigrated
-                    or not _G[oldSV].global.settingsTransmuted then
-                    HHTD:Debug(WARNING, "Getting settings from " .. oldName .. "...");
-
-                    if not HHTD_SavedVariables then
-                        HHTD_SavedVariables = {};
-                    end
-
-                    HHTD:tcopy(HHTD_SavedVariables, _G[oldSV]);
-
-                    HHTD_SavedVariables.global.settingsMigrated = true;
-                    HHTD_SavedVariables.global.Enabled = true;
-
-                    HHTD:tcopy(_G[oldSV].global, {["settingsTransmuted"] = "settings switched to new H.H.T.D add-on", ["Enabled"] = false})
-
-                    HHTD:Debug(WARNING, "done. Now disabling " .. oldName .. "...");
-                    disableOldName();
-                elseif _G[oldSV].global and _G[oldSV].global.settingsTransmuted then
-                    HHTD:Debug(WARNING, "Settings already tranferred from " .. oldName);
-                    disableOldName();
-                    _G[oldSV].global.Enabled = false;
-                end
-            else
-                -- oldName was enabled but no settings were found.
-                -- Either there are none or oldName has not been loaded yet...
-                return false;
-            end
-
-            return true;
-        end
-
-    end
-
 
     function HHTD:OnInitialize()
         -- Catch people updating add-ons while WoW is running before they post "it doesn't work!!!!" comments.
@@ -936,74 +865,16 @@ do
         end
 
 
-        local oldNameGState = select(5, GetAddOnInfo(oldName));
-        local oldNameGEnableState = GetAddOnEnableState(nil, oldName);
-        local oldNameLState = GetAddOnEnableState(UnitName("player"), oldName);
-        local TSsuccess, TSstatus = pcall(transmuteSettings);
-
-        if not TSsuccess then
-            T._DiagStatus = 2;
-            T._Diagmessage = "Settings transfer from '" .. oldName .. "' to '" .. ADDON_NAME .. "' failed. " .. ADDON_NAME ..
-            " will stay disabled. Error was: " .. TSstatus .. "\n\n" .. debugstack(2,1,1);
-
-            T._FatalError(T._Diagmessage);
-            return false;
-        elseif TSstatus then
-            self:Debug(WARNING, "Previous settings were successfully transferred.");
-
-        end
-
         self.db = LibStub("AceDB-3.0"):New("HHTD_SavedVariables", DEFAULT__CONFIGURATION);
-
-        -- store once the status of the oldName
-        if self.db.global.oldNameEnableState == nil then
-            self.db.global.oldNameEnableState = oldNameGEnableState; -- 0 == disabled everywhere, 1 partially, 2 globally enabled
-        end
-
-        if TSstatus and not self.db.char.settingsMigrated then
-            T._MessageBox((L["HHTD_IS_NOW_KNOWN_AS_H.H.T.D."]):format(oldName, oldName));
-            self.db.char.settingsMigrated = true;
-        end
 
         LibStub("AceConfig-3.0"):RegisterOptionsTable(tostring(self), self.GetOptions, {"hhtd", "H.H.T.D."});
         --LibStub("AceConfigDialog-3.0"):AddToBlizOptions(tostring(self));
         self:RegisterChatCommand('hhtdg', function() LibStub("AceConfigDialog-3.0"):Open(tostring(self)) end, true);
         self:CreateClassColorTables();
 
-        -- if the user previously disabled the oldName then we don't want to intrude
-        -- NOTE: once the old add-on is disabled on all characters and the user
-        -- reset their settings then this code will be triggered :/
-        -- Just make sure that it can be triggered only once...
-        -- maybe add a delay?
-        if oldNameGState == "DISABLED" and self.db.global.settingsMigrated == nil then
-            self:Debug(WARNING, oldName .. " was already disabled for all characters, quitting.");
-            self:SetEnabledState(false);
-            DisableAddOn(ADDON_NAME, true); -- disable globaly as the oldName was
-            self:Debug(WARNING, "globally disabled");
-        elseif oldNameGState ~= "DISABLED" and oldNameLState == 0 and self.db.char.settingsMigrated == nil
-            -- and there was actually a per character emable/disable setting
-            and self.db.global.oldNameEnableState == 1 then
-            -- The oldName was already disabled for this specific character
-            self:SetEnabledState(false);
-            self:Debug(WARNING, "disabled for this character as", oldName, "was already disabled for", (UnitName("player")));
-            DisableAddOn(ADDON_NAME);
-        else
-            self:SetEnabledState(self.db.global.Enabled);
-        end
 
+        self:SetEnabledState(self.db.global.Enabled);
 
-        -- if we manage to run once on this character make sure that any
-        -- disable action on the oldName will not trigger the above code
-        if self.db.char.settingsMigrated == nil then
-            self.db.char.settingsMigrated = false;
-        end
-
-        if self.db.global.settingsMigrated == nil then
-            -- if we're here it means that no setting were transferred but
-            -- that we found no reason to auto-disable make sure not to find
-            -- one in the future
-            self.db.global.settingsMigrated = false;
-        end
 
         if HHTD_C.WOWC then
             self.db.global.PvpHSpecsOnly = false;
@@ -1012,15 +883,6 @@ do
     end
 
     function HHTD:ADDON_LOADED(selfEvent, addOnName)
-        if addOnName == oldName then
-            self:Debug(WARNING, oldName .. " was post-loaded... reinitializing!");
-            T._DiagStatus = 1;
-            self:Disable();
-            self.db = nil;
-            self:OnInitialize();
-            self:Enable();
-            T._DiagStatus = nil;
-        end
     end
 end
 
@@ -1040,7 +902,7 @@ function HHTD:OnEnable()
     self:RegisterEvent("UPDATE_MOUSEOVER_UNIT", "TestUnit");
     self:RegisterEvent("PLAYER_TARGET_CHANGED", "TestUnit");
     self:RegisterEvent("PLAYER_ALIVE"); -- talents SHOULD be available
-    self:RegisterEvent("ADDON_LOADED");
+    -- self:RegisterEvent("ADDON_LOADED");
     -- self:RegisterEvent("PARTY_MEMBER_DISABLE"); -- useless event, no argument...
 
     if not T._DiagStatus and self.db.global.ShowChatCommandReminder then
