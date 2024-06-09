@@ -41,6 +41,8 @@ local VERSION = "@project-version@";
 
 local ADDON_NAME, T = ...;
 local GetAddOnMetadata  = _G.C_AddOns and _G.C_AddOns.GetAddOnMetadata or _G.GetAddOnMetadata;
+local GetSpellInfo      = _G.C_Spell and _G.C_Spell.GetSpellName or _G.GetSpellInfo;
+local GetSpellName      = _G.C_Spell and _G.C_Spell.GetSpellName or function (spellId) return (GetSpellInfo(spellId)) end;
 
 T._FatalError = function (TheError)
 
@@ -384,13 +386,13 @@ local function REGISTER_HEALERS_ONLY_SPELLS_ONCE ()
 
 
     -- /spew _HHTD_DEBUG.Constants.Healers_Only_Spells_ByName
-    -- /spew GetSpellInfo(077485)
+    -- /spew GetSpellName(077485)
 
     local debug_SpellNumber = 0;
     for spellID, class in pairs(Healers_Only_Spells_ByID) do
 
-        if (GetSpellInfo(spellID)) then
-            HHTD_C.Healers_Only_Spells_ByName[(GetSpellInfo(spellID))] = class;
+        if (GetSpellName(spellID)) then
+            HHTD_C.Healers_Only_Spells_ByName[GetSpellName(spellID)] = class;
             debug_SpellNumber = debug_SpellNumber + 1;
         else
             HHTD:Debug(ERROR, "Missing spell (you should check if there is an updated version of HHTD):", spellID);
@@ -1468,13 +1470,13 @@ do
 
         local class = select(2, UnitClass(unit));
         local dummySpell = ({
-            ["DRUID"] = GetSpellInfo(000740),
-            ["SHAMAN"] = GetSpellInfo(077472),
-            ["PRIEST"] = GetSpellInfo(047788),
-            ["PALADIN"] = GetSpellInfo(085222),
-            ["MONK"] = GetSpellInfo(116849),
-            ["EVOKER"] = GetSpellInfo(364343),
-        })[class] or GetSpellInfo(3273);
+            ["DRUID"] = GetSpellName(000740),
+            ["SHAMAN"] = GetSpellName(077472),
+            ["PRIEST"] = GetSpellName(047788),
+            ["PALADIN"] = GetSpellName(085222),
+            ["MONK"] = GetSpellName(116849),
+            ["EVOKER"] = GetSpellName(364343),
+        })[class] or GetSpellName(3273);
         self:COMBAT_LOG_EVENT_UNFILTERED(nil, 0, event, false, srcGUID, srcName, srcFlags, 0, destGUID, destName, destFlags, 0, 0, dummySpell, "", HHTD.HealThreshold + 1);
     end
 
