@@ -296,7 +296,7 @@ local function REGISTER_HEALERS_ONLY_SPELLS_ONCE ()
 
         -- Priests
         --      Discipline
-        [047540] = "PRIEST", -- Penance
+       -- [047540] = "PRIEST", -- Penance - removed due to strange reports received where this spell is misattributed.
         [109964] = "PRIEST", -- Spirit shell -- not seen in disc
         [033206] = "PRIEST", -- Pain Suppression
         [000527] = "PRIEST", -- Purify

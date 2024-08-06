@@ -4,9 +4,11 @@ H.H.T.D.
 *Change log*
 ------------
 
-**version 2.4.21 (2024-06-09):**
+**version 2.4.21 (2024-08-07):**
 
 - Compatible with The War Within
+
+- Remove Penance from specialized healer spell
 
 
 **version 2.4.20 (2024-05-26):**
