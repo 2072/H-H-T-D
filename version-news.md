@@ -4,6 +4,11 @@ H.H.T.D.
 *Change log*
 ------------
 
+**version 2.4.22 (2024-10-04):**
+
+- TOC updates
+
+
 **version 2.4.21 (2024-08-07):**
 
 - Compatible with The War Within
