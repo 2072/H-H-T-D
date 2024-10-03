@@ -1176,7 +1176,7 @@ do
                 WIPRBSD[2] = PlayerName;
                 WIPRBSD[3] = GetTime();
 
-                HHTD:Debug(WARNING, "RequestBattlefieldScoreData()")
+                HHTD:Debug(INFO, "RequestBattlefieldScoreData()")
             elseif GetTime() - WIPRBSD[3] > 30 then
                 RequestBattlefieldScoreData()
                 WIPRBSD[3] = GetTime();
