@@ -373,7 +373,7 @@ local function REGISTER_HEALERS_ONLY_SPELLS_ONCE ()
 
             -- Shaman Restoration
            -- [16178] = "SHAMAN", -- Purification --ct removed
-            [29206] = "SHAMAN", -- Healing way
+            -- [29206] = "SHAMAN", -- Healing way -- mop removed
             [001064] = "SHAMAN", -- Chain Heal
         }
 
