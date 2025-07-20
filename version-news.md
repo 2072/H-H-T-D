@@ -4,6 +4,11 @@ H.H.T.D.
 *Change log*
 ------------
 
+**version 2.4.25 (2025-07-21):**
+
+- TOC updates
+
+
 **version 2.4.24 (2025-03-14):**
 
 - TOC updates
