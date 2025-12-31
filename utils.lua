@@ -58,7 +58,7 @@ local RAID_CLASS_COLORS = _G.RAID_CLASS_COLORS;
 
 HHTD_C.ClassesColors = { };
 
-local LC = _G.LOCALIZED_CLASS_NAMES_MALE;
+local LC = {}
 
 function HHTD:GetClassColor (englishClass) -- {{{
     if not HHTD_C.ClassesColors[englishClass] then
@@ -94,6 +94,19 @@ local NON_CLASSIC_CLASSES = {
 };
 
 function HHTD:CreateClassColorTables () -- {{{
+
+    -- Make sure to never crash if some locals are missing (seen this happen on
+    -- Chinese clients when relying on LOCALIZED_CLASS_NAMES_MALE constant)
+    -- While that was probably caused by a badd-on redefining the constant,
+    -- it's best to stay on the safe side...
+
+    local localizedClasses = {};
+
+    HHTD:tcopy(localizedClasses, LocalizedClassList and LocalizedClassList(false) or FillLocalizedClassList({}, false));
+
+
+    LC = setmetatable(localizedClasses, {__index = function(t,k) return k end});
+
     if RAID_CLASS_COLORS then
         local class, colors;
         for class in pairs(RAID_CLASS_COLORS) do
@@ -101,7 +114,7 @@ function HHTD:CreateClassColorTables () -- {{{
                 HHTD:GetClassHexColor(class);
             elseif not (HHTD_C.WOWC and NON_CLASSIC_CLASSES[class]) then
                 --RAID_CLASS_COLORS[class] = nil; -- Eat that!
-                self:Print("|cFFFF0000Stupid value found in _G.RAID_CLASS_COLORS table|r\nThis will cause many issues (tainting), HHTD will display this message until the culprit add-on is fixed or removed, the Stupid value is: '", class, "'");
+                self:Print("|cFFFF0000Unexpected value found in _G.RAID_CLASS_COLORS table|r\nThis will cause many issues (tainting), HHTD will display this message until the culprit add-on is fixed or removed, the Stupid value is: '", class, "'");
             end
         end
     else
