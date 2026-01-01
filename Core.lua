@@ -112,6 +112,7 @@ local L = HHTD.Localized_Text;
 HHTD.Constants = {};
 local HHTD_C = HHTD.Constants;
 HHTD_C.WOWC = WOW_PROJECT_ID ~= WOW_PROJECT_MAINLINE
+HHTD_C.MN = tocversion >= 120000
 
 --[=[
 HHTD_C.Healing_Classes = { -- unused
@@ -899,7 +900,11 @@ function HHTD:OnEnable()
 
     REGISTER_HEALERS_ONLY_SPELLS_ONCE ();
 
-    self:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED");
+    if not HHTD_C.MN then
+        self:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED");
+    else
+        self:Print("Could not register CLEU, only the marker feature will work.")
+    end
     self:RegisterEvent("UPDATE_BATTLEFIELD_SCORE");
     self:RegisterEvent("UPDATE_MOUSEOVER_UNIT", "TestUnit");
     self:RegisterEvent("PLAYER_TARGET_CHANGED", "TestUnit");

@@ -28,6 +28,7 @@ local INFO2     = 4;
 
 local ADDON_NAME, T = ...;
 local HHTD = T.HHTD;
+local HHTD_C = HHTD.Constants;
 local L = HHTD.Localized_Text;
 
 
@@ -145,7 +146,13 @@ do
                     Warning2 = {
                         type = 'description',
                         name = HHTD:ColorText(L["OPT_NPH_WARNING2"], "FFFF0000"),
-                        hidden = function () return GetCVarBool("nameplateShowFriends") end,
+                        hidden = function ()
+                            if not HHTD_C.MN then
+                                return GetCVarBool("nameplateShowFriends")
+                            else
+                                return GetCVarBool("nameplateShowFriendlyPlayers")
+                            end
+                        end,
                         order = 2,
                     },
                     MarkerChoice = {
@@ -268,10 +275,19 @@ do
                         name = L["OPT_NPH_FRIENDLY_NAMEPLATE"],
                         order = 14.1,
                         set = function (info, value)
-                            SetCVar("nameplateShowFriends", value and 1 or 0);
+                            if not HHTD_C.MN then
+                                SetCVar("nameplateShowFriends", value and 1 or 0)
+                            else
+                                SetCVar("nameplateShowFriendlyPlayers", value and 1 or 0)
+                                SetCVar("nameplateShowFriendlyNPCs", value and 1 or 0)
+                            end
                         end,
                         get = function()
-                            return GetCVarBool("nameplateShowFriends");
+                            if not HHTD_C.MN then
+                                return GetCVarBool("nameplateShowFriends")
+                            else
+                                return GetCVarBool("nameplateShowFriendlyPlayers")
+                            end
                         end,
                     },
                     FNPC_Nameplate = {

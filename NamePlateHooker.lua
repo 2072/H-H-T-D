@@ -114,7 +114,13 @@ function NPH:GetOptions () -- {{{
                 Warning2 = {
                     type = 'description',
                     name = HHTD:ColorText(L["OPT_NPH_WARNING2"], "FFFF0000"),
-                    hidden = function () return GetCVarBool("nameplateShowFriends") end,
+                    hidden = function ()
+                            if not HHTD_C.MN then
+                                return GetCVarBool("nameplateShowFriends")
+                            else
+                                return GetCVarBool("nameplateShowFriendlyPlayers")
+                            end
+                        end,
                     order = 1,
                 },
                 sPve = {
@@ -155,11 +161,20 @@ function NPH:GetOptions () -- {{{
                     name = L["OPT_NPH_FRIENDLY_NAMEPLATE"],
                     order = 13.2,
                     set = function (info, value)
-                        SetCVar("nameplateShowFriends", value and 1 or 0);
-                    end,
-                    get = function()
-                        return GetCVarBool("nameplateShowFriends");
-                    end,
+                            if not HHTD_C.MN then
+                                SetCVar("nameplateShowFriends", value and 1 or 0)
+                            else
+                                SetCVar("nameplateShowFriendlyPlayers", value and 1 or 0)
+                                SetCVar("nameplateShowFriendlyNPCs", value and 1 or 0)
+                            end
+                        end,
+                        get = function()
+                            if not HHTD_C.MN then
+                                return GetCVarBool("nameplateShowFriends")
+                            else
+                                return GetCVarBool("nameplateShowFriendlyPlayers")
+                            end
+                        end,
                 },
                 FNPC_Nameplate = {
                         type = 'toggle',
