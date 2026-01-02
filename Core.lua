@@ -43,6 +43,7 @@ local ADDON_NAME, T = ...;
 local GetAddOnMetadata  = _G.C_AddOns and _G.C_AddOns.GetAddOnMetadata or _G.GetAddOnMetadata;
 local GetSpellInfo      = _G.C_Spell and _G.C_Spell.GetSpellName or _G.GetSpellInfo;
 local GetSpellName      = _G.C_Spell and _G.C_Spell.GetSpellName or function (spellId) return (GetSpellInfo(spellId)) end;
+local canaccessvalue    = _G.canaccessvalue or function(_) return true; end
 
 T._FatalError = function (TheError)
 
@@ -994,7 +995,7 @@ do
 
         local unitFirstName, unitRealm = UnitName(unit);
 
-        if HHTD.Registry_by_GUID[isFriend][unitGuid] then
+        if canaccessvalue(unitGuid) and HHTD.Registry_by_GUID[isFriend][unitGuid] then
 
             -- remove dead units
             if UnitIsDead(unit) then
@@ -1487,6 +1488,7 @@ do
 
     -- http://www.wowpedia.org/API_COMBAT_LOG_EVENT
     function HHTD:COMBAT_LOG_EVENT_UNFILTERED(e, timestamp, event, hideCaster, sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags, _spellID, spellNAME, _spellSCHOOL, _amount)
+        if not canaccessvalue(sourceGUID) then return end -- of course this is only triggered when the "test hhtd behavior on current target" button is used!
 
         --@debug@
         --if hideCaster then

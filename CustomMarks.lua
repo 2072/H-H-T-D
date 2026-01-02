@@ -59,6 +59,7 @@ local pairs                 = _G.pairs;
 local ipairs                = _G.ipairs;
 local CreateFrame           = _G.CreateFrame;
 local GetTexCoordsForRole   = _G.GetTexCoordsForRole;
+local canaccessvalue        = _G.canaccessvalue or function(_) return true; end
 -- }}}
 
 function CM:OnInitialize() -- {{{
@@ -169,6 +170,12 @@ do
                         func = function ()
                             if (UnitGUID("target")) then
                                 local un = (UnitName("target"))
+
+                                if not canaccessvalue(un) then
+                                    HHTD:Print("Unit information not available to add-ons...")
+                                    return
+                                end
+
                                 local hadMark = self.db.global.playerNamesToMark[un]
 
                                 self.db.global.playerNamesToMark[un] = self.db.global.MarkerChoice
@@ -191,6 +198,11 @@ do
                         func = function ()
                             if (UnitGUID("target")) then
                                 local un = (UnitName("target"));
+
+                                if not canaccessvalue(un) then
+                                    HHTD:Print("Unit information not available to add-ons...")
+                                    return
+                                end
 
                                 self.db.global.playerNamesToMark[un] = nil
 
@@ -528,6 +540,10 @@ function CM:LNR_ON_NEW_PLATE(selfevent, plate, data)
     local plateName = data.name;
     local isFriend = (data.reaction == "FRIENDLY") and true or false;
 
+    if not canaccessvalue(plateName) then
+        return
+    end
+
     -- test for uniqueness of the nameplate
     if not Plate_Name_Count[plateName] then
         Plate_Name_Count[plateName] = 1;
@@ -548,6 +564,7 @@ end
 function CM:LNR_ON_RECYCLE_PLATE(selfevent, plate, data)
     local plateName = data.name;
 
+    if not canaccessvalue(plateName) then return end
 
    self:HideMarkerFromPlate(plate, plateName, "LNR_ON_RECYCLE_PLATE");
 

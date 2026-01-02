@@ -66,6 +66,7 @@ local pairs                 = _G.pairs;
 local ipairs                = _G.ipairs;
 local CreateFrame           = _G.CreateFrame;
 local GetTexCoordsForRole   = _G.GetTexCoordsForRole;
+local canaccessvalue        = _G.canaccessvalue or function(_) return true; end
 -- }}}
 
 function NPH:OnInitialize() -- {{{
@@ -478,6 +479,8 @@ function NPH:LNR_ON_NEW_PLATE(selfevent, plate, data)
     local plateName = data.name;
     local isFriend = (data.reaction == "FRIENDLY") and true or false;
 
+    if not canaccessvalue(plateName) then return  end
+
     --@alpha@
 
     if not callbacks_consisistency_check[plate] then
@@ -540,6 +543,7 @@ function NPH:LNR_ON_RECYCLE_PLATE(selfevent, plate, data)
 
     local plateName = data.name;
 
+    if not canaccessvalue(plateName) then return end
 
     --@alpha@
     if not callbacks_consisistency_check[plate] then
