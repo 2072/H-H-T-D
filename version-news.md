@@ -4,6 +4,14 @@ H.H.T.D.
 *Change log*
 ------------
 
+**version 2.4.27 (2025-01-24):**
+
+- Do not crash on Midnight but does not do much either... The custom marker
+  feature may still work in certain conditions...
+
+- Add TOC for BCC.
+
+
 **version 2.4.26 (2025-12-31):**
 
 - Fix an error message in chat at startup on retail.
